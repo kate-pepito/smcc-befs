@@ -1,8 +1,8 @@
-<?php 
-session_start();
-include('../dbconnect.php');
+<?php
 
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);  // The admin's user ID
+authenticated_page("dean");
+
+  // The admin's user ID
 $stud_id = mysqli_real_escape_string($conn, $_REQUEST['stud_id']);  // The student ID to enroll
 
 if (isset($_POST['enroll_student'])) {
@@ -21,7 +21,7 @@ if (isset($_POST['enroll_student'])) {
         // Successfully enrolled, redirect with alert
         echo "<script type='text/javascript'>
                 alert('Student Successfully Approve!');
-                document.location='dean_students_pending.php?user_id=$user_id';
+                document.location='dean_students_pending';
               </script>";
     } else {
         // Query failed, display error message

@@ -1,8 +1,6 @@
 <?php
-include('../dbconnect.php');
 
-// Validate and fetch the dean's user ID
-$user_id = mysqli_real_escape_string($conn, isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : null);
+authenticated_page("dean");
 
 if (!$user_id) {
     die("Error: Missing user ID. Please log in again.");
@@ -60,24 +58,24 @@ $counter = 1;
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Reviewers - SMCC</title>
    <!-- Favicons -->
-   <link href="../images/Smcc_logo.gif" rel="icon" type="image/gif">
-    <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+   <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
+    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="../assets/css/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
 </head>
 <body>
   <?php 
@@ -89,22 +87,22 @@ $counter = 1;
     }
   ?>
   
-  <?php include('dean_header.php'); ?>
-  <?php include('dean_sidebar.php'); ?>
+  <?php require_once get_dean_header(); ?>
+  <?php require_once get_dean_sidebar(); ?>
 
   <main id="main" class="main">
     <div class="pagetitle">
       <h1>List of Reviewers</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="dean_home_page.php?user_id=<?php echo $user_id; ?>">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="dean_home_page">Dashboard</a></li>
           <li class="breadcrumb-item">Reviewer</li>
         </ol>
       </nav>
     </div>
 
     <section class="section">
-    <form method="GET" action="dean_reviewers.php">
+    <form method="GET">
             <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_GET['user_id'] ?? ''); ?>">
             <div class="d-flex align-items-center justify-content-end">
               <label for="school_year_filter" class="card-title me-2">School Year:</label>
@@ -151,7 +149,7 @@ $counter = 1;
                       <td><?php echo $row['date_created']; ?></td>
                       <td><?php echo $row['status']; ?></td>
                       <td>
-                        <a href="dean_reviewer_assign_subjects.php?user_id=<?php echo $user_id; ?>&faculty_id=<?php echo $row['f_id']; ?>&school_year=<?php echo $row['school_year_id']; ?>&course_id=<?php echo $row['c_id']; ?>" class="btn btn-primary">Assign</a>
+                        <a href="dean_reviewer_assign_subjects?faculty_id=<?php echo $row['f_id']; ?>&school_year=<?php echo $row['school_year_id']; ?>&course_id=<?php echo $row['c_id']; ?>" class="btn btn-primary">Assign</a>
                       </td>
                     </tr>
                   <?php } ?>
@@ -164,9 +162,9 @@ $counter = 1;
     </section>
   </main>
 
-  <?php include('../footer.php'); ?>
+  <?php require_once get_footer(); ?>
 
-  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/main.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
 </body>
 </html>

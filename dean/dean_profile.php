@@ -1,7 +1,8 @@
 <?php 
-include('../dbconnect.php');
 
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+authenticated_page("dean");
+
+
 $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
 if ($row = mysqli_fetch_array($query)) {
     $logged_in = $row['logged_in'];
@@ -12,7 +13,7 @@ if ($row = mysqli_fetch_array($query)) {
         $fname = ucfirst(strtolower($row['fname']));
         $lname = ucfirst(strtolower($row['lname']));
         $type = ucfirst(strtolower($row['type']));
-        $profile_image = $row['profile_image'] ? $row['profile_image'] : '../assets/img/default-profile.jpg';
+        $profile_image = "$BASE_URL/" . ($row['profile_image'] ? $row['profile_image'] : 'assets/img/default-profile.jpg');
     }
 }
 
@@ -38,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowed_extensions = ['jpg', 'jpeg', 'png'];
         if (in_array($image_ext, $allowed_extensions)) {
             $new_image_name = uniqid() . '.' . $image_ext;
-            $image_path = '../uploads/' . $new_image_name;
+            $image_path = "../uploads/$new_image_name";
+            $image_path_url = "uploads/$new_image_name";
 
             if (!move_uploaded_file($image_tmp_name, $image_path)) {
                 echo "<script>alert('Failed to upload the image.'); history.back();</script>";
@@ -51,9 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Update user profile in the database
-    $query_update = "UPDATE users SET fname = '$fname', lname = '$lname', profile_image = '$image_path' WHERE id = '$user_id'";
+    $query_update = "UPDATE users SET fname = '$fname', lname = '$lname', profile_image = '$image_path_url' WHERE id = '$user_id'";
     if (mysqli_query($conn, $query_update)) {
-        echo "<script>alert('Profile updated successfully!'); window.location='dean_profile.php?user_id=$user_id';</script>";
+        echo "<script>alert('Profile updated successfully!'); window.location='dean_profile';</script>";
     } else {
         echo "<script>alert('Failed to update profile.'); history.back();</script>";
     }
@@ -68,35 +70,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Profile - SMCC</title>
 
     <!-- Favicons -->
-    <link href="../images/Smcc_logo.gif" rel="icon" type="image/gif">
-    <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
+    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="../assets/css/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
 </head>
 <body>
-<?php include('dean_header.php'); ?>
-<?php include('dean_sidebar.php'); ?>
+<?php require_once get_dean_header(); ?>
+<?php require_once get_dean_sidebar(); ?>
 
 <main id="main" class="main">
     <div class="pagetitle">
         <h1>Profile</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="dean_home_page.php?user_id=<?php echo $user_id; ?>">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="dean_home_page">Dashboard</a></li>
                 <li class="breadcrumb-item active">Profile</li>
             </ol>
         </nav>
@@ -115,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="tab-content pt-2">
                             <div class="tab-pane fade show active profile-overview" id="profile-overview">
-                                <form action="dean_profile.php?user_id=<?php echo $user_id; ?>" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
+                                <form method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
                                     <div style="text-align: center; margin-top: 20px;">
                                         <br>
                                         <div>
@@ -152,19 +154,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </section>
 </main>
 
-<?php include('../footer.php'); ?>
+<?php require_once get_footer(); ?>
 
 <!-- Vendor JS Files -->
-<script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
-<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/vendor/chart.js/chart.umd.js"></script>
-<script src="../assets/vendor/echarts/echarts.min.js"></script>
-<script src="../assets/vendor/quill/quill.js"></script>
-<script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
-<script src="../assets/vendor/tinymce/tinymce.min.js"></script>
-<script src="../assets/vendor/php-email-form/validate.js"></script>
+<script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+<script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
+<script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
+<script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
+<script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+<script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+<script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
 
 <!-- Template Main JS File -->
-<script src="../assets/js/main.js"></script>
+<script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
 </body>
 </html>

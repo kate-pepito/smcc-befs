@@ -1,6 +1,6 @@
 <?php
-// dean_assign_subject.php
-include('../dbconnect.php');
+
+authenticated_page("dean");
 
 // Validate required parameters
 $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
@@ -46,7 +46,7 @@ $assign_result = mysqli_query($conn, $assign_query);
 
 if ($assign_result) {
     // Redirect with all required parameters
-    $redirect_url = "dean_reviewer_assign_subjects.php?user_id=$user_id&faculty_id=$faculty_id&school_year=$school_year&course_id=$course_id";
+    $redirect_url = "dean_reviewer_assign_subjects?faculty_id=$faculty_id&school_year=$school_year&course_id=$course_id";
     echo "<script>window.location.href='" . $redirect_url . "';</script>";    
 } else {
     die("Error: Could not assign the subject. " . mysqli_error($conn));

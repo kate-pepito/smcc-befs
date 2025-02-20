@@ -1,6 +1,6 @@
 <?php 
-session_start();
-include('../dbconnect.php');
+
+authenticated_page("dean");
 
 // Check database connection
 if (!$conn) {
@@ -58,7 +58,7 @@ if (isset($_POST['add_subjects'])) {
 
             if (mysqli_query($conn, $insert_timer_query) && mysqli_query($conn, $insert_percent_query)) {
                 echo "<script type='text/javascript'>alert('Subject Successfully Saved!');
-                document.location='dean_subjects.php?user_id=$user_id'</script>";
+                document.location='dean_subjects'</script>";
             } else {
                 echo "Error: Failed to insert related timers or percentages. " . mysqli_error($conn);
             }

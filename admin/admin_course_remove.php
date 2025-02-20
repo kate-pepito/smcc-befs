@@ -1,8 +1,7 @@
 <?php
-session_start();
-include('../dbconnect.php');
 
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+authenticated_page("admin");
+
 $c_id = mysqli_real_escape_string($conn, $_REQUEST['c_id']);
 
 // Check if parameters are passed correctly
@@ -20,7 +19,7 @@ $result = mysqli_query($conn, $query);
 
 if ($result) {
     // If the update is successful, redirect back to the admin_course.php page
-    header("Location: admin_course.php?user_id=$user_id");
+    header("Location: admin_course");
     exit();
 } else {
     // If there's an error, display a message

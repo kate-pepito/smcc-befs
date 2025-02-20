@@ -1,5 +1,6 @@
 <?php
-include('../dbconnect.php');
+
+authenticated_page("dean");
 
 // Validate and fetch parameters from the URL
 $user_id = mysqli_real_escape_string($conn, isset($_GET['user_id']) ? $_GET['user_id'] : null); // Dean ID
@@ -37,31 +38,31 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Assign Subjects - SMCC</title>
-    <link href="../images/Smcc_logo.gif" rel="icon" type="image/gif">
-    <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
+    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="../assets/css/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
 </head>
 
 <body>
     <header id="header" class="header fixed-top d-flex align-items-center">
         <div class="d-flex align-items-center justify-content-between">
-            <a href="admin_home.php?user_id=<?php echo $user_id; ?>" class="logo d-flex align-items-center">
-                <img src="../images/Smcc_logo.gif" alt="">
+            <a href="admin_home" class="logo d-flex align-items-center">
+                <img src="<?= $BASE_URL ?>/images/Smcc_logo.gif" alt="">
                 <span class="d-none d-lg-block">SMCC - BEFS</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -78,7 +79,7 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
                     </a>
                 </li><!-- End Search Icon-->
                 <li class="nav-item dropdown pe-3">
-                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="dean_reviewers.php?user_id=<?php echo $user_id; ?>" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="dean_reviewers" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <?php
                         // Assuming you have a field 'profile_image' in the users table
                         $profile_image = !empty($row['profile_image']) ? $row['profile_image'] : '../assets/img/profile-img2.jpg';
@@ -97,13 +98,13 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="dean_profile.php?user_id=<?php echo $user_id; ?>&faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>&course_id=<?php echo $course_id; ?>">
+                            <a class="dropdown-item d-flex align-items-center" href="dean_profile?faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>&course_id=<?php echo $course_id; ?>">
                                 <i class="bi bi-person"></i>
                                 <span>Profile</span>
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="../change_password.php?user_id=<?php echo $user_id; ?>&faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>&course_id=<?php echo $course_id; ?>">
+                            <a class="dropdown-item d-flex align-items-center" href="../change_password?faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>&course_id=<?php echo $course_id; ?>">
                                 <i class="bi bi-question-circle"></i>
                                 <span>Change Password</span>
                             </a>
@@ -112,7 +113,7 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="../log_out_sc.php?user_id=<?php echo $user_id; ?>&faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>&course_id=<?php echo $course_id; ?>">
+                            <a class="dropdown-item d-flex align-items-center" href="../log_out_sc?faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>&course_id=<?php echo $course_id; ?>">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Sign Out</span>
                             </a>
@@ -123,14 +124,14 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
         </nav><!-- End Icons Navigation -->
     </header>
 
-    <?php include('dean_sidebar.php'); ?>
+    <?php require_once get_dean_sidebar(); ?>
 
     <main id="main" class="main">
         <div class="pagetitle">
             <h1>Assign Subjects</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="dean_dashboard.php?user_id=<?php echo $user_id; ?>">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="dean_dashboard">Dashboard</a></li>
                     <li class="breadcrumb-item">Assign Subjects</li>
                 </ol>
             </nav>
@@ -180,7 +181,7 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
                                             <td><?php echo $row['description']; ?></td>
                                             <td><?php echo $row['yr_desc']; ?></td>
                                             <td>
-                                                <a href="dean_assign_subject.php?user_id=<?php echo $user_id; ?>&course_id=<?php echo $course_id; ?>&sub_id=<?php echo $row['sub_id']; ?>&faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>">
+                                                <a href="dean_assign_subject?course_id=<?php echo $course_id; ?>&sub_id=<?php echo $row['sub_id']; ?>&faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>">
                                                     <button type="button" class="btn btn-success">Assign</button>
                                                 </a>
                                             </td>
@@ -232,7 +233,7 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
                                             <td><?php echo $row['description']; ?></td>
                                             <td><?php echo $row['yr_desc']; ?></td>
                                             <td>
-                                                <a href="dean_remove_subject.php?user_id=<?php echo $user_id; ?>&course_id=<?php echo $course_id; ?>&sub_id=<?php echo $row['sid']; ?>&faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>">
+                                                <a href="dean_remove_subject?course_id=<?php echo $course_id; ?>&sub_id=<?php echo $row['sid']; ?>&faculty_id=<?php echo $faculty_id; ?>&school_year=<?php echo $school_year; ?>">
                                                     <button type="button" class="btn btn-danger">Remove</button>
                                                 </a>
                                             </td>
@@ -249,8 +250,8 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
         </section>
     </main>
 
-    <?php include('../footer.php'); ?>
-    <script src="../assets/js/main.js"></script>
+    <?php require_once get_footer(); ?>
+    <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
 </body>
 
 </html>

@@ -1,5 +1,6 @@
-<?php session_start();
-include('../dbconnect.php');
+<?php
+
+authenticated_page("dean");
 
 $user_id=mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 $s_id=mysqli_real_escape_string($conn, $_REQUEST['s_id']);
@@ -10,7 +11,7 @@ if (mysqli_query($conn, $query))
 			echo "<script type='text/javascript'>window.alert('hello world');
 </script>";
 
-			header("location: dean_subjects.php?user_id=".$user_id."");
+			header("location: dean_subjects");
 } 
   	
 ?>

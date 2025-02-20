@@ -1,9 +1,9 @@
 <?php
-include('../dbconnect.php');
+
+authenticated_page("reviewer");
 
 // Sanitize input
 $stud_id = htmlspecialchars($_REQUEST['stud_id'], ENT_QUOTES, 'UTF-8');
-$user_id = htmlspecialchars($_REQUEST['user_id'], ENT_QUOTES, 'UTF-8');
 
 // Fetch student details using prepared statement
 $stmt = $conn->prepare("SELECT
@@ -78,24 +78,24 @@ if ($row = $result->fetch_array()) {
     <title>Active Students - SMCC</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
-    <link href="../images/Smcc_logo.gif" rel="icon">
-    <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-    <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
-    <link href="../assets/css/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
 </head>
 
 <body>
     <?php
-    include('reviewer_header.php');
-    include('reviewer_sidebar.php');
+    require_once get_reviewer_header();
+    require_once get_reviewer_sidebar();
     ?>
 
     <main id="main" class="main">
@@ -103,8 +103,8 @@ if ($row = $result->fetch_array()) {
             <h1>Student's Profile</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="reviewer_home.php?user_id=<?php echo $user_id; ?>">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="reviewer_students.php?user_id=<?php echo $user_id; ?>">List of Student</a></li>
+                    <li class="breadcrumb-item"><a href="reviewer_home">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="reviewer_students">List of Student</a></li>
                     <li class="breadcrumb-item">Student Profile</li>
                 </ol>
             </nav>
@@ -128,7 +128,7 @@ if ($row = $result->fetch_array()) {
                                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
                                     <form>
                                         </br>
-                                        <img src='<?php echo !empty($student_profile_image) ? "../student/{$student_profile_image}" : "../assets/img/profile-img2.jpg"; ?>' alt='Profile Image' class='rounded-circle' width='100'>
+                                        <img src='<?php echo !empty($student_profile_image) ? "$BASE_URL/{$student_profile_image}" : "$BASE_URL/assets/img/profile-img2.jpg"; ?>' alt='Profile Image' class='rounded-circle' width='100'>
                                         </br>
 
                                         <h5 class="card-title">About</h5>
@@ -408,13 +408,13 @@ if ($row = $result->fetch_array()) {
     </main>
 
     <!-- Vendor JS Files -->
-    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
-    <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
-    <script src="../assets/vendor/php-email-form/validate.js"></script>
+    <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
 
     <!-- Template Main JS File -->
-    <script src="../assets/js/main.js"></script>
+    <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
 </body>
 
 </html>

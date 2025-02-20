@@ -1,5 +1,6 @@
 <?php
-include('../dbconnect.php');
+
+authenticated_page("dean");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check if the necessary POST variables are set
@@ -24,17 +25,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (mysqli_query($conn, $query)) {
             // Redirect with success message and active tab
-            header("Location: dean_students.php?user_id=$user_id&sub_id=$sub_id&status=success&tab=$active_tab");
+            header("Location: dean_students&sub_id=$sub_id&status=success&tab=$active_tab");
             exit;
         } else {
             // If there's an error in the query
             echo "Error: " . mysqli_error($conn);
-            header("Location: dean_students.php?user_id=$user_id&sub_id=$sub_id&status=error&tab=$active_tab");
+            header("Location: dean_students&sub_id=$sub_id&status=error&tab=$active_tab");
             exit;
         }
     } else {
         // Missing data handling
-        header("Location: dean_students.php?user_id=$user_id&sub_id=$sub_id&status=missing&tab=$active_tab");
+        header("Location: dean_students&sub_id=$sub_id&status=missing&tab=$active_tab");
         exit;
     }
 }

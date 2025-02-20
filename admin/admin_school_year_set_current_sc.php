@@ -1,7 +1,8 @@
-<?php session_start();
-include('../dbconnect.php');
+<?php
 
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+authenticated_page("admin");
+
+
 $year_code = mysqli_real_escape_string($conn, $_REQUEST['year_code']);
 
 	$query="UPDATE school_year SET status = 'Not Set' where user_id = $user_id" or die(mysqli_error($conn));	  
@@ -21,7 +22,7 @@ $year_code = mysqli_real_escape_string($conn, $_REQUEST['year_code']);
 		if (mysqli_query($conn, $query)) 
 		{
 				echo "<script type='text/javascript'>alert('School Year Successfully Set to Current!');
-			document.location='admin_school_year.php?user_id=$user_id'</script>";
+			document.location='admin_school_year'</script>";
 		} 
 		else 
 		{

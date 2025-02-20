@@ -1,7 +1,7 @@
 <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="d-flex align-items-center justify-content-between">
-        <a href="reviewer_home.php?user_id=<?php echo $user_id; ?>" class="logo d-flex align-items-center">
-            <img src="../images/Smcc_logo.gif" alt="">
+        <a href="reviewer_home" class="logo d-flex align-items-center">
+            <img src="<?= $BASE_URL ?>/images/Smcc_logo.gif" alt="">
             <span class="d-none d-lg-block">SMCC - BEFS</span>
         </a>
         <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -35,20 +35,20 @@
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="reviewer_profile.php?user_id=<?php echo $user_id; ?>">
+                        <a class="dropdown-item d-flex align-items-center" href="reviewer_profile">
                             <i class="bi bi-person"></i>
                             <span>Profile</span>
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="../change_password.php?user_id=<?php echo $user_id; ?>">
+                        <a class="dropdown-item d-flex align-items-center" href="../change_password">
                             <i class="bi bi-question-circle"></i>
                             <span>Change Password</span>
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="../log_out_sc.php?user_id=<?php echo $user_id; ?>">
+                        <a class="dropdown-item d-flex align-items-center" href="../log_out_sc">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
                         </a>

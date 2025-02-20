@@ -1,5 +1,6 @@
 <?php
-include('../dbconnect.php');
+
+authenticated_page("dean");
 
 // Validate and fetch parameters from the URL
 $user_id = mysqli_real_escape_string($conn, isset($_GET['user_id']) ? $_GET['user_id'] : null); // Dean ID
@@ -17,7 +18,7 @@ if (!$user_id || !$faculty_id || !$school_year || !$course_id || !$sub_id) {
 $query = "DELETE FROM faculty_subjects WHERE faculty_id = '$faculty_id' AND subjects_id = '$sub_id'";
 if (mysqli_query($conn, $query)) {
     // Successfully removed, redirect back to the Assign Subjects page
-    header("Location: dean_reviewer_assign_subjects.php?user_id=$user_id&faculty_id=$faculty_id&school_year=$school_year&course_id=$course_id");
+    header("Location: dean_reviewer_assign_subjects?faculty_id=$faculty_id&school_year=$school_year&course_id=$course_id");
     exit();
 } else {
     die("Error: Could not remove the subject. Please try again.");

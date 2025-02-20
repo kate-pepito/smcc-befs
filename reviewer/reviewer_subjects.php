@@ -1,6 +1,7 @@
 <?php 
-include('../dbconnect.php');
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+
+authenticated_page("reviewer");
+
 
 // Fetch the "Current Set" school year
 $current_school_year_query = mysqli_query($conn, "SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error($conn));
@@ -23,24 +24,24 @@ $selected_school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ??
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="../images/Smcc_logo.gif" rel="icon">
-  <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="../assets/css/style.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
 
 </head>
 
@@ -54,11 +55,11 @@ if ($row = mysqli_fetch_array($query)) {
 }
 ?>
   <!-- ======= Header ======= -->
-  <?php include('reviewer_header.php'); ?> 
+  <?php require_once get_reviewer_header(); ?> 
   <!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
-  <?php include('reviewer_sidebar.php'); ?>
+  <?php require_once get_reviewer_sidebar(); ?>
   <!-- End Sidebar-->
 
   <main id="main" class="main">
@@ -67,14 +68,14 @@ if ($row = mysqli_fetch_array($query)) {
       <h1>List of Subjects</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="reviewer_home.php?user_id=<?php echo $user_id; ?>">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="reviewer_home">Dashboard</a></li>
           <li class="breadcrumb-item">Subjects</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
     <div>
         <!-- School Year Filter -->
-        <form method="GET" action="reviewer_subjects.php">
+        <form method="GET">
           <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_GET['user_id'] ?? ''); ?>">
           <div class="d-flex align-items-center justify-content-end">
             <label for="school_year_filter" class="card-title me-2">School Year:</label>
@@ -169,7 +170,7 @@ if ($row = mysqli_fetch_array($query)) {
                       <td><?php echo $timer; ?></td>
                       <td class="d-flex justify-content-between align-items-center">
                         <div>
-                          <a href="reviewer_test_questions.php?user_id=<?php echo $user_id; ?>&s_id=<?php echo $s_id; ?>" class="text-decoration-none">
+                          <a href="reviewer_test_questions&s_id=<?php echo $s_id; ?>" class="text-decoration-none">
                               Manage Test Questions
                           </a> /
                           <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#timerModal">
@@ -177,7 +178,7 @@ if ($row = mysqli_fetch_array($query)) {
                           </a>
                         </div>
                         <div>
-                          <a href="reviewer_students_view.php?user_id=<?php echo $user_id; ?>&sub_id=<?php echo $s_id; ?>" class="btn btn-primary btn-sm">
+                          <a href="reviewer_students_view&sub_id=<?php echo $s_id; ?>" class="btn btn-primary btn-sm">
                               View
                           </a>
                         </div>
@@ -198,23 +199,23 @@ if ($row = mysqli_fetch_array($query)) {
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
-   <?php include('../footer.php'); ?>
+   <?php require_once get_footer(); ?>
   <!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="../assets/vendor/echarts/echarts.min.js"></script>
-  <script src="../assets/vendor/quill/quill.js"></script>
-  <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="../assets/vendor/php-email-form/validate.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="../assets/js/main.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
 
   <!-- Modal -->
 <div class="modal fade" id="timerModal" tabindex="-1" aria-labelledby="timerModalLabel" aria-hidden="true">
@@ -226,7 +227,7 @@ if ($row = mysqli_fetch_array($query)) {
       </div>
       <div class="modal-body">
         <!-- Form to set the timer -->
-        <form action="reviewer_update_timer_sc.php?user_id=<?php echo $user_id; ?>&s_id=<?php echo $s_id; ?>" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
+        <form action="./reviewer_update_timer_sc?s_id=<?php echo $s_id; ?>" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
           <div class="row mb-3">
             <label for="inputText" class="col-sm-2 col-form-label">Minutes:</label>
             <div class="col-sm-10">

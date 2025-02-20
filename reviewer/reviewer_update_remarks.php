@@ -1,5 +1,7 @@
 <?php
-include('../dbconnect.php');
+
+authenticated_page("reviewer");
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check if the necessary POST variables are set
@@ -22,17 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (mysqli_query($conn, $query)) {
             // Redirect with success message, preserving the active tab
-            header("Location: reviewer_students_view.php?user_id=$user_id&sub_id=$sub_id&status=success&active_tab=$active_tab");
+            header("Location: reviewer_students_view.php?sub_id=$sub_id&status=success&active_tab=$active_tab");
             exit;
         } else {
             // If there's an error in the query
             echo "Error: " . mysqli_error($conn);
-            header("Location: reviewer_students_view.php?user_id=$user_id&sub_id=$sub_id&status=error&active_tab=$active_tab");
+            header("Location: reviewer_students_view.php?sub_id=$sub_id&status=error&active_tab=$active_tab");
             exit;
         }
     } else {
         // Missing data handling
-        header("Location: reviewer_students_view.php?user_id=$user_id&sub_id=$sub_id&status=missing&active_tab=$active_tab");
+        header("Location: reviewer_students_view.php?sub_id=$sub_id&status=missing&active_tab=$active_tab");
         exit;
     }
 }

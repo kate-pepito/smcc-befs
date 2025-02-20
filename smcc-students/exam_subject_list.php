@@ -1,10 +1,8 @@
-<?php session_start();
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
-$stud_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
-?>
-
 <?php
-require_once './dbconnect.php';
+
+authenticated_page("student");
+
+$stud_id = $user_id;
 
 $query = mysqli_query($conn, "select * from students where id = '$user_id'") or die(mysqli_error($conn));
 
@@ -26,7 +24,7 @@ while ($row = mysqli_fetch_array($query)) {
     <meta content="" name="description">
 
     <!-- Favicon -->
-    <link href="../images/Smcc_logo.gif" rel="icon">
+    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,14 +36,14 @@ while ($row = mysqli_fetch_array($query)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Libraries Stylesheet -->
-    <link href="lib/animate/animate.min.css" rel="stylesheet">
-    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/smcc-students/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/smcc-students/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
     <!-- Customized Bootstrap Stylesheet -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/smcc-students/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Template Stylesheet -->
-    <link href="css/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/smcc-students/css/style.css" rel="stylesheet">
 
     <script type="text/javascript">
         window.onload = function() {
@@ -70,7 +68,7 @@ while ($row = mysqli_fetch_array($query)) {
 
     <!-- Navbar Start -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-        <a href="index.php?user_id=<?php echo $user_id; ?>" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+        <a href="index" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
             <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>Saint Michael College of Caraga - BEFS</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -78,16 +76,16 @@ while ($row = mysqli_fetch_array($query)) {
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="index.php?user_id=<?php echo $user_id; ?>" class="nav-item nav-link active">Home</a>
+                <a href="index" class="nav-item nav-link active">Home</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">PROFILE</a>
                     <div class="dropdown-menu fade-down m-0">
-                        <a href="edit_profile_sc.php?user_id=<?php echo $user_id; ?>" class="dropdown-item">My Profile</a>
-                        <a href="log_out_sc.php?user_id=<?php echo $user_id; ?>" class="dropdown-item">Log Out</a>
+                        <a href="edit_profile_sc" class="dropdown-item">My Profile</a>
+                        <a href="log_out_sc" class="dropdown-item">Log Out</a>
                     </div>
                 </div>
             </div>
-            <a href="index.php?user_id=<?php echo $user_id; ?>" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Back to Dashboard<i class="fa fa-arrow-right ms-3"></i></a>
+            <a href="index" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Back to Dashboard<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
     </nav>
     <!-- Navbar End -->
@@ -98,7 +96,7 @@ while ($row = mysqli_fetch_array($query)) {
             <div class="row g-4">
 
                 <?php
-                require_once './dbconnect.php';
+
 
                 // Modified query to include faculty name
                 $query = mysqli_query($conn, "
@@ -124,7 +122,7 @@ while ($row = mysqli_fetch_array($query)) {
                 ?>
                     <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="service-item text-center pt-3">
-                            <a href="exam_form.php?user_id=<?php echo $user_id; ?>&sub_id=<?php echo $sub_id; ?>">
+                            <a href="exam_form&sub_id=<?php echo $sub_id; ?>">
                                 <div class="p-4">
                                     <i class="fa fa-3x fa-graduation-cap text-primary mb-4"></i>
                                     <p><?php echo $code; ?></p>
@@ -157,7 +155,7 @@ while ($row = mysqli_fetch_array($query)) {
             <div class="owl-carousel testimonial-carousel position-relative">
 
                 <?php
-                require_once './dbconnect.php';
+
                 $query = mysqli_query($conn, "select * from students") or die(mysqli_error($conn));
                 while ($row = mysqli_fetch_array($query)) {
                     $fname = $row['fname'];
@@ -187,7 +185,7 @@ while ($row = mysqli_fetch_array($query)) {
 
     <!-- Footer Start -->
     <?php
-    include('footer.php');
+    require_once get_student_footer();
     ?>
     <!-- Footer End -->
 

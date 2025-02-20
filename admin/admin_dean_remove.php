@@ -1,8 +1,7 @@
 <?php 
-session_start();
-include('../dbconnect.php');
 
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+authenticated_page("admin");
+
 $f_id = mysqli_real_escape_string($conn, $_REQUEST['f_id']);
 
 if (isset($_REQUEST['confirmed']) && $_REQUEST['confirmed'] == '1') {
@@ -11,22 +10,22 @@ if (isset($_REQUEST['confirmed']) && $_REQUEST['confirmed'] == '1') {
     if (mysqli_query($conn, $query)) {
         echo "<script type='text/javascript'>
                 alert('Dean successfully removed!');
-                window.location.href = 'admin_dean.php?user_id=$user_id';
+                window.location.href = 'admin_dean';
               </script>";
     } else {
         echo "<script type='text/javascript'>
                 alert('Error removing dean. Please try again.');
-                window.location.href = 'admin_dean.php?user_id=$user_id';
+                window.location.href = 'admin_dean';
               </script>";
     }
 } else {
     // If not confirmed yet, show confirmation prompt
     echo "<script type='text/javascript'>
             if (confirm('Are you sure you want to remove this dean?')) {
-                window.location.href = 'admin_dean_remove.php?user_id=$user_id&f_id=$f_id&confirmed=1';
+                window.location.href = 'admin_dean_remove?f_id=$f_id&confirmed=1';
             } else {
                 alert('Action canceled.');
-                window.location.href = 'admin_dean.php?user_id=$user_id';
+                window.location.href = 'admin_dean';
             }
           </script>";
 }

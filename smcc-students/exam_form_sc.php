@@ -1,6 +1,8 @@
 <?php
-include('../dbconnect.php');
-$stud_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+
+authenticated_page("student");
+
+$stud_id = $user_id;
 $sub_id = mysqli_real_escape_string($conn, $_REQUEST['sub_id']);
 
 $query=mysqli_query($conn,"select * from subjects where id = '$sub_id'")or die(mysqli_error($conn));

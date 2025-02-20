@@ -1,6 +1,6 @@
 <?php 
-include('../dbconnect.php');
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+
+authenticated_page("dean");
 $sub_id = mysqli_real_escape_string($conn, $_REQUEST['sub_id']);
 
 $subject_query = mysqli_query($conn, "SELECT description FROM subjects WHERE id = '$sub_id'") or die(mysqli_error($conn));
@@ -19,24 +19,24 @@ if ($subject_row = mysqli_fetch_assoc($subject_query)) {
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="../images/Smcc_logo.gif" rel="icon">
-  <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="../assets/css/style.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -49,17 +49,17 @@ if ($row = mysqli_fetch_array($query)) {
 }
 ?>
   <!-- Header -->
-  <?php include('dean_header.php'); ?>
+  <?php require_once get_dean_header(); ?>
   <!-- Sidebar -->
-  <?php include('dean_sidebar.php'); ?>
+  <?php require_once get_dean_sidebar(); ?>
 
   <main id="main" class="main">
     <div class="pagetitle">
       <h1>List of Students</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="faculty_home.php?user_id=<?php echo $user_id; ?>">Dashboard</a></li>
-          <li class="breadcrumb-item"><a href="faculty_subjects.php?user_id=<?php echo $user_id; ?>">Subjects</a></li>
+          <li class="breadcrumb-item"><a href="faculty_home">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="faculty_subjects">Subjects</a></li>
           <li class="breadcrumb-item">List of Students</li>
         </ol>
       </nav>
@@ -142,7 +142,7 @@ while ($row = mysqli_fetch_array($query)) {
     echo "<td>{$score}</td>";
     echo "<td>{$average}</td>";
     echo "<td>
-            <form method='POST' action='dean_update_remarks.php'>
+            <form method='POST' action='./dean_update_remarks'>
                 <input type='hidden' name='sid' value='{$sid}'>
                 <input type='hidden' name='sub_id' value='{$sub_id}'>
                 <input type='hidden' name='user_id' value='{$user_id}'>
@@ -219,7 +219,7 @@ while ($row = mysqli_fetch_array($query)) {
     echo "<td>{$score}</td>";
     echo "<td>{$average}</td>";
     echo "<td>
-            <form method='POST' action='dean_update_remarks.php'>
+            <form method='POST' action='./dean_update_remarks'>
                 <input type='hidden' name='sid' value='{$sid}'>
                 <input type='hidden' name='sub_id' value='{$sub_id}'>
                 <input type='hidden' name='user_id' value='{$user_id}'>
@@ -248,12 +248,12 @@ while ($row = mysqli_fetch_array($query)) {
   </main>
 
   <!-- Footer -->
-  <?php include('../footer.php'); ?>
+  <?php require_once get_footer(); ?>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/main.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
 
   <script>
     // Get URL parameters

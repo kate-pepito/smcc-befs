@@ -1,7 +1,6 @@
 <?php 
-session_start();
-include('../dbconnect.php');
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+
+authenticated_page("admin");
 
 // Handle course registration
 if (isset($_POST['add_course'])) {
@@ -15,7 +14,7 @@ if (isset($_POST['add_course'])) {
               VALUES ('$description', '$dt', 'Active', '$code_no')";
 
     if (mysqli_query($conn, $query)) {
-        echo "<script type='text/javascript'>alert('Course Successfully Saved!'); document.location='admin_course.php?user_id=$user_id';</script>";
+        echo "<script type='text/javascript'>alert('Course Successfully Saved!'); document.location='admin_course';</script>";
     } else {
         echo "Error: " . $query . "<br>" . mysqli_error($conn);
     }
@@ -33,24 +32,24 @@ if (isset($_POST['add_course'])) {
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="../images/Smcc_logo.gif" rel="icon">
-    <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="../assets/css/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
 
 </head>
 
@@ -70,11 +69,11 @@ if ($row = mysqli_fetch_array($query)) {
 ?>
 
 <!-- ======= Header ======= -->
-<?php include('../header.php'); ?>
+<?php require_once get_admin_header(); ?>
 <!-- End Header -->
 
 <!-- ======= Sidebar ======= -->
-<?php include('../sidebar.php'); ?>
+<?php require_once get_admin_sidebar(); ?>
 <!-- End Sidebar -->
 
 <main id="main" class="main">
@@ -86,7 +85,7 @@ if ($row = mysqli_fetch_array($query)) {
         <h1>List of Course</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="admin_home.php?user_id=<?php echo $user_id; ?>">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="admin_home">Dashboard</a></li>
                 <li class="breadcrumb-item">Course</li>
             </ol>
         </nav>
@@ -129,7 +128,7 @@ if ($row = mysqli_fetch_array($query)) {
                                     <td><?php echo $description; ?></td>
                                     <td><?php echo $date_entry; ?></td>
                                     <td><?php echo $status; ?></td>
-                                    <td><a href="admin_course_remove.php?user_id=<?php echo $user_id;?>&c_id=<?php echo $id; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this course?');">
+                                    <td><a href="admin_course_remove?c_id=<?php echo $id; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this course?');">
                                         Remove</a></td>
                                 </tr>
                             <?php } ?>
@@ -147,7 +146,7 @@ if ($row = mysqli_fetch_array($query)) {
 </main><!-- End #main -->
 
 <!-- ======= Footer ======= -->
-<?php include('../footer.php'); ?>
+<?php require_once get_footer(); ?>
 <!-- End Footer -->
 
 <!-- Add Course Modal -->
@@ -159,7 +158,7 @@ if ($row = mysqli_fetch_array($query)) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="admin_course.php?user_id=<?php echo $user_id; ?>" method="POST">
+                <form method="POST">
                     <div class="mb-3">
                         <label for="inputCodeNo" class="form-label">Course</label>
                         <input type="text" class="form-control" name="code_no" required>
@@ -178,10 +177,10 @@ if ($row = mysqli_fetch_array($query)) {
 </div>
 
 <!-- Vendor JS Files -->
-<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <!-- Template Main JS File -->
-<script src="../assets/js/main.js"></script>
+<script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
 
 </body>
 </html>

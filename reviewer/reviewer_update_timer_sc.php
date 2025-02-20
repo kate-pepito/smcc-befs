@@ -1,8 +1,9 @@
-<?php session_start();
-include('../dbconnect.php');
+<?php
+
+authenticated_page("reviewer");
+
 if(isset($_POST['set_timer']))
 {
-$user_id=mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 $s_id=mysqli_real_escape_string($conn, $_REQUEST['s_id']);
 $timer=mysqli_real_escape_string($conn, $_POST['timer']);
 
@@ -12,7 +13,7 @@ if (mysqli_query($conn, $query))
 			echo "<script type='text/javascript'>window.alert('hello world');
 </script>";
 
-			header("location: reviewer_subjects.php?user_id=".$user_id."");
+			header("location: reviewer_subjects");
 } 
 }	  	
 ?>

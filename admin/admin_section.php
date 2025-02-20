@@ -1,7 +1,6 @@
 <?php
-include('../dbconnect.php');
-session_start();
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+
+authenticated_page("admin");
 
 // Handle Add Section
 if (isset($_POST['add_section'])) {
@@ -13,7 +12,7 @@ if (isset($_POST['add_section'])) {
     // Check for duplicate section
     $check_duplicate = mysqli_query($conn, "SELECT * FROM section WHERE description = '$description'");
     if (mysqli_num_rows($check_duplicate) > 0) {
-        echo '<script>alert("Section already exists!");window.location="admin_section.php?user_id=' . $user_id . '";</script>';
+        echo '<script>alert("Section already exists!");window.location="admin_section.php";</script>';
     } else {
         // Insert new section
         $query = mysqli_query($conn, "INSERT INTO section (description, date_entry, status) VALUES ('$description', '$dt', 'Active')") or die(mysqli_error($conn));
@@ -47,20 +46,21 @@ $sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'")
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Section - SMCC</title>
-  <link href="../images/Smcc_logo.gif" rel="icon">
-  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="../assets/css/style.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
 
-   <!-- Google Fonts -->
-   <link href="https://fonts.gstatic.com" rel="preconnect">
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
 </head>
 
 <body>
-<?php include('../header.php'); ?>
-<?php include('../sidebar.php'); ?>
+<?php require_once get_admin_header(); ?>
+<?php require_once get_admin_sidebar(); ?>
 
 <main id="main" class="main">
   <div class="pagetitle">
@@ -70,7 +70,7 @@ $sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'")
     <h1>List of Sections</h1>
     <nav>
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="admin_home.php?user_id=<?php echo $user_id; ?>">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="admin_home">Dashboard</a></li>
         <li class="breadcrumb-item">Section</li>
       </ol>
     </nav>
@@ -98,7 +98,7 @@ $sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'")
                   <td><?php echo $row['description']; ?></td>
                   <td><?php echo $row['date_entry']; ?></td>
                   <td>
-                    <a href="admin_section_remove.php?user_id=<?php echo $user_id; ?>&s_id=<?php echo $row['id']; ?>" 
+                    <a href="admin_section_remove&s_id=<?php echo $row['id']; ?>" 
                        class="btn btn-danger btn-sm" 
                        onclick="return confirm('Are you sure you want to remove this section?');">
                        Remove
@@ -139,8 +139,8 @@ $sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'")
 </div>
 
 <!-- Footer -->
-<?php include('../footer.php'); ?>
-<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/js/main.js"></script>
+<?php require_once get_footer(); ?>
+<script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
 </body>
 </html>

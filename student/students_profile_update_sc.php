@@ -1,8 +1,4 @@
-<?php
-session_start();
-include('../dbconnect.php'); // Adjust the path as needed
-
-$stud_id = mysqli_real_escape_string($conn, $_REQUEST['stud_id']);
+<?php // Adjust the path as needed
 
 if (isset($_POST['update_profile'])) {
     $about = mysqli_real_escape_string($conn, $_POST['about']);
@@ -40,11 +36,11 @@ if (isset($_POST['update_profile'])) {
                   about = '$about', 
                   complete_address = '$address', 
                   profile_image = '$image_path' 
-              WHERE id = '$stud_id'";
+              WHERE id = '$user_id'";
 
     if (mysqli_query($conn, $query)) {
         echo "<script>alert('Profile Successfully Updated!');
-        document.location='students_profile.php?stud_id=$stud_id';</script>";
+        document.location='students_profile';</script>";
     } else {
         echo "Error: " . mysqli_error($conn);
     }

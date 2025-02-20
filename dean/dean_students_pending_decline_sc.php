@@ -1,5 +1,5 @@
-<?php session_start();
-include('../dbconnect.php');
+<?php
+
 
 $user_id=mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 $stud_id=mysqli_real_escape_string($conn, $_REQUEST['stud_id']);
@@ -10,7 +10,7 @@ if (mysqli_query($conn, $query))
 			echo "<script type='text/javascript'>window.alert('hello world');
 </script>";
 
-			header("location: dean_students_pending.php?user_id=".$user_id."");
+			header("location: dean_students_pending");
 }
 
 ?>

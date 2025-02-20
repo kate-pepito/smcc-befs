@@ -1,9 +1,6 @@
-<?php session_start();
-require_once './dbconnect.php';
+<?php 
 
-$stud_id = mysqli_real_escape_string($conn, $_REQUEST['stud_id']);
-
-$query = mysqli_query($conn, "select * from students where id = '$stud_id'") or die(mysqli_error($conn));
+$query = mysqli_query($conn, "select * from students where id = '$user_id'") or die(mysqli_error($conn));
 if ($row = mysqli_fetch_array($query)) {
     $password_hashed = $row['password'];
 }
@@ -18,19 +15,19 @@ if (isset($_POST['change_password'])) {
     if (password_verify($current_password, $password_hashed)) {
         if ($new_password == $renew_password) {
             $new_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $query = "update students set password = '$new_password' where id = '$stud_id'" or die(mysqli_error($conn));
+            $query = "update students set password = '$new_password' where id = '$user_id'" or die(mysqli_error($conn));
             if (mysqli_query($conn, $query)) {
                 echo "<script type='text/javascript'>alert('Paswwrod Successfully Changed!');
-            document.location='students_profile.php?stud_id=$stud_id'</script>";
+            document.location='students_profile'</script>";
             } else {
                 echo "Error: " . $query . "<br>" . mysqli_error($conn);
             }
         } else {
             echo "<script type='text/javascript'>alert('Password did not match!');
-        document.location='students_profile.php?stud_id=$stud_id'</script>";
+        document.location='students_profile'</script>";
         }
     } else {
         echo "<script type='text/javascript'>alert('Incorrect Current Password!');
-		document.location='students_profile.php?stud_id=$stud_id'</script>";
+		document.location='students_profile'</script>";
     }
 }

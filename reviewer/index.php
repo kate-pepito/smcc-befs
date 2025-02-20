@@ -1,0 +1,3 @@
+<?php
+
+authenticated_page();

@@ -1,6 +1,7 @@
 <?php
-include('../dbconnect.php');
-$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+
+authenticated_page("dean");
+
 
 // Fetch the dean's course from the dean_course table
 $query = mysqli_query($conn, "SELECT course_id FROM dean_course WHERE user_id = '$user_id'");
@@ -13,11 +14,11 @@ $update_query = "UPDATE students
 
 if (mysqli_query($conn, $update_query)) {
     // Redirect back to the students list with success message
-    header("Location: dean_students_all.php?user_id=$user_id&message=success");
+    header("Location: dean_students_all&message=success");
     exit;
 } else {
     // Redirect back with an error message
-    header("Location: dean_students_all.php?user_id=$user_id&message=error");
+    header("Location: dean_students_all&message=error");
     exit;
 }
 ?>
