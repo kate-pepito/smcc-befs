@@ -1,7 +1,7 @@
 RewriteEngine On
 
-php_flag display_errors off
-php_value error_reporting 0
+php_value date.timezone Asia/Manila
+php_value display_errors Off
 
 RewriteCond %{HTTPS} off
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
