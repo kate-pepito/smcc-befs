@@ -1,17 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
 <?php 
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 // Fetch the "Current Set" school year
 $current_school_year_query = mysqli_query($conn, "SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error($conn));
 $current_school_year = mysqli_fetch_assoc($current_school_year_query);
-$current_school_year_id = $current_school_year['id'] ?? null;
+$current_school_year_id = mysqli_real_escape_string($conn, $current_school_year['id'] ?? null);
 
 // Determine selected school year (default to "Current Set")
-$selected_school_year = $_GET['school_year'] ?? $current_school_year_id;
+$selected_school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ?? $current_school_year_id);
 
 ?>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -45,7 +46,7 @@ $selected_school_year = $_GET['school_year'] ?? $current_school_year_id;
 <body>
 <?php 
   // Fetch user details
-  $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error());
+  $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
   if ($row = mysqli_fetch_array($query)) {
       $fname = ucfirst(strtolower($row['fname']));
       $lname = ucfirst(strtolower($row['lname']));

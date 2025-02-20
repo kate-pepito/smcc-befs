@@ -1,8 +1,7 @@
-<!DOCTYPE html>
 <?php 
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
-$query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error());
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error($conn));
 if($row=mysqli_fetch_array($query))
 {
    $logged_in = $row['logged_in'];
@@ -11,13 +10,9 @@ if($row=mysqli_fetch_array($query))
 		document.location='../index.php'</script>";
    }
    else{
-    ?>
-<html lang="en">
-<?php 
-$user_id = $_REQUEST['user_id'];
 ?>
-
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -51,7 +46,7 @@ $user_id = $_REQUEST['user_id'];
 <body>
 <?php 
 
-  $query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error());
+  $query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error($conn));
     if($row=mysqli_fetch_array($query))
     {
       $fname=$row['fname'];
@@ -69,9 +64,7 @@ $user_id = $_REQUEST['user_id'];
    ?><!-- End Header -->
   <!-- ======= Sidebar ======= -->
   <?php
-  include('../dbconnect.php');
-  $user_id = $_REQUEST['user_id'];
-  $query=mysqli_query($conn,"select * from school_year where status = 'Current Set' and user_id = $user_id")or die(mysqli_error());
+  $query=mysqli_query($conn,"select * from school_year where status = 'Current Set' and user_id = $user_id")or die(mysqli_error($conn));
   if($row=mysqli_fetch_array($query))
   {
   include('../sidebar.php');

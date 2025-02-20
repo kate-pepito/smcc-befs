@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
 <?php
-$stud_id = $_REQUEST['user_id'];
+$stud_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 $sub_id = $_REQUEST['sub_id'];
-?>
-
-<?php
 include('exam_form_sc.php');
 shuffle($questions);
 ?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>Home - SMCC</title>
@@ -95,7 +92,7 @@ window.onload = function() {
 
 <?php 
 
-$query=mysqli_query($conn,"select * from subject_percent where sub_id = '$sub_id'")or die(mysqli_error());
+$query=mysqli_query($conn,"select * from subject_percent where sub_id = '$sub_id'")or die(mysqli_error($conn));
   if($row=mysqli_fetch_array($query))
   {
     $percent=$row['percent'];
@@ -104,7 +101,7 @@ $query=mysqli_query($conn,"select * from subject_percent where sub_id = '$sub_id
 ?>
 <?php 
 
-$query=mysqli_query($conn,"select * from students where id = '$stud_id'")or die(mysqli_error());
+$query=mysqli_query($conn,"select * from students where id = '$stud_id'")or die(mysqli_error($conn));
   if($row=mysqli_fetch_array($query))
   {
     $level=$row['level'];
@@ -143,7 +140,7 @@ $query=mysqli_query($conn,"select * from students where id = '$stud_id'")or die(
     </nav>
     <!-- Navbar End -->
     <?php 
-        $query=mysqli_query($conn,"select count(id) as c from question_answer where subject_id = '$sub_id'")or die(mysqli_error());
+        $query=mysqli_query($conn,"select count(id) as c from question_answer where subject_id = '$sub_id'")or die(mysqli_error($conn));
         if($row=mysqli_fetch_array($query))
         {
             $c=$row['c'];
@@ -226,7 +223,7 @@ $query=mysqli_query($conn,"select * from students where id = '$stud_id'")or die(
         ?>
     <?php endif; ?>
     <!-- Testimonial End -->
-        
+
 
     <!-- Footer Start -->
     <?php

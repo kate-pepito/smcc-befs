@@ -1,77 +1,78 @@
 <?php
 session_start();
-include('dbconnect.php');
+require_once './dbconnect.php';
 
 $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . "/smcc-befs";
 $homepage = '';
 
 // Check if user_id is passed via the request
-$user_id = $_REQUEST['user_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 
 
-if(isset($_POST['change_password']))
-{
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
+if (isset($_POST['change_password'])) {
+  $password = $_POST['password'];
+  $confirm_password = $_POST['confirm_password'];
 
-    if ($password == $confirm_password) {
-        $query = "UPDATE users SET password = '$password' WHERE id = '$user_id'";
+  if ($password === $confirm_password) {
+    $password = password_hash($password, PASSWORD_DEFAULT);
+    $query = "UPDATE users SET password = '$password' WHERE id = '$user_id'";
 
-        if (mysqli_query($conn, $query)) {
-            // Fetch the user type based on the user_id
-            $user_type_query = "SELECT type FROM users WHERE id = '$user_id'";
-            $result = mysqli_query($conn, $user_type_query);
-        
-            if ($result && mysqli_num_rows($result) > 0) {
-                $row = mysqli_fetch_assoc($result);
-                $type = $row['type'];
-        
-                // Determine the appropriate homepage
-                switch ($type) {
-                  case 'REVIEWER':
-                      $homepage = 'index.php';
-                      break;
-                  case 'DEAN':
-                      $homepage = 'index.php';
-                      break;
-                  case 'ADMIN':
-                      $homepage = 'index.php'; // Change to admin_profile.php for admin
-                      break;
-                  default:
-                      // Default page in case type doesn't match
-                      $homepage = 'index.php';
-                      break;
-              }
-              echo "Homepage: " . $homepage . "<br>"; // Debugging homepage
+    if (mysqli_query($conn, $query)) {
+      // Fetch the user type based on the user_id
+      $user_type_query = "SELECT type FROM users WHERE id = '$user_id'";
+      $result = mysqli_query($conn, $user_type_query);
 
-              // Redirect to the appropriate homepage
-              echo "<script type='text/javascript'>
+      if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $type = $row['type'];
+
+        // Determine the appropriate homepage
+        switch ($type) {
+          case 'REVIEWER':
+            $homepage = 'index.php';
+            break;
+          case 'DEAN':
+            $homepage = 'index.php';
+            break;
+          case 'ADMIN':
+            $homepage = 'index.php'; // Change to admin_profile.php for admin
+            break;
+          default:
+            // Default page in case type doesn't match
+            $homepage = 'index.php';
+            break;
+        }
+        echo "Homepage: " . $homepage . "<br>"; // Debugging homepage
+
+        // Redirect to the appropriate homepage
+        echo "<script type='text/javascript'>
                       alert('Password Successfully Changed!');
                       window.location.href = '$base_url/$homepage?user_id=$user_id';
                     </script>";
-          } else {
-                echo "<script type='text/javascript'>
+      } else {
+        echo "<script type='text/javascript'>
                         alert('Error: Unable to determine user type.');
                         window.location.href = 'login.php';
                       </script>";
-            }
-        } else {
-            echo "<script type='text/javascript'>
+      }
+    } else {
+      echo "<script type='text/javascript'>
                     alert('Error: Failed to update password.');
                     window.location.href = 'change_password.php?user_id=$user_id';
                   </script>";
-        }
-    } else {
-        echo "<script type='text/javascript'>
+    }
+  } else {
+    echo "<script type='text/javascript'>
                 alert('Passwords do not match. Please try again.');
                 window.location.href = 'change_password.php?user_id=$user_id';
               </script>";
-    }
+  }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -106,7 +107,7 @@ if(isset($_POST['change_password']))
                     <p class="text-center small">Please don't forget your password, Thank you!</p>
                   </div>
 
-                  <form action="change_password.php?user_id=<?php echo $user_id;?>" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
+                  <form action="change_password.php?user_id=<?php echo $user_id; ?>" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
                     <div class="col-12">
                       <label for="yourPassword" class="form-label">Password</label>
                       <input type="password" name="password" class="form-control" id="yourPassword" required>
@@ -122,7 +123,7 @@ if(isset($_POST['change_password']))
                     <div class="col-12">
                       <button class="btn btn-primary w-100" name="change_password" type="submit">Change Password</button>
                     </div>
-                   <!-- <div class="col-12">
+                    <!-- <div class="col-12">
                     <a class="btn btn-warning w-100" href="<?php echo $base_url . '/' . $homepage . '?user_id=' . $user_id; ?>">Back to Dashboard</a>
                   </div> -->
                   </form>
@@ -151,4 +152,5 @@ if(isset($_POST['change_password']))
   <script src="assets/vendor/php-email-form/validate.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
+
 </html>

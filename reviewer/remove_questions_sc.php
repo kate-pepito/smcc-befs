@@ -3,7 +3,7 @@ session_start();
 include('../dbconnect.php');
 
 $user_id = $_REQUEST['user_id'];
-$qid = $_REQUEST['qid'];
+$qid = mysqli_real_escape_string($conn, $_REQUEST['qid']);
 $s_id = $_REQUEST['s_id'];
 $active_tab = isset($_REQUEST['active_tab']) ? $_REQUEST['active_tab'] : ''; // Default to empty if not set
 

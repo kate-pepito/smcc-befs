@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
 <?php
 include('../dbconnect.php');
 
@@ -71,6 +69,8 @@ if ($row = $result->fetch_array()) {
     $dean_profile_image = !empty($row['profile_image']) ? $row['profile_image'] : '../assets/img/profile-img2.jpg';
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -204,56 +204,56 @@ if ($row = $result->fetch_array()) {
                                 <div class="tab-pane fade" id="student-results">
                                     <!-- Preboard 1 -->
                                     <section class="section">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-body">
-                <h5 class="card-title">PREBOARD 1</h5>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">PREBOARD 1</h5>
 
-<?php
-// Query to calculate the sum of the average scores for all subjects in PREBOARD 1
-$stmt = $conn->prepare("
+                                                        <?php
+                                                        // Query to calculate the sum of the average scores for all subjects in PREBOARD 1
+                                                        $stmt = $conn->prepare("
     SELECT SUM(average) AS total_average
     FROM student_score
     WHERE stud_id = ? 
         AND level = 'PREBOARD1'
 ");
 
-// Execute the query with the student ID
-$stmt->bind_param("i", $stud_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_array();
+                                                        // Execute the query with the student ID
+                                                        $stmt->bind_param("i", $stud_id);
+                                                        $stmt->execute();
+                                                        $result = $stmt->get_result();
+                                                        $row = $result->fetch_array();
 
-// Fetch the total average from the result
-$total_average = $row['total_average'];
+                                                        // Fetch the total average from the result
+                                                        $total_average = $row['total_average'];
 
-if ($total_average !== null) {
-    echo "<p><strong>Total Average Score: </strong>" . number_format($total_average, 2) . " %</p>";
-} else {
-    echo "<p><strong>Total Average Score: </strong>Not available</p>";
-}
-?>
+                                                        if ($total_average !== null) {
+                                                            echo "<p><strong>Total Average Score: </strong>" . number_format($total_average, 2) . " %</p>";
+                                                        } else {
+                                                            echo "<p><strong>Total Average Score: </strong>Not available</p>";
+                                                        }
+                                                        ?>
 
 
-                    <!-- Table with stripped rows -->
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Code No.</th>
-                                <th>Description</th>
-                                <th>Status</th>
-                                <th>Score</th>
-                                <th>Average</th>
-                                <th>Percentile</th>
-                                <th>Reviewer</th>
-                                <th>Dean</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            // Query to fetch subjects and their individual averages for PREBOARD 1
-                            $query = mysqli_query($conn, "
+                                                        <!-- Table with stripped rows -->
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Code No.</th>
+                                                                    <th>Description</th>
+                                                                    <th>Status</th>
+                                                                    <th>Score</th>
+                                                                    <th>Average</th>
+                                                                    <th>Percentile</th>
+                                                                    <th>Reviewer</th>
+                                                                    <th>Dean</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php
+                                                                // Query to fetch subjects and their individual averages for PREBOARD 1
+                                                                $query = mysqli_query($conn, "
                                 SELECT 
                                     subjects.code AS code,
                                     subjects.description AS description,
@@ -283,40 +283,40 @@ if ($total_average !== null) {
                                     subjects.code, subjects.description;
                             ") or die(mysqli_error($conn));
 
-                            while ($row = mysqli_fetch_array($query)) {
-                                $code = $row['code'];
-                                $description = $row['description'];
-                                $status = $row['status'];
-                                $score = $row['score'];
-                                $items = $row['items'];
-                                $avg_score = $row['avg_score'];
-                                $percent = $row['percent'];
-                                $remarks = $row['remarks'];
-                                $remarks2 = $row['remarks2'];
-                                $formatted_avg_score = number_format($avg_score, 2); // Format individual subject average
-                            ?>
-                            <tr>
-                                <td><?php echo $code; ?></td>
-                                <td><?php echo $description; ?></td>
-                                <td><?php echo $status; ?></td>
-                                <td><?php echo $score . " / " . $items; ?></td>
-                                <td><?php echo $formatted_avg_score; ?> %</td>
-                                <td><?php echo $percent; ?>%</td>
-                                <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks); ?></td>
-                                <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks2); ?></td>
-                            </tr>
-                            <?php 
-                            } 
-                            ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+                                                                while ($row = mysqli_fetch_array($query)) {
+                                                                    $code = $row['code'];
+                                                                    $description = $row['description'];
+                                                                    $status = $row['status'];
+                                                                    $score = $row['score'];
+                                                                    $items = $row['items'];
+                                                                    $avg_score = $row['avg_score'];
+                                                                    $percent = $row['percent'];
+                                                                    $remarks = $row['remarks'];
+                                                                    $remarks2 = $row['remarks2'];
+                                                                    $formatted_avg_score = number_format($avg_score, 2); // Format individual subject average
+                                                                ?>
+                                                                    <tr>
+                                                                        <td><?php echo $code; ?></td>
+                                                                        <td><?php echo $description; ?></td>
+                                                                        <td><?php echo $status; ?></td>
+                                                                        <td><?php echo $score . " / " . $items; ?></td>
+                                                                        <td><?php echo $formatted_avg_score; ?> %</td>
+                                                                        <td><?php echo $percent; ?>%</td>
+                                                                        <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks); ?></td>
+                                                                        <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks2); ?></td>
+                                                                    </tr>
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
 
-                                    
+
                                     <!-- Preboard 2 -->
                                     <section class="section">
                                         <div class="row">
@@ -325,30 +325,30 @@ if ($total_average !== null) {
                                                     <div class="card-body">
                                                         <h5 class="card-title">PREBOARD 2</h5>
 
-<?php
-// Query to calculate the sum of the average scores for all subjects in PREBOARD 1
-$stmt = $conn->prepare("
+                                                        <?php
+                                                        // Query to calculate the sum of the average scores for all subjects in PREBOARD 1
+                                                        $stmt = $conn->prepare("
     SELECT SUM(average) AS total_average
     FROM student_score
     WHERE stud_id = ? 
         AND level = 'PREBOARD2'
 ");
 
-// Execute the query with the student ID
-$stmt->bind_param("i", $stud_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_array();
+                                                        // Execute the query with the student ID
+                                                        $stmt->bind_param("i", $stud_id);
+                                                        $stmt->execute();
+                                                        $result = $stmt->get_result();
+                                                        $row = $result->fetch_array();
 
-// Fetch the total average from the result
-$total_average = $row['total_average'];
+                                                        // Fetch the total average from the result
+                                                        $total_average = $row['total_average'];
 
-if ($total_average !== null) {
-    echo "<p><strong>Total Average Score: </strong>" . number_format($total_average, 2) . " %</p>";
-} else {
-    echo "<p><strong>Total Average Score: </strong>Not available</p>";
-}
-?>
+                                                        if ($total_average !== null) {
+                                                            echo "<p><strong>Total Average Score: </strong>" . number_format($total_average, 2) . " %</p>";
+                                                        } else {
+                                                            echo "<p><strong>Total Average Score: </strong>Not available</p>";
+                                                        }
+                                                        ?>
 
                                                         <!-- Table with stripped rows -->
                                                         <table class="table">
@@ -409,18 +409,18 @@ if ($total_average !== null) {
                                                                     $remarks2 = $row['remarks2'];
                                                                     $formatted_sum_average = number_format($avg_score, 2);
                                                                 ?>
-                                                                <tr>
-                                                                    <td><?php echo $code; ?></td>
-                                                                    <td><?php echo $description; ?></td>
-                                                                    <td><?php echo $status; ?></td>
-                                                                    <td><?php echo $score . " / " . $items; ?></td>
-                                                                    <td><?php echo $formatted_sum_average; ?> %</td>
-                                                                    <td><?php echo $percent; ?>%</td>
-                                                                    <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks); ?></td>
-                                                                    <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks2); ?></td>
-                                                                </tr>
-                                                                <?php 
-                                                                } 
+                                                                    <tr>
+                                                                        <td><?php echo $code; ?></td>
+                                                                        <td><?php echo $description; ?></td>
+                                                                        <td><?php echo $status; ?></td>
+                                                                        <td><?php echo $score . " / " . $items; ?></td>
+                                                                        <td><?php echo $formatted_sum_average; ?> %</td>
+                                                                        <td><?php echo $percent; ?>%</td>
+                                                                        <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks); ?></td>
+                                                                        <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks2); ?></td>
+                                                                    </tr>
+                                                                <?php
+                                                                }
                                                                 ?>
                                                             </tbody>
                                                         </table>

@@ -1,22 +1,22 @@
+<?php session_start();
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$stud_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+?>
+
+<?php
+require_once './dbconnect.php';
+
+$query = mysqli_query($conn, "select * from students where id = '$user_id'") or die(mysqli_error($conn));
+
+while ($row = mysqli_fetch_array($query)) {
+    $fname = $row['fname'];
+    $lname = $row['lname'];
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-<?php session_start();
-$user_id = $_REQUEST['user_id'];
-$stud_id = $_REQUEST['user_id'];
-?>
-
-<?php 
-include('dbconnect.php');
-
-$query=mysqli_query($conn,"select * from students where id = '$user_id'")or die(mysqli_error());
-
-while($row=mysqli_fetch_array($query))
-{
-    $fname=$row['fname'];
-    $lname=$row['lname'];
-}  
-
-?>
 
 <head>
     <meta charset="utf-8">
@@ -61,7 +61,7 @@ while($row=mysqli_fetch_array($query))
 
     <!-- Navbar Start -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-        <a href="index.php?user_id=<?php echo $user_id;?>" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+        <a href="index.php?user_id=<?php echo $user_id; ?>" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
             <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>Saint Michael College of Caraga - BEFS</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -69,7 +69,7 @@ while($row=mysqli_fetch_array($query))
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="index.php?user_id=<?php echo $user_id;?>" class="nav-item nav-link active">Home</a>
+                <a href="index.php?user_id=<?php echo $user_id; ?>" class="nav-item nav-link active">Home</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">PROFILE</a>
                     <div class="dropdown-menu fade-down m-0">
@@ -93,7 +93,7 @@ while($row=mysqli_fetch_array($query))
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-sm-10 col-lg-8">
-                                <h1 class="display-3 text-white animated slideInDown"><?php echo "Hi! ".$fname." ".$lname; ?> </h1>
+                                <h1 class="display-3 text-white animated slideInDown"><?php echo "Hi! " . $fname . " " . $lname; ?> </h1>
                                 </br>
                                 </br>
                                 </br>
@@ -113,15 +113,15 @@ while($row=mysqli_fetch_array($query))
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-sm-10 col-lg-8">
-                                <h1 class="display-3 text-white animated slideInDown"><?php echo "Hi! ".$fname." ".$lname; ?></h1>
+                                <h1 class="display-3 text-white animated slideInDown"><?php echo "Hi! " . $fname . " " . $lname; ?></h1>
                                 </br>
                                 </br>
                                 </br>
                                 <h5 class="text-primary text-uppercase mb-3 animated slideInDown">Saint Michael College of Caraga</h5>
                                 <h1 class="text-primary text-uppercase text-white mb-3 animated slideInDown">Mission</h1>
                                 <p class="fs-5 text-white mb-4 pb-2">- SMCC shall provide spiritual formation and learning culture that will ensure the students with excellent and rewarding learning experience that transform lives, abound spirituality, develop skills and prepare future leaders. <br><br>
-                                - SMCC shall engage in dynamic, innovative, and interdisciplinary researches that are publishable to advance and achieve institutional initiatives. <br><br>
-                                - SMCC shall commit to serve the diverse and local communities in fostering innovations through service-learning that enhances reciprocal community partnerships for spiritual and social development.</p>
+                                    - SMCC shall engage in dynamic, innovative, and interdisciplinary researches that are publishable to advance and achieve institutional initiatives. <br><br>
+                                    - SMCC shall commit to serve the diverse and local communities in fostering innovations through service-learning that enhances reciprocal community partnerships for spiritual and social development.</p>
 
                                 <a href="exam_subject_list.php?user_id=<?php echo $user_id; ?>" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Take Exam Now</a>
                             </div>
@@ -135,7 +135,7 @@ while($row=mysqli_fetch_array($query))
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-sm-10 col-lg-8">
-                                <h1 class="display-3 text-white animated slideInDown"><?php echo "Hi! ".$fname." ".$lname; ?></h1>
+                                <h1 class="display-3 text-white animated slideInDown"><?php echo "Hi! " . $fname . " " . $lname; ?></h1>
                                 </br>
                                 </br>
                                 </br>
@@ -156,13 +156,13 @@ while($row=mysqli_fetch_array($query))
 
     <!-- Service Start -->
     <div class="container-xxl py-5">
-    <h1 class="section-title bg-white text-start text-primary pe-3">Michaelinian Identity</h1>
-    <br>
-    <h5>Secured by Saint Michael the Archangel’s Sword of Bravery and Victory, nourished by the faithful
-acceptance and practice of the Christian teachings and guidance of the Catholic Church, animated by the
-Blessed Virgin Mary’s maternal devotion and intercession, guided by the gospel values, and empowered
-by Christ’s life and examples – the Michaelinians of today and tomorrow are persons who are:</h5>
-<br>
+        <h1 class="section-title bg-white text-start text-primary pe-3">Michaelinian Identity</h1>
+        <br>
+        <h5>Secured by Saint Michael the Archangel’s Sword of Bravery and Victory, nourished by the faithful
+            acceptance and practice of the Christian teachings and guidance of the Catholic Church, animated by the
+            Blessed Virgin Mary’s maternal devotion and intercession, guided by the gospel values, and empowered
+            by Christ’s life and examples – the Michaelinians of today and tomorrow are persons who are:</h5>
+        <br>
         <div class="container">
             <div class="row g-4">
                 <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
@@ -171,8 +171,8 @@ by Christ’s life and examples – the Michaelinians of today and tomorrow are 
                             <i class="fa fa-3x fa-hands-helping text-primary mb-4"></i>
                             <h5 class="mb-3">Socially Responsible</h5>
                             <p>for the respect, care, love and development of God’s creations as such at
-all times demonstrate and live out their social responsibilities;
-</p>
+                                all times demonstrate and live out their social responsibilities;
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -182,9 +182,9 @@ all times demonstrate and live out their social responsibilities;
                             <i class="fa fa-3x fa-cross text-primary mb-4"></i>
                             <h5 class="mb-3">Missionaries of Christian Values </h5>
                             <p>in possessing a faith that is dynamic to imbibe and to
-proclaim and promote the Christian values, hence, sharing in the mission of Christ and of the
-Catholic church to make all people members of one sheepfold of God; 
-</p>
+                                proclaim and promote the Christian values, hence, sharing in the mission of Christ and of the
+                                Catholic church to make all people members of one sheepfold of God;
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -194,9 +194,9 @@ Catholic church to make all people members of one sheepfold of God;
                             <i class="fa fa-3x fa-user-tie text-primary mb-4"></i>
                             <h5 class="mb-3">Committed Individuals and/or Leaders</h5>
                             <p>as equated to the faithful commitment of Jesus to His
-Father, thus, upholding unconditional commitment to value-filled life and actions of love and
-mercy;
-</p>
+                                Father, thus, upholding unconditional commitment to value-filled life and actions of love and
+                                mercy;
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -206,9 +206,9 @@ mercy;
                             <i class="fa fa-3x fa-lightbulb text-primary mb-4"></i>
                             <h5 class="mb-3">Competent in their Chosen Fields of Endeavor</h5>
                             <p>by being aware, curious, and interested in
-learning about the world and how it works in order to possess the ability to innovate and
-ensure success.
-</p>
+                                learning about the world and how it works in order to possess the ability to innovate and
+                                ensure success.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -231,18 +231,19 @@ ensure success.
                     <h1 class="section-title bg-white text-start text-primary pe-3">General Objectives</h1>
                     <p class="mb-4">-To integrate positive and evangelical values in all areas and design Christian formation programs that are effective and responsive to the psychospiritual needs of the students, pupils, parents, and personnel. <br><br>-To continuously enhance the curriculum and upgrade teachers’ professional, emotional, spiritual growth, and quality of instruction.
 
-<br><br>-To continue upgrading facilities and services for the satisfaction of the clientele.
+                        <br><br>-To continue upgrading facilities and services for the satisfaction of the clientele.
 
-<br><br>-To intensify the curriculum-based and institutional researches that are dynamic, innovative, and interdisciplinary
+                        <br><br>-To intensify the curriculum-based and institutional researches that are dynamic, innovative, and interdisciplinary
 
-<br><br>-To implement programs that help educate, motivate, and inspire to assume an active role and become socially responsible stewards of God’s creation.
+                        <br><br>-To implement programs that help educate, motivate, and inspire to assume an active role and become socially responsible stewards of God’s creation.
 
-<br><br>-To provide the best student services catering physical, mental, emotional, spiritual, socio-cultural needs of the students.
+                        <br><br>-To provide the best student services catering physical, mental, emotional, spiritual, socio-cultural needs of the students.
 
-<br><br>-To establish harmonious linkages with the Alumni, PTA, LGU, and other stakeholders to gain support for the school development plans.
+                        <br><br>-To establish harmonious linkages with the Alumni, PTA, LGU, and other stakeholders to gain support for the school development plans.
 
-<br><br>-To work for Accreditation by any recognized accrediting agency. </p>
-                    
+                        <br><br>-To work for Accreditation by any recognized accrediting agency.
+                    </p>
+
                 </div>
             </div>
         </div>
@@ -259,35 +260,33 @@ ensure success.
             <div class="owl-carousel testimonial-carousel position-relative">
 
                 <?php
-                    include('dbconnect.php');
-                    $query=mysqli_query($conn,"select * from students")or die(mysqli_error());
-                    while($row=mysqli_fetch_array($query))
-                    {
-                      $fname=$row['fname'];
-                      $about=$row['about'];
-                      if($about==""){
-                        $about="Nothing to say!";
-                      }
-                      else{
-                        $about=$row['about'];
-                      }
+                require_once './dbconnect.php';
+                $query = mysqli_query($conn, "select * from students") or die(mysqli_error($conn));
+                while ($row = mysqli_fetch_array($query)) {
+                    $fname = $row['fname'];
+                    $about = $row['about'];
+                    if ($about == "") {
+                        $about = "Nothing to say!";
+                    } else {
+                        $about = $row['about'];
+                    }
                 ?>
                     <div class="testimonial-item text-center">
-                    <h5 class="mb-0"><?php echo $fname; ?></h5>
-                    <p>Student</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                    <p class="mb-0"><?php echo $about; ?></p>
+                        <h5 class="mb-0"><?php echo $fname; ?></h5>
+                        <p>Student</p>
+                        <div class="testimonial-text bg-light text-center p-4">
+                            <p class="mb-0"><?php echo $about; ?></p>
+                        </div>
                     </div>
-                </div>
-                  
-                <?php 
-                    } 
+
+                <?php
+                }
                 ?>
             </div>
         </div>
     </div>
     <!-- Testimonial End -->
-        
+
 
     <!-- Footer Start -->
     <?php

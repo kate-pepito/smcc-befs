@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
 <?php
 include('../dbconnect.php');
-$stud_id = $_REQUEST['stud_id'];
+$stud_id = mysqli_real_escape_string($conn, $_REQUEST['stud_id']);
 
-$query=mysqli_query($conn,"select
+$query = mysqli_query($conn, "select
 students.profile_image as profile_image,
 students.lrn_num as lrn_num,
 students.fname as fname,
@@ -27,9 +25,8 @@ students.year_level_id = year_level.id and
 students.course_id = course.id and
 students.section_id = section.id and
 students.id = '$stud_id'
-")or die(mysqli_error());
-if($row=mysqli_fetch_array($query))
-{
+") or die(mysqli_error($conn));
+if ($row = mysqli_fetch_array($query)) {
   $lrn_num = $row['lrn_num'];
   $fname = $row['fname'];
   $lname = $row['lname'];
@@ -43,36 +40,28 @@ if($row=mysqli_fetch_array($query))
   $level = $row['level'];
   $profile_image = $row['profile_image'];
 
-    // Set a default profile image if none is provided
-    if (empty($profile_image)) {
-        $profile_image = '../assets/img/profile-img2.jpg';
-    }
-
-}
-else
-{
+  // Set a default profile image if none is provided
+  if (empty($profile_image)) {
+    $profile_image = '../assets/img/profile-img2.jpg';
+  }
+} else {
   echo "Error: " . $query . "<br>" . mysqli_error($conn);
 }
-  
-?>
 
-
-<?php
-$query=mysqli_query($conn,"select count(subjects_id) as sub_count
+$query = mysqli_query($conn, "select count(subjects_id) as sub_count
 from 
 students_subjects
 where 
 students_id = '$stud_id'
-")or die(mysqli_error());
-if($row=mysqli_fetch_array($query))
-{
+") or die(mysqli_error($conn));
+if ($row = mysqli_fetch_array($query)) {
   $sub_count = $row['sub_count'];
-}
-else
-{
+} else {
   echo "Error: " . $query . "<br>" . mysqli_error($conn);
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
@@ -112,18 +101,17 @@ else
 </head>
 
 <body class="toggle-sidebar">
-<?php 
+  <?php
 
-  $query=mysqli_query($conn,"select * from students where id = '$stud_id'")or die(mysqli_error());
-    if($row=mysqli_fetch_array($query))
-    {
-      $fname=$row['fname'];
-      $lname=$row['lname'];
-      $fname = ucfirst(strtolower($fname));
-      $lname = ucfirst(strtolower($lname));
-    }
+  $query = mysqli_query($conn, "select * from students where id = '$stud_id'") or die(mysqli_error($conn));
+  if ($row = mysqli_fetch_array($query)) {
+    $fname = $row['fname'];
+    $lname = $row['lname'];
+    $fname = ucfirst(strtolower($fname));
+    $lname = ucfirst(strtolower($lname));
+  }
 
-?>
+  ?>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -146,13 +134,13 @@ else
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-          <img src="<?php echo $profile_image; ?>" alt="Profile Image" class="rounded-circle" width="35" height="35" style="margin-right: 10px;">
+            <img src="<?php echo $profile_image; ?>" alt="Profile Image" class="rounded-circle" width="35" height="35" style="margin-right: 10px;">
             <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $lname; ?></span>
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6><?php echo $fname." ".$lname; ?></h6>
+              <h6><?php echo $fname . " " . $lname; ?></h6>
             </li>
             <li>
               <hr class="dropdown-divider">
@@ -165,8 +153,8 @@ else
               </a>
               </a>
               <a href="../log_out_sc.php?user_id=<?php echo $stud_id; ?>" class="dropdown-item"><i class="bi bi-box-arrow-right"></i>
-              Log Out
-            </a>
+                Log Out
+              </a>
             </li>
 
           </ul><!-- End Profile Dropdown Items -->
@@ -178,7 +166,7 @@ else
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
-  <?php 
+  <?php
   include('students_sidebar.php');
   ?>
   <!-- End Sidebar-->
@@ -196,57 +184,57 @@ else
     </div><!-- End Page Title -->
 
     <section class="section">
-  <div class="row">
-    <div class="col-lg-12">
+      <div class="row">
+        <div class="col-lg-12">
 
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">PREBOARD 1</h5>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">PREBOARD 1</h5>
 
-<?php
-// Query to calculate the sum of the average scores for all subjects in PREBOARD 1
-$stmt = $conn->prepare("
+              <?php
+              // Query to calculate the sum of the average scores for all subjects in PREBOARD 1
+              $stmt = $conn->prepare("
     SELECT SUM(average) AS total_average
     FROM student_score
     WHERE stud_id = ? 
         AND level = 'PREBOARD1'
 ");
 
-// Execute the query with the student ID
-$stmt->bind_param("i", $stud_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_array();
+              // Execute the query with the student ID
+              $stmt->bind_param("i", $stud_id);
+              $stmt->execute();
+              $result = $stmt->get_result();
+              $row = $result->fetch_array();
 
-// Fetch the total average from the result
-$total_average = $row['total_average'];
+              // Fetch the total average from the result
+              $total_average = $row['total_average'];
 
-if ($total_average !== null) {
-    echo "<p><strong>Total Average Score: </strong>" . number_format($total_average, 2) . " %</p>";
-} else {
-    echo "<p><strong>Total Average Score: </strong>Not available</p>";
-}
-?>
+              if ($total_average !== null) {
+                echo "<p><strong>Total Average Score: </strong>" . number_format($total_average, 2) . " %</p>";
+              } else {
+                echo "<p><strong>Total Average Score: </strong>Not available</p>";
+              }
+              ?>
 
-            
-          <!-- Table with stripped rows -->
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Code No.</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Score</th>
-                <th>Average</th>
-                <th>Percentile</th>
-                <th>Reviewer</th>
-                <th>Dean</th>
-              </tr>
-            </thead>
-            <tbody>
-            <?php
-                include('../dbconnect.php');
-                $query = mysqli_query($conn, "
+
+              <!-- Table with stripped rows -->
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Code No.</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Score</th>
+                    <th>Average</th>
+                    <th>Percentile</th>
+                    <th>Reviewer</th>
+                    <th>Dean</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  include('../dbconnect.php');
+                  $query = mysqli_query($conn, "
                     SELECT 
     subjects.code AS code,
     subjects.description AS description,
@@ -277,93 +265,93 @@ GROUP BY
     subjects.code, subjects.description;
                 ") or die(mysqli_error($conn));
 
-                while ($row = mysqli_fetch_array($query)) {
-                  $code = $row['code'];
-                  $description = $row['description'];
-                  $status = $row['status'];
-                  $score = $row['score'];
-                  $items = $row['items'];
-                  $avg_score = $row['avg_score'];
-                  $percent = $row['percent'];
-                  $remarks = $row['remarks'];
-                  $remarks2 = $row['remarks2'];
-                  $formatted_sum_average = number_format($avg_score, 2);
-              ?>
-              <tr>
-                <td><?php echo $code; ?></td>
-                <td><?php echo $description; ?></td>
-                <td><?php echo $status; ?></td>
-                <td><?php echo $score . " / " . $items; ?></td>
-                <td><?php echo $formatted_sum_average; ?> %</td>
-                <td><?php echo $percent; ?>%</td>
-                <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks); ?></td>
-                <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks2); ?></td>
-              </tr>
-              <?php 
-                } 
-              ?>
-            </tbody>
-          </table>
-          <!-- End Table with stripped rows -->
+                  while ($row = mysqli_fetch_array($query)) {
+                    $code = $row['code'];
+                    $description = $row['description'];
+                    $status = $row['status'];
+                    $score = $row['score'];
+                    $items = $row['items'];
+                    $avg_score = $row['avg_score'];
+                    $percent = $row['percent'];
+                    $remarks = $row['remarks'];
+                    $remarks2 = $row['remarks2'];
+                    $formatted_sum_average = number_format($avg_score, 2);
+                  ?>
+                    <tr>
+                      <td><?php echo $code; ?></td>
+                      <td><?php echo $description; ?></td>
+                      <td><?php echo $status; ?></td>
+                      <td><?php echo $score . " / " . $items; ?></td>
+                      <td><?php echo $formatted_sum_average; ?> %</td>
+                      <td><?php echo $percent; ?>%</td>
+                      <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks); ?></td>
+                      <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks2); ?></td>
+                    </tr>
+                  <?php
+                  }
+                  ?>
+                </tbody>
+              </table>
+              <!-- End Table with stripped rows -->
+
+            </div>
+          </div>
 
         </div>
       </div>
+    </section>
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
 
-    </div>
-  </div>
-</section>
-<section class="section">
-  <div class="row">
-    <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">PREBOARD 2</h5>
 
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">PREBOARD 2</h5>
-
-<?php
-// Query to calculate the sum of the average scores for all subjects in PREBOARD 1
-$stmt = $conn->prepare("
+              <?php
+              // Query to calculate the sum of the average scores for all subjects in PREBOARD 1
+              $stmt = $conn->prepare("
     SELECT SUM(average) AS total_average
     FROM student_score
     WHERE stud_id = ? 
         AND level = 'PREBOARD2'
 ");
 
-// Execute the query with the student ID
-$stmt->bind_param("i", $stud_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_array();
+              // Execute the query with the student ID
+              $stmt->bind_param("i", $stud_id);
+              $stmt->execute();
+              $result = $stmt->get_result();
+              $row = $result->fetch_array();
 
-// Fetch the total average from the result
-$total_average = $row['total_average'];
+              // Fetch the total average from the result
+              $total_average = $row['total_average'];
 
-if ($total_average !== null) {
-    echo "<p><strong>Total Average Score: </strong>" . number_format($total_average, 2) . " %</p>";
-} else {
-    echo "<p><strong>Total Average Score: </strong>Not available</p>";
-}
-?>
+              if ($total_average !== null) {
+                echo "<p><strong>Total Average Score: </strong>" . number_format($total_average, 2) . " %</p>";
+              } else {
+                echo "<p><strong>Total Average Score: </strong>Not available</p>";
+              }
+              ?>
 
-            
-          <!-- Table with stripped rows -->
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Code No.</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Score</th>
-                <th>Average</th>
-                <th>Percentile</th>
-                <th>Reviewer</th>
-                <th>Dean</th>
-              </tr>
-            </thead>
-            <tbody>
-            <?php
-                include('../dbconnect.php');
-                $query = mysqli_query($conn, "
+
+              <!-- Table with stripped rows -->
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Code No.</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Score</th>
+                    <th>Average</th>
+                    <th>Percentile</th>
+                    <th>Reviewer</th>
+                    <th>Dean</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  include('../dbconnect.php');
+                  $query = mysqli_query($conn, "
                    SELECT 
     subjects.code AS code,
     subjects.description AS description,
@@ -395,50 +383,50 @@ GROUP BY
 
                 ") or die(mysqli_error($conn));
 
-                while ($row = mysqli_fetch_array($query)) {
-                  $code = $row['code'];
-                  $description = $row['description'];
-                  $status = $row['status'];
-                  $score = $row['score'];
-                  $items = $row['items'];
-                  $avg_score = $row['avg_score'];
-                  $percent = $row['percent'];
-                  $remarks = $row['remarks'];
-                  $remarks2 = $row['remarks2'];
-                  $formatted_sum_average = number_format($avg_score, 2);
-              ?>
-              <tr>
-                <td><?php echo $code; ?></td>
-                <td><?php echo $description; ?></td>
-                <td><?php echo $status; ?></td>
-                <td><?php echo $score . " / " . $items; ?></td>
-                <td><?php echo $formatted_sum_average; ?> %</td>
-                <td><?php echo $percent; ?>%</td>
-                <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks); ?></td>
-                <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks2); ?></td>
-              </tr>
-              <?php 
-                } 
-              ?>
-            </tbody>
-          </table>
-          <!-- End Table with stripped rows -->
+                  while ($row = mysqli_fetch_array($query)) {
+                    $code = $row['code'];
+                    $description = $row['description'];
+                    $status = $row['status'];
+                    $score = $row['score'];
+                    $items = $row['items'];
+                    $avg_score = $row['avg_score'];
+                    $percent = $row['percent'];
+                    $remarks = $row['remarks'];
+                    $remarks2 = $row['remarks2'];
+                    $formatted_sum_average = number_format($avg_score, 2);
+                  ?>
+                    <tr>
+                      <td><?php echo $code; ?></td>
+                      <td><?php echo $description; ?></td>
+                      <td><?php echo $status; ?></td>
+                      <td><?php echo $score . " / " . $items; ?></td>
+                      <td><?php echo $formatted_sum_average; ?> %</td>
+                      <td><?php echo $percent; ?>%</td>
+                      <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks); ?></td>
+                      <td style="max-width: 200px; overflow-x: auto;"><?php echo htmlspecialchars($remarks2); ?></td>
+                    </tr>
+                  <?php
+                  }
+                  ?>
+                </tbody>
+              </table>
+              <!-- End Table with stripped rows -->
+
+            </div>
+          </div>
 
         </div>
       </div>
-
-    </div>
-  </div>
-</section>
+    </section>
 
 
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
-   <?php 
-   include('../footer.php');
-   ?>
-<!-- End Footer -->
+  <?php
+  include('../footer.php');
+  ?>
+  <!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 

@@ -1,23 +1,20 @@
-<!DOCTYPE html>
 <?php 
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
-$query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error());
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error($conn));
 if($row=mysqli_fetch_array($query))
 {
-   $logged_in = $row['logged_in'];
-   if($logged_in=="NO" || $logged_in==null){
-    echo "<script type='text/javascript'>alert('Please login again!');
-		document.location='index.php'</script>";
-   }
-   else{
-    ?>
-<html lang="en">
-<?php 
-$user_id = $_REQUEST['user_id'];
+  $logged_in = $row['logged_in'];
+  if($logged_in=="NO" || $logged_in==null){
+  echo "<script type='text/javascript'>alert('Please login again!');
+  document.location='index.php'</script>";
+  }
+  else{
 ?>
+<!DOCTYPE html>
+<html lang="en">
   <?php
-  $query=mysqli_query($conn,"select * from faculty_course_school_year where user_id = $user_id")or die(mysqli_error());
+  $query=mysqli_query($conn,"select * from faculty_course_school_year where user_id = $user_id")or die(mysqli_error($conn));
   if($row=mysqli_fetch_array($query))
   {
     $course_id = $row['course_id'];
@@ -61,7 +58,7 @@ $user_id = $_REQUEST['user_id'];
 <body>
 <?php 
 
-  $query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error());
+  $query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error($conn));
     if($row=mysqli_fetch_array($query))
     {
       $fname=$row['fname'];
@@ -216,7 +213,7 @@ $user_id = $_REQUEST['user_id'];
                     JOIN year_level ON students.year_level_id = year_level.id
                     JOIN section ON students.section_id = section.id
                     ORDER BY sum_average DESC;
-                    ")or die(mysqli_error());
+                    ")or die(mysqli_error($conn));
                     while($row=mysqli_fetch_array($query))
                     {
                       $stud_id=$row['stud_id'];

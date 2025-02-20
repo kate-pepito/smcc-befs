@@ -1,8 +1,8 @@
-<?php 
+<?php
 session_start();
 include('../dbconnect.php'); // Adjust the path as needed
 
-$stud_id = $_REQUEST['stud_id'];
+$stud_id = mysqli_real_escape_string($conn, $_REQUEST['stud_id']);
 
 if (isset($_POST['update_profile'])) {
     $about = mysqli_real_escape_string($conn, $_POST['about']);
@@ -49,4 +49,3 @@ if (isset($_POST['update_profile'])) {
         echo "Error: " . mysqli_error($conn);
     }
 }
-?>

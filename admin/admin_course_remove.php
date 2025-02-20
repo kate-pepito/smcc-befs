@@ -2,8 +2,8 @@
 session_start();
 include('../dbconnect.php');
 
-$user_id = $_REQUEST['user_id'];
-$c_id = $_REQUEST['c_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$c_id = mysqli_real_escape_string($conn, $_REQUEST['c_id']);
 
 // Check if parameters are passed correctly
 if (!$user_id || !$c_id) {

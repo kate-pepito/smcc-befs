@@ -1,8 +1,8 @@
 <?php 
 include('../dbconnect.php');
 
-$user_id = $_REQUEST['user_id'];
-$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error());
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
 if ($row = mysqli_fetch_array($query)) {
     $logged_in = $row['logged_in'];
     if ($logged_in == "NO" || $logged_in == null) {
@@ -18,8 +18,8 @@ if ($row = mysqli_fetch_array($query)) {
 
 // Handle profile update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fname = $_POST['fname'];
-    $lname = $_POST['lname'];
+    $fname = mysqli_real_escape_string($conn, $_POST['fname']);
+    $lname = mysqli_real_escape_string($conn, $_POST['lname']);
     
     // Validate input
     if (empty($fname) || empty($lname)) {

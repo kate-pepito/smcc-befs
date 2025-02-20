@@ -1,12 +1,12 @@
 <?php
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 
 // Fetch the current school year
 $current_sy_query = mysqli_query($conn, "SELECT id FROM school_year WHERE status = 'Current Set' LIMIT 1");
-$current_school_year = mysqli_fetch_assoc($current_sy_query)['id'] ?? null; 
+$current_school_year = mysqli_fetch_assoc($current_sy_query)['id'] ?? null;
 
-$school_year = $_GET['school_year'] ?? $current_school_year; // Get the selected school year, if any
+$school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ?? $current_school_year); // Get the selected school year, if any
 
 // Base query to get students assigned to the courses of the dean
 $sql = "
@@ -21,7 +21,7 @@ $sql = "
 
 // Add school year filter if provided
 if (!empty($school_year)) {
-    $sql .= " AND students.school_year_id = ?";
+  $sql .= " AND students.school_year_id = ?";
 }
 
 $sql .= " ORDER BY students.lname ASC";
@@ -31,9 +31,9 @@ $stmt = $conn->prepare($sql);
 
 // Bind parameters
 if (!empty($school_year)) {
-    $stmt->bind_param("ii", $user_id, $school_year); // Bind user_id and school_year_id
+  $stmt->bind_param("ii", $user_id, $school_year); // Bind user_id and school_year_id
 } else {
-    $stmt->bind_param("i", $user_id); // Bind only user_id
+  $stmt->bind_param("i", $user_id); // Bind only user_id
 }
 
 // Execute and fetch results
@@ -44,6 +44,7 @@ $counter = 1; // Initialize counter outside the loop
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -71,17 +72,18 @@ $counter = 1; // Initialize counter outside the loop
   <link href="../assets/css/style.css" rel="stylesheet">
 
 </head>
+
 <body>
-  <?php 
-    $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error());
-    if($row = mysqli_fetch_array($query)) {
-        $fname = $row['fname'];
-        $lname = $row['lname'];
-        $type = $row['type'];
-        $fname = ucfirst(strtolower($fname));
-        $lname = ucfirst(strtolower($lname));
-        $type = ucfirst(strtolower($type));
-    }
+  <?php
+  $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
+  if ($row = mysqli_fetch_array($query)) {
+    $fname = $row['fname'];
+    $lname = $row['lname'];
+    $type = $row['type'];
+    $fname = ucfirst(strtolower($fname));
+    $lname = ucfirst(strtolower($lname));
+    $type = ucfirst(strtolower($type));
+  }
   ?>
   <!-- ======= Header ======= -->
   <?php include('dean_header.php'); ?>
@@ -108,25 +110,25 @@ $counter = 1; // Initialize counter outside the loop
         </div>
 
         <div>
-  <form method="GET" action="dean_students_active.php">
-    <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_GET['user_id'] ?? ''); ?>">
+          <form method="GET" action="dean_students_active.php">
+            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_GET['user_id'] ?? ''); ?>">
 
-    <div class="d-flex align-items-center justify-content-end">
-      <label for="school_year_filter" class="card-title me-2">School Year:</label>
-      <select class="form-select" style="width: 200px;" name="school_year" id="school_year_filter" onchange="this.form.submit()">
-        <option value="" <?= empty($school_year) ? 'selected' : ''; ?>>All</option>
-        <?php
-          // Fetch all available school years
-          $sy_query = mysqli_query($conn, "SELECT id, description FROM school_year ORDER BY description ASC");
-          while ($sy_row = mysqli_fetch_array($sy_query)) {
-            $selected = $school_year == $sy_row['id'] ? 'selected' : '';
-            echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";
-          }
-        ?>
-      </select>
-    </div>
-  </form>
-</div>
+            <div class="d-flex align-items-center justify-content-end">
+              <label for="school_year_filter" class="card-title me-2">School Year:</label>
+              <select class="form-select" style="width: 200px;" name="school_year" id="school_year_filter" onchange="this.form.submit()">
+                <option value="" <?= empty($school_year) ? 'selected' : ''; ?>>All</option>
+                <?php
+                // Fetch all available school years
+                $sy_query = mysqli_query($conn, "SELECT id, description FROM school_year ORDER BY description ASC");
+                while ($sy_row = mysqli_fetch_array($sy_query)) {
+                  $selected = $school_year == $sy_row['id'] ? 'selected' : '';
+                  echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";
+                }
+                ?>
+              </select>
+            </div>
+          </form>
+        </div>
 
 
       </div>
@@ -154,30 +156,30 @@ $counter = 1; // Initialize counter outside the loop
                   </tr>
                 </thead>
                 <tbody>
-                <?php
+                  <?php
                   while ($row = $result->fetch_assoc()) {
-                ?>
-                  <tr>
-                    <td><?php echo $counter++; ?></td>
-                    <td><?= htmlspecialchars($row['lrn_num']) ?></td>
-                    <td><?= htmlspecialchars($row['lname']) ?></td>
-                    <td><?= htmlspecialchars($row['fname']) ?></td>
-                    <td><?= htmlspecialchars($row['gender']) ?></td>
-                    <td><?= htmlspecialchars($row['course']) ?></td>
-                    <td><?= htmlspecialchars($row['section']) ?></td>
-                    <td><?= htmlspecialchars($row['date_registered']) ?></td>
-                    <td>
-                      <a href="dean_students_assign_subjects.php?user_id=<?= htmlspecialchars($user_id) ?>&stud_id=<?= htmlspecialchars($row['stud_id']) ?>&c_id=<?= htmlspecialchars($row['c_id']) ?>">Assign Subjects</a> 
-                      &nbsp;&nbsp;/&nbsp;&nbsp;
-                      <a href="dean_students_remove_sc.php?user_id=<?= htmlspecialchars($user_id) ?>&stud_id=<?= htmlspecialchars($row['stud_id']) ?>">
-                        <i class="ri-delete-bin-5-fill"></i>
-                      </a>
-                    </td>
-                  </tr>
-                <?php
+                  ?>
+                    <tr>
+                      <td><?php echo $counter++; ?></td>
+                      <td><?= htmlspecialchars($row['lrn_num']) ?></td>
+                      <td><?= htmlspecialchars($row['lname']) ?></td>
+                      <td><?= htmlspecialchars($row['fname']) ?></td>
+                      <td><?= htmlspecialchars($row['gender']) ?></td>
+                      <td><?= htmlspecialchars($row['course']) ?></td>
+                      <td><?= htmlspecialchars($row['section']) ?></td>
+                      <td><?= htmlspecialchars($row['date_registered']) ?></td>
+                      <td>
+                        <a href="dean_students_assign_subjects.php?user_id=<?= htmlspecialchars($user_id) ?>&stud_id=<?= htmlspecialchars($row['stud_id']) ?>&c_id=<?= htmlspecialchars($row['c_id']) ?>">Assign Subjects</a>
+                        &nbsp;&nbsp;/&nbsp;&nbsp;
+                        <a href="dean_students_remove_sc.php?user_id=<?= htmlspecialchars($user_id) ?>&stud_id=<?= htmlspecialchars($row['stud_id']) ?>">
+                          <i class="ri-delete-bin-5-fill"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  <?php
                   }
                   $stmt->close();
-                ?>
+                  ?>
                 </tbody>
               </table>
             </div>
@@ -209,4 +211,5 @@ $counter = 1; // Initialize counter outside the loop
   <script src="../assets/js/main.js"></script>
 
 </body>
+
 </html>

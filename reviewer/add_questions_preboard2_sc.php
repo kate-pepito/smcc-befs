@@ -1,8 +1,8 @@
 <?php
 session_start();
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
-$s_id = $_REQUEST['s_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$s_id = mysqli_real_escape_string($conn, $_REQUEST['s_id']);
 $active_tab = isset($_REQUEST['active_tab']) ? $_REQUEST['active_tab'] : 'preboard'; // Default to 'preboard' if not set
 
 if (isset($_POST['add_prelim_question1'])) {

@@ -2,8 +2,8 @@
 session_start();
 include('../dbconnect.php');
 
-$user_id = $_REQUEST['user_id'];
-$f_id = $_REQUEST['f_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$f_id = mysqli_real_escape_string($conn, $_REQUEST['f_id']);
 
 // Fetch faculty details to populate the form
 $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$f_id'") or die(mysqli_error($conn));
@@ -14,8 +14,8 @@ if ($row = mysqli_fetch_array($query)) {
 
 // Check if form is submitted to update the faculty
 if (isset($_POST['update_dean'])) {
-    $f_fname = $_POST['fname'];
-    $f_lname = $_POST['lname'];
+    $f_fname = mysqli_real_escape_string($conn, $_POST['fname']);
+    $f_lname = mysqli_real_escape_string($conn, $_POST['lname']);
 
     // Update faculty details in the database
     $update_query = "UPDATE users SET fname = '$f_fname', lname = '$f_lname' WHERE id = '$f_id'";

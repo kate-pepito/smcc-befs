@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
 <?php
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
-$s_id = $_REQUEST['s_id'];
-$s_code = $_REQUEST['s_code'];
-$s_desc = $_REQUEST['s_desc'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$s_id = mysqli_real_escape_string($conn, $_REQUEST['s_id']);
+$s_code = mysqli_real_escape_string($conn, $_REQUEST['s_code']);
+$s_desc = mysqli_real_escape_string($conn, $_REQUEST['s_desc']);
 ?>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -47,7 +48,7 @@ $s_desc = $_REQUEST['s_desc'];
 <body>
 <?php 
 
-  $query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error());
+  $query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error($conn));
     if($row=mysqli_fetch_array($query))
     {
       $fname=$row['fname'];

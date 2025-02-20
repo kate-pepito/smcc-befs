@@ -1,6 +1,6 @@
 <?php
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 
 // Fetch the dean's course from the dean_course table
 $query = mysqli_query($conn, "SELECT course_id FROM dean_course WHERE user_id = '$user_id'");

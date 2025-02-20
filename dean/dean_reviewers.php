@@ -2,14 +2,14 @@
 include('../dbconnect.php');
 
 // Validate and fetch the dean's user ID
-$user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : null;
+$user_id = mysqli_real_escape_string($conn, isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : null);
 
 if (!$user_id) {
     die("Error: Missing user ID. Please log in again.");
 }
 
 // Get the selected school year from the form submission
-$selected_school_year = isset($_GET['school_year']) ? $_GET['school_year'] : '';
+$selected_school_year = mysqli_real_escape_string($conn, isset($_GET['school_year']) ? $_GET['school_year'] : '');
 
 // Build the query to fetch reviewers based on the dean's course
 $sql = "
@@ -36,11 +36,11 @@ $sql = "
     WHERE 
         users.type = 'REVIEWER' 
         AND users.`status` = 'Active' 
-        AND dean_course.user_id = '" . mysqli_real_escape_string($conn, $user_id) . "'";
+        AND dean_course.user_id = '" . $user_id . "'";
 
 // Apply the school year filter if selected
 if (!empty($selected_school_year)) {
-    $sql .= " AND faculty_course_school_year.school_year_id = '" . mysqli_real_escape_string($conn, $selected_school_year) . "'";
+    $sql .= " AND faculty_course_school_year.school_year_id = '" . $selected_school_year . "'";
 }
 
 // Add ordering

@@ -1,23 +1,22 @@
+<?php session_start();
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$stud_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+?>
+
+<?php
+require_once './dbconnect.php';
+
+$query = mysqli_query($conn, "select * from students where id = '$user_id'") or die(mysqli_error($conn));
+
+while ($row = mysqli_fetch_array($query)) {
+    $fname = $row['fname'];
+    $lname = $row['lname'];
+    $level = $row['level'];
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
-<?php session_start();
-$user_id = $_REQUEST['user_id'];
-$stud_id = $_REQUEST['user_id'];
-?>
-
-<?php 
-include('dbconnect.php');
-
-$query=mysqli_query($conn,"select * from students where id = '$user_id'")or die(mysqli_error());
-
-while($row=mysqli_fetch_array($query))
-{
-    $fname=$row['fname'];
-    $lname=$row['lname'];
-    $level=$row['level'];
-}  
-
-?>
 
 <head>
     <meta charset="utf-8">
@@ -49,18 +48,14 @@ while($row=mysqli_fetch_array($query))
     <link href="css/style.css" rel="stylesheet">
 
     <script type="text/javascript">
-
-
         window.onload = function() {
-            
-                sessionStorage.clear();
-        
- 
+
+            sessionStorage.clear();
+
+
         };
-
-
     </script>
-    
+
 </head>
 
 <body>
@@ -75,7 +70,7 @@ while($row=mysqli_fetch_array($query))
 
     <!-- Navbar Start -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-        <a href="index.php?user_id=<?php echo $user_id;?>" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+        <a href="index.php?user_id=<?php echo $user_id; ?>" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
             <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>Saint Michael College of Caraga - BEFS</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -83,7 +78,7 @@ while($row=mysqli_fetch_array($query))
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="index.php?user_id=<?php echo $user_id;?>" class="nav-item nav-link active">Home</a>
+                <a href="index.php?user_id=<?php echo $user_id; ?>" class="nav-item nav-link active">Home</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">PROFILE</a>
                     <div class="dropdown-menu fade-down m-0">
@@ -102,11 +97,11 @@ while($row=mysqli_fetch_array($query))
         <div class="container">
             <div class="row g-4">
 
-            <?php
-include('dbconnect.php');
+                <?php
+                require_once './dbconnect.php';
 
-// Modified query to include faculty name
-$query = mysqli_query($conn, "
+                // Modified query to include faculty name
+                $query = mysqli_query($conn, "
     SELECT 
         subjects.id AS sub_id, 
         subjects.code AS code, 
@@ -119,32 +114,32 @@ $query = mysqli_query($conn, "
     WHERE students_subjects.students_id = $user_id
     AND students_subjects.status = 'NOT TAKEN'
     AND students_subjects.level = '$level'
-") or die(mysqli_error());
+") or die(mysqli_error($conn));
 
-while ($row = mysqli_fetch_array($query)) {
-    $sub_id = $row['sub_id'];
-    $code = $row['code'];
-    $description = $row['description'];
-    $faculty_name = $row['faculty_name']; // Get the faculty name
-?>
-    <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
-        <div class="service-item text-center pt-3">
-            <a href="exam_form.php?user_id=<?php echo $user_id; ?>&sub_id=<?php echo $sub_id; ?>">
-                <div class="p-4">
-                    <i class="fa fa-3x fa-graduation-cap text-primary mb-4"></i>
-                    <p><?php echo $code; ?></p>
-                    <h5 class="mb-3"><?php echo $description; ?></h5>
-                    <p><strong>Reviewer: </strong><?php echo $faculty_name ? $faculty_name : 'No faculty assigned'; ?></p> <!-- Display faculty name -->
-                </div>
-            </a>
-        </div>
-    </div>
-<?php
-}
-?>
+                while ($row = mysqli_fetch_array($query)) {
+                    $sub_id = $row['sub_id'];
+                    $code = $row['code'];
+                    $description = $row['description'];
+                    $faculty_name = $row['faculty_name']; // Get the faculty name
+                ?>
+                    <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="service-item text-center pt-3">
+                            <a href="exam_form.php?user_id=<?php echo $user_id; ?>&sub_id=<?php echo $sub_id; ?>">
+                                <div class="p-4">
+                                    <i class="fa fa-3x fa-graduation-cap text-primary mb-4"></i>
+                                    <p><?php echo $code; ?></p>
+                                    <h5 class="mb-3"><?php echo $description; ?></h5>
+                                    <p><strong>Reviewer: </strong><?php echo $faculty_name ? $faculty_name : 'No faculty assigned'; ?></p> <!-- Display faculty name -->
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                <?php
+                }
+                ?>
 
 
-             
+
             </div>
         </div>
     </div>
@@ -162,35 +157,33 @@ while ($row = mysqli_fetch_array($query)) {
             <div class="owl-carousel testimonial-carousel position-relative">
 
                 <?php
-                    include('dbconnect.php');
-                    $query=mysqli_query($conn,"select * from students")or die(mysqli_error());
-                    while($row=mysqli_fetch_array($query))
-                    {
-                      $fname=$row['fname'];
-                      $about=$row['about'];
-                      if($about==""){
-                        $about="Nothing to say!";
-                      }
-                      else{
-                        $about=$row['about'];
-                      }
+                require_once './dbconnect.php';
+                $query = mysqli_query($conn, "select * from students") or die(mysqli_error($conn));
+                while ($row = mysqli_fetch_array($query)) {
+                    $fname = $row['fname'];
+                    $about = $row['about'];
+                    if ($about == "") {
+                        $about = "Nothing to say!";
+                    } else {
+                        $about = $row['about'];
+                    }
                 ?>
                     <div class="testimonial-item text-center">
-                    <h5 class="mb-0"><?php echo $fname; ?></h5>
-                    <p>Student</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                    <p class="mb-0"><?php echo $about; ?></p>
+                        <h5 class="mb-0"><?php echo $fname; ?></h5>
+                        <p>Student</p>
+                        <div class="testimonial-text bg-light text-center p-4">
+                            <p class="mb-0"><?php echo $about; ?></p>
+                        </div>
                     </div>
-                </div>
-                  
-                <?php 
-                    } 
+
+                <?php
+                }
                 ?>
             </div>
         </div>
     </div>
     <!-- Testimonial End -->
-        
+
 
     <!-- Footer Start -->
     <?php

@@ -1,6 +1,6 @@
 <?php 
 session_start();
-include('dbconnect.php');
+require_once './dbconnect.php';
 
 // Fetch the current school year
 $query = mysqli_query($conn, "SELECT * FROM school_year WHERE status = 'Current Set'") or die(mysqli_error($conn));
@@ -9,25 +9,26 @@ if ($row = mysqli_fetch_array($query)) {
 }
 
 if (isset($_POST['add_student'])) {
-    $lrn_num = $_POST['lrn_num'];
-    $fname = $_POST['fname'];
-    $lname = $_POST['lname'];
-    $gender = $_POST['gender'];
-    $course = $_POST['course'];
-    $year_level = $_POST['year_level'];
-    $section = $_POST['section'];
-    $username = $_POST['username'];
+    $lrn_num = mysqli_real_escape_string($conn, $_POST['lrn_num']);
+    $fname = mysqli_real_escape_string($conn, $_POST['fname']);
+    $lname = mysqli_real_escape_string($conn, $_POST['lname']);
+    $gender = mysqli_real_escape_string($conn, $_POST['gender']);
+    $course = mysqli_real_escape_string($conn, $_POST['course']);
+    $year_level = mysqli_real_escape_string($conn, $_POST['year_level']);
+    $section = mysqli_real_escape_string($conn, $_POST['section']);
+    $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    date_default_timezone_set("Asia/Manila");    
+    date_default_timezone_set("Asia/Manila");
     $dt = date("Y-m-d") . " " . date("h:i:sa");
-    
+
     if ($password == $confirm_password) {
+        $password = password_hash($password, PASSWORD_DEFAULT);
         // Insert student data including the current school year ID
         $query = "INSERT INTO students (lrn_num, fname, lname, gender, course_id, year_level_id, section_id, username, password, date_registered, status, logged_in, level, school_year_id) 
                   VALUES ('$lrn_num', '$fname', '$lname', '$gender', '$course', '$year_level', '$section', '$username', '$password', '$dt', 'For Approval', 'NO', 'PREBOARD1', '$school_year_id')" 
-                  or die(mysqli_error($conn));      
+                  or die(mysqli_error($conn));
         if (mysqli_query($conn, $query)) {
             echo "<script type='text/javascript'>alert('Student Successfully Registered!');
             document.location='index.php'</script>";
@@ -37,7 +38,7 @@ if (isset($_POST['add_student'])) {
     } else {
         echo "<script type='text/javascript'>alert('Password did not match!');
             document.location='register.php'</script>";
-    }    
+    }
 }
 ?>
 
@@ -138,8 +139,8 @@ if (isset($_POST['add_student'])) {
                       <label for="yourEmail" class="form-label">Course</label>
                       <select name="course" class="form-select" aria-label="Default select example">
                         <?php
-                          include('dbconnect.php');
-                          $query=mysqli_query($conn,"select * from course where status = 'Active' ORDER BY description asc")or die(mysqli_error());
+                          require_once './dbconnect.php';
+                          $query=mysqli_query($conn,"select * from course where status = 'Active' ORDER BY description asc")or die(mysqli_error($conn));
                           while($row=mysqli_fetch_array($query)) {
                               $id=$row['id'];
                               $description=$row['description'];

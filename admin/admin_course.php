@@ -1,19 +1,19 @@
 <?php 
 session_start();
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 
 // Handle course registration
 if (isset($_POST['add_course'])) {
-    $code_no = $_POST['code_no'];
-    $description = $_POST['description'];
+    $code_no = mysqli_real_escape_string($conn, $_POST['code_no']);
+    $description = mysqli_real_escape_string($conn, $_POST['description']);
 
     date_default_timezone_set("Asia/Manila");
     $dt = date("Y-m-d") . " " . date("h:i:sa");
 
     $query = "INSERT INTO course (description, date_entry, status, code_no) 
               VALUES ('$description', '$dt', 'Active', '$code_no')";
-    
+
     if (mysqli_query($conn, $query)) {
         echo "<script type='text/javascript'>alert('Course Successfully Saved!'); document.location='admin_course.php?user_id=$user_id';</script>";
     } else {
@@ -58,7 +58,7 @@ if (isset($_POST['add_course'])) {
 
 <?php 
 // User info fetching
-$query = mysqli_query($conn,"SELECT * FROM users WHERE id = '$user_id'")or die(mysqli_error());
+$query = mysqli_query($conn,"SELECT * FROM users WHERE id = '$user_id'")or die(mysqli_error($conn));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -116,7 +116,7 @@ if ($row = mysqli_fetch_array($query)) {
                                 $query = mysqli_query($conn, "SELECT course.id as i, course.code_no as cn, course.description as c_desc, 
                                                               course.date_entry as de, course.status as s 
                                                               FROM course 
-                                                              WHERE course.status = 'Active'") or die(mysqli_error());
+                                                              WHERE course.status = 'Active'") or die(mysqli_error($conn));
                                 while ($row = mysqli_fetch_array($query)) {
                                     $id = $row['i'];
                                     $code_no = $row['cn'];

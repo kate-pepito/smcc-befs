@@ -1,16 +1,16 @@
 <?php 
 session_start();
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
-$s_id = $_REQUEST['s_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$s_id = mysqli_real_escape_string($conn, $_REQUEST['s_id']);
 
 if (isset($_POST['add_prelim_question'])) {
 
-    $question = $_POST['question'];
-    $answer1 = $_POST['answer1'];
-    $answer2 = $_POST['answer2'];
-    $answer3 = $_POST['answer3'];
-    $answer4 = $_POST['answer4'];
+    $question = mysqli_real_escape_string($conn, $_POST['question']);
+    $answer1 = mysqli_real_escape_string($conn, $_POST['answer1']);
+    $answer2 = mysqli_real_escape_string($conn, $_POST['answer2']);
+    $answer3 = mysqli_real_escape_string($conn, $_POST['answer3']);
+    $answer4 = mysqli_real_escape_string($conn, $_POST['answer4']);
     $final_answer = $_POST['final_answer'];
 
     if ($final_answer == "") {

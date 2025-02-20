@@ -1,9 +1,9 @@
 <?php
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 // Fetch the current school year
 $current_sy_query = mysqli_query($conn, "SELECT id FROM school_year WHERE status = 'Current Set' LIMIT 1");
-$current_school_year = mysqli_fetch_assoc($current_sy_query)['id'] ?? null; 
+$current_school_year = mysqli_fetch_assoc($current_sy_query)['id'] ?? null;
 
 $school_year = $_GET['school_year'] ?? $current_school_year; // Get the selected school year, if any
 
@@ -72,7 +72,7 @@ $counter = 1; // Initialize counter outside the loop
 </head>
 <body>
   <?php 
-    $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error());
+    $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
     if($row = mysqli_fetch_array($query)) {
         $fname = $row['fname'];
         $lname = $row['lname'];

@@ -1,11 +1,11 @@
 <?php
 include('../dbconnect.php');
 session_start();
-$user_id = $_REQUEST['user_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 
 // Handle Add Section
 if (isset($_POST['add_section'])) {
-    $description = $_POST['description'];
+    $description = mysqli_real_escape_string($conn, $_POST['description']);
 
     date_default_timezone_set("Asia/Manila");
     $dt = date("Y-m-d H:i:s");
@@ -27,7 +27,7 @@ if (isset($_POST['add_section'])) {
 }
 
 // Fetch user info
-$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error());
+$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -38,7 +38,7 @@ if ($row = mysqli_fetch_array($query)) {
 }
 
 // Fetch sections
-$sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'") or die(mysqli_error());
+$sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'") or die(mysqli_error($conn));
 ?>
 
 <!DOCTYPE html>

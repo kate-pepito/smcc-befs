@@ -7,7 +7,7 @@ if (!$conn) {
     die("Database connection failed: " . mysqli_connect_error());
 }
 
-$user_id = $_REQUEST['user_id'] ?? null;
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id'] ?? null);
 if (!$user_id) {
     die("User ID is missing or invalid.");
 }

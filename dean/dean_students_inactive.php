@@ -1,7 +1,7 @@
 <?php
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
-$school_year = $_GET['school_year'] ?? ''; // Get the selected school year, if any
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ?? ''); // Get the selected school year, if any
 
 // Base query to get students assigned to the courses of the dean
 $sql = "
@@ -69,7 +69,7 @@ $counter = 1; // Initialize counter outside the loop
 <body>
   <?php 
     // Fetch the user information as you did for active students
-    $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error());
+    $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
     if($row = mysqli_fetch_array($query)) {
         $fname = $row['fname'];
         $lname = $row['lname'];

@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
 <?php
+
 include('../dbconnect.php');
 
 // Retrieve the student ID from the request
-$stud_id = $_REQUEST['stud_id'];
+$stud_id = mysqli_real_escape_string($conn, $_REQUEST['stud_id']);
 
 // Fetch the student's profile and related details from the database
 $query = mysqli_query($conn, "
@@ -58,14 +57,14 @@ if ($row = mysqli_fetch_array($query)) {
     echo "<script>document.location='students_list.php';</script>"; // Redirect to a list or another appropriate page
     exit;
 }
-?>
-<?php
+
 $query=mysqli_query($conn,"select count(subjects_id) as sub_count
 from 
 students_subjects
 where 
 students_id = '$stud_id' and level = '$level'
-")or die(mysqli_error());
+")or die(mysqli_error($conn));
+
 if($row=mysqli_fetch_array($query))
 {
   $sub_count = $row['sub_count'];
@@ -75,7 +74,8 @@ else
   echo "Error: " . $query . "<br>" . mysqli_error($conn);
 }
 ?>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -116,14 +116,14 @@ else
 <body class="toggle-sidebar">
 <?php 
 
-  $query=mysqli_query($conn,"select * from students where id = '$stud_id'")or die(mysqli_error());
-    if($row=mysqli_fetch_array($query))
-    {
-      $fname=$row['fname'];
-      $lname=$row['lname'];
-      $fname = ucfirst(strtolower($fname));
-      $lname = ucfirst(strtolower($lname));
-    }
+  $query=mysqli_query($conn,"select * from students where id = '$stud_id'")or die(mysqli_error($conn));
+  if($row=mysqli_fetch_array($query))
+  {
+    $fname=$row['fname'];
+    $lname=$row['lname'];
+    $fname = ucfirst(strtolower($fname));
+    $lname = ucfirst(strtolower($lname));
+  }
 
 ?>
   <!-- ======= Header ======= -->
@@ -412,7 +412,7 @@ else
                     <?php 
                         // $query = mysqli_query($conn, "SELECT SUM(average)/COUNT(average) AS sum_average FROM student_score WHERE stud_id = '$stud_id'") or die(mysqli_error());
                         if($level == 'PREBOARD1'){
-                              $query = mysqli_query($conn, "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '$stud_id' and level ='$level'") or die(mysqli_error());
+                              $query = mysqli_query($conn, "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '$stud_id' and level ='$level'") or die(mysqli_error($conn));
                               if ($row = mysqli_fetch_array($query)) {
                                   $sum_average = $row['sum_average'];
                                   if ($sum_average == "") {
@@ -431,7 +431,7 @@ else
                       <?php
                         }
                         else{
-                          $query = mysqli_query($conn, "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '$stud_id' and level ='$level'") or die(mysqli_error());
+                          $query = mysqli_query($conn, "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '$stud_id' and level ='$level'") or die(mysqli_error($conn));
                               if ($row = mysqli_fetch_array($query)) {
                                   $sum_average = $row['sum_average'];
                                   if ($sum_average == "") {

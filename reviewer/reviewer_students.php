@@ -1,13 +1,13 @@
 <?php 
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
 
 // Fetch the current school year
 $current_sy_query = mysqli_query($conn, "SELECT id FROM school_year WHERE status = 'Current Set' LIMIT 1");
 $current_school_year = mysqli_fetch_assoc($current_sy_query)['id'] ?? null;
 
 // Get the selected school year, or use the current school year as the default
-$school_year = $_GET['school_year'] ?? $current_school_year;
+$school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ?? $current_school_year);
 
 // Fetch the faculty's course and school year from faculty_course_school_year table
 $query = mysqli_query($conn, "SELECT course_id, school_year_id FROM faculty_course_school_year WHERE user_id = '$user_id'");

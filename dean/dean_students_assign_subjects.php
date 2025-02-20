@@ -1,11 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+
 <?php 
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
-$c_id = $_REQUEST['c_id'];
-$stud_id = $_REQUEST['stud_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$c_id = mysqli_real_escape_string($conn, $_REQUEST['c_id']);
+$stud_id = mysqli_real_escape_string($conn, $_REQUEST['stud_id']);
 ?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -39,7 +40,7 @@ $stud_id = $_REQUEST['stud_id'];
 <body>
 <?php 
 
-  $query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error());
+  $query=mysqli_query($conn,"select * from users where id = '$user_id'")or die(mysqli_error($conn));
     if($row=mysqli_fetch_array($query))
     {
       $fname=$row['fname'];
@@ -112,7 +113,7 @@ $stud_id = $_REQUEST['stud_id'];
                       FROM students_subjects 
                       WHERE students_id = '$stud_id'
                         );
-                    ")or die(mysqli_error());
+                    ")or die(mysqli_error($conn));
                     while($row=mysqli_fetch_array($query))
                     {
                         $sub_id=$row['sub_id'];
@@ -175,7 +176,7 @@ $stud_id = $_REQUEST['stud_id'];
               JOIN 
                   year_level ON subjects.year_level_id = year_level.id
               WHERE 
-                  students_subjects.students_id = '$stud_id' AND students_subjects.level = 'PREBOARD1'")or die(mysqli_error());
+                  students_subjects.students_id = '$stud_id' AND students_subjects.level = 'PREBOARD1'")or die(mysqli_error($conn));
                     while($row=mysqli_fetch_array($query))
                     {
                       $sub_id=$row['sub_id'];

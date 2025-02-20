@@ -2,8 +2,8 @@
 session_start();
 include('../dbconnect.php');
 
-$user_id = $_REQUEST['user_id'];
-$f_id = $_REQUEST['f_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$f_id = mysqli_real_escape_string($conn, $_REQUEST['f_id']);
 
 if (isset($_REQUEST['confirmed']) && $_REQUEST['confirmed'] == '1') {
     // If the confirmation is received, process the query

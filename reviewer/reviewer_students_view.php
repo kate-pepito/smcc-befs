@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
 <?php 
 include('../dbconnect.php');
-$user_id = $_REQUEST['user_id'];
-$sub_id = $_REQUEST['sub_id'];
+$user_id = mysqli_real_escape_string($conn, $_REQUEST['user_id']);
+$sub_id = mysqli_real_escape_string($conn, $_REQUEST['sub_id']);
 
 $subject_query = mysqli_query($conn, "SELECT description FROM subjects WHERE id = '$sub_id'") or die(mysqli_error($conn));
 $subject_description = "Subject Not Found"; // Default value if query fails
@@ -11,6 +9,8 @@ if ($subject_row = mysqli_fetch_assoc($subject_query)) {
     $subject_description = $subject_row['description'];
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
