@@ -1,9 +1,9 @@
 <?php
-$mysql_servername = "localhost";
-$mysql_username = "root";
-$mysql_password = "";
-$mysql_dbname = "smcc_befs";
-$sql_file = "database/smcc_befs.sql";
+$mysql_servername = $_ENV["MYSQL_HOST"] ?? "localhost";
+$mysql_username = $_ENV["MYSQL_USERNAME"] ?? "root";
+$mysql_password = $_ENV["MYSQL_PASSWORD"] ?? "";
+$mysql_dbname = $_ENV["MYSQL_DBNAME"] ?? "smcc_befs";
+$sql_file = $_ENV["MYSQL_IMPORT_FILE"] ?? "database/smcc_befs.sql";
 
 $c1 = new mysqli($mysql_servername, $mysql_username, $mysql_password);
 if ($c1->connect_error) {

@@ -1,5 +1,50 @@
 <?php
 
+function get_base_uri_path()
+{
+    return $_ENV['BASE_URI'] ?? "/smcc-befs";
+}
+
+function is_current_unauthenticated_page()
+{
+    $unauthenticated_pages = [
+        # add or change uri path if needed
+        "/",
+        "/register",
+        "/_hash_passwords",
+        "/ftp",
+        "/ftp_sse",
+    ];
+    $bsp = strlen(get_base_uri_path()) === 0 ? null : get_base_uri_path();
+    $trimed_uri = $bsp === null ? get_uri_path() : substr(get_uri_path(), strlen($bsp));
+    return in_array($trimed_uri, $unauthenticated_pages);
+}
+
+function get_current_path()
+{
+    $bsp = strlen(get_base_uri_path()) === 0 ? null : get_base_uri_path();
+    return $bsp === null ? get_uri_path() : substr(get_uri_path(), strlen($bsp));
+}
+
+function load_dotenv($filename = ".env")
+{
+    if (!file_exists($filename)) {
+        return;
+    }
+    $envFile = file_get_contents($filename);
+    $envLines = explode("\n", $envFile);
+    foreach ($envLines as $line) {
+        if (strpos($line, "#") === 0) {
+            continue;
+        }
+        $linekv = explode("=", $line);
+        $key = trim($linekv[0]);
+        $value = trim($linekv[1]);
+        putenv("{$key}={$value}");
+    }
+}
+
+
 function redirect_to_no_php_path()
 {
     $bn = explode(".", basename(get_uri_path()));
