@@ -1,14 +1,12 @@
 <?php
 
-require_once __DIR__ . '/dbconnect.php';
-
 function saveToTxt($data) {
     $txt = "";
     foreach ($data as $k => $v) {
         foreach ($v as $d)
             $txt .= "[$k]: " . $d['username'] . " = " . $d['old_password'] . PHP_EOL;
     }
-    file_put_contents("_passwords.txt", $txt);
+    file_put_contents("_passwords.txt", $txt, FILE_APPEND);
 }
 
 $result = [

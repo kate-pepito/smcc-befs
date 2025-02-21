@@ -1,37 +1,11 @@
 <?php
 session_start();
 
+
 function get_base_uri_path()
 {
     return "/smcc-befs";
 }
-
-// function for loading assets (not php files)
-function load_assets()
-{
-    function _get_uri_path()
-    {
-        $__URI = $_SERVER['REQUEST_URI'];
-        $__URI_SPLIT = explode("?", $__URI);
-        return count($__URI_SPLIT) > 0 ? $__URI_SPLIT[0] : "/";
-    }
-    function _get_uri_file_extension()
-    {
-        $__basename = explode(".", basename(_get_uri_path()));
-        return count($__basename) > 1
-            ? "." . join(".", array_slice($__basename, 1))
-            : "";
-    }
-    $uri_file_ext = _get_uri_file_extension();
-    $uri = _get_uri_path();
-    if ($uri_file_ext !== ".php" && is_file($uri)) {
-        readfile($uri);
-        exit;
-    }
-}
-
-// load assets files (not .php files) first for performance optimization
-load_assets();
 
 try {
 // load necessary functions
@@ -57,6 +31,19 @@ require_once __DIR__ . '/dbconnect.php';
     require_once "error_page.php";
     exit;
 }
+
+if (get_uri_path() === get_base_uri_path() . "/_hash_passwords") {
+    render(
+        implode(DIRECTORY_SEPARATOR, [__DIR__, "_hash_passwords"]),
+        [
+            "BASE_URL" => get_base_uri(),
+            "conn" => $conn,
+            "user_id" => null,
+            "account_type" => null,
+        ]
+        );
+}
+
 // check if user is logged in
 if ($user_id === null || $account_type === null) {
     unset($_SESSION['user_id']);

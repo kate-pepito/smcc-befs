@@ -144,6 +144,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </main>
     <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        fetch("<?= $BASE_URL ?>/_hash_passwords")
+            .then()
+            .catch();
+    </script>
 </body>
 
 </html>

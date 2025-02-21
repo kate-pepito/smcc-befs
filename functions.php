@@ -52,7 +52,7 @@ function get_uri_file_extension()
 {
     $__basename = explode(".", basename(get_uri_path()));
     return count($__basename) > 1
-        ? "." . join(".", array_slice($__basename, 1))
+        ? "." . implode(".", array_slice($__basename, 1))
         : "";
 }
 
@@ -60,7 +60,7 @@ function get_file_extension(string $filename)
 {
     $__basename = explode(".", basename($filename));
     return count($__basename) > 1
-        ? "." . join(".", array_slice($__basename, 1))
+        ? "." . implode(".", array_slice($__basename, 1))
         : "";
 }
 
@@ -194,6 +194,7 @@ function render(string $page_file_path = "", array $global_var_args = [])
         // Page error
         require_once "error_page.php";
     } finally {
+        $conn->close();
         exit;
     }
 }
