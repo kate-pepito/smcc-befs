@@ -87,22 +87,6 @@ function uploadFilesRecursively($conn_id, $local_dir, $remote_dir, &$uploaded_fi
         if (is_dir($local_path)) {
             uploadFilesRecursively($conn_id, $local_path, $remote_path,  $uploaded_files, $current_count); // Recur for subdir
         } else {
-            if (ftpFileExists($conn_id, $remote_path)) {
-                $local_size = filesize($local_path);
-                $remote_size = ftpGetFileSize($conn_id, $remote_path);
-                if ($local_size === $remote_size) {
-                    $remote_temp = ftpDownloadTempFile($conn_id, $remote_path);
-                    if ($remote_temp && md5_file($local_path) === md5_file($remote_temp)) {
-                        unlink($remote_temp);
-                        $uploaded_files[] = ['skipped' => $remote_path, 'reason' => 'Same size and content'];
-                        sendEvent("{$current_count}|Skipped file: $remote_path");
-                        continue;
-                    }
-                    if ($remote_temp) {
-                        unlink($remote_temp);
-                    }
-                }
-            }
             if (ftp_put($conn_id, $remote_path, $local_path, FTP_BINARY)) {
                 $uploaded_files[] = ['success' => $remote_path];
                 sendEvent(" $current_count|Uploaded file: $remote_path");
