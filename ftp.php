@@ -78,8 +78,8 @@
         eventSource.onopen = function() {
             console.log("Connected...");
         }
-        eventSource.onerror = function(error, emsg) {
-            console.log("ERROR: ", emsg);
+        eventSource.onerror = function(event) {
+            eventSource.close()
         }
 
     });
