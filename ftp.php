@@ -49,38 +49,74 @@
         }
         eMessage.style.display = "block";
     }
+    var stopped_animation = true;
+    function startProgressAnimation(progress) {
+        const progressBar = document.getElementById('progress-bar');
+        progressBar.style.width = `${progress}%`;
+        progressBar.innerHTML = `${progress}%`;
+        progress = (progress + 1) % 100;
+        if (!stopped_animation) {
+            setTimeout(() => startProgressAnimation(progress), 30);
+        }
+    }
+
     document.getElementById('start-upload').addEventListener('click', function() {
         const progressBar = document.getElementById('progress-bar');
         const status = document.getElementById('status');
         this.disabled = true;
         const searchURL = new URLSearchParams({ftp_server: "185.27.134.11", ftp_username: "if0_38161483", ftp_password: "eBpMR2Fj4E48A1h", ftp_directory: "/smcc-befs.infinityfreeapp.com/htdocs", ftp_src: "dist"})
-        const eventSource = new EventSource(`ftp_sse?${searchURL.toString()}`);
-        eventSource.onmessage = function(event) {
-            let data = event.data.split("|");
-            console.log("received data:", data);
-            let seq = Number.parseInt(data[0]);
-            if (seq === 45 || seq === 55 || seq === 65 || seq === 100) {
-                let eMsg = {};
-                eventSource.close();
-                status.innerHTML = seq < 100 ? "Upload Failed." : "Upload completed.";
-                eMsg = seq === 100 ? JSON.parse(data[1]) : data[1];
-                progressBar.style.width = data[0] + '%';
-                progressBar.innerHTML = data[0] + '%';
-                document.getElementById('start-upload').disabled = false;
-                displayMessageUploaded(eMsg);
-            } else {
-                status.innerHTML = data[1];
-                progressBar.style.width = data[0] + '%';
-                progressBar.innerHTML = data[0] + '%';
-                displayMessageUploaded(data[1]);
-            }
-        };
-        eventSource.onopen = function() {
-            console.log("Connected...");
-        }
-        eventSource.onerror = function(event) {
-            eventSource.close()
-        }
+        status.innerHTML = "Uploading... Please Wait";
+        stopped_animation = false;
+        startProgressAnimation(0);
+
+        fetch(`ftp_sse?${searchURL.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                status.innerHTML = "Upload completed.";
+                stopped_animation = true;
+                displayMessageUploaded(data);
+                setTimeout(() => {
+                    progressBar.style.width = `100%`;
+                    progressBar.innerHTML = `100%`;
+                }, 100);
+            })
+            .catch(error => {
+                status.innerHTML = "Upload Failed.";
+                stopped_animation = true;
+                displayMessageUploaded("An error occurred while uploading the files. Please try again.");
+                setTimeout(() => {
+                    progressBar.style.width = `0%`;
+                    progressBar.innerHTML = `0%`;
+                }, 100);
+                console.error("Error:", error);
+            })
+        // const eventSource = new EventSource(`ftp_sse?${searchURL.toString()}`);
+        // eventSource.onmessage = function(event) {
+        //     let data = event.data.split("|");
+        //     console.log("received data:", data);
+        //     let seq = Number.parseInt(data[0]);
+        //     if (seq === 45 || seq === 55 || seq === 65 || seq === 100) {
+        //         let eMsg = {};
+        //         eventSource.close();
+        //         status.innerHTML = seq < 100 ? "Upload Failed." : "Upload completed.";
+        //         eMsg = seq === 100 ? JSON.parse(data[1]) : data[1];
+        //         progressBar.style.width = data[0] + '%';
+        //         progressBar.innerHTML = data[0] + '%';
+        //         document.getElementById('start-upload').disabled = false;
+        //         displayMessageUploaded(eMsg);
+        //     } else {
+        //         status.innerHTML = data[1];
+        //         progressBar.style.width = data[0] + '%';
+        //         progressBar.innerHTML = data[0] + '%';
+        //         displayMessageUploaded(data[1]);
+        //     }
+        // };
+        // eventSource.onopen = function() {
+        //     console.log("Connected...");
+        // }
+        // eventSource.onerror = function(event) {
+        //     eventSource.close()
+        // }
 
     });
 </script>

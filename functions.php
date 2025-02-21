@@ -2,7 +2,7 @@
 
 function get_base_uri_path()
 {
-    return $_ENV['BASE_URI'] ?? "/smcc-befs";
+    return $_ENV['BEFS_BASE_URI'] ?? "/smcc-befs";
 }
 
 function is_current_unauthenticated_page()
@@ -28,19 +28,23 @@ function get_current_path()
 
 function load_dotenv($filename = ".env")
 {
+    global $_ENV;
     if (!file_exists($filename)) {
         return;
     }
     $envFile = file_get_contents($filename);
     $envLines = explode("\n", $envFile);
     foreach ($envLines as $line) {
-        if (strpos($line, "#") === 0) {
+        if (strpos($line, "#") === 0 || $line === "" || $line === "=") {
             continue;
         }
         $linekv = explode("=", $line);
+        if (count($linekv) !== 2) {
+            continue;
+        }
         $key = trim($linekv[0]);
         $value = trim($linekv[1]);
-        putenv("{$key}={$value}");
+        $_ENV[$key] = $value;
     }
 }
 

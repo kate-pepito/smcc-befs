@@ -29,6 +29,7 @@ require_once __DIR__ . '/dbconnect.php';
     exit;
 }
 
+
 // check if user is logged in
 if ($user_id === null || $account_type === null) {
     unset($_SESSION['user_id']);

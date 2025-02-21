@@ -1,17 +1,18 @@
 <?php
 // Set headers for Server-Sent Events
-header('Content-Type: text/event-stream');
-header('Cache-Control: no-cache');
-header('Connection: keep-alive');
+// header('Content-Type: text/event-stream');
+// header('Cache-Control: no-cache');
+// header('Connection: keep-alive');
 
-function sendEvent($data, $event = null) {
-    if ($event) {
-        echo "event: $event\n";
-    }
-    echo "data: " . $data . "\n\n";
-    ob_flush();
-    flush();
-}
+// function sendEvent($data, $event = null) {
+//     if ($event) {
+//         echo "event: $event\n";
+//     }
+//     echo "data: " . $data . "\n\n";
+//     ob_flush();
+//     flush();
+// }
+header('Content-Type: application/json');
 
 function copyFilesRecursively($source, $destination, $excluded_files = []) {
     if (is_dir($source)) {
@@ -89,10 +90,10 @@ function uploadFilesRecursively($conn_id, $local_dir, $remote_dir, &$uploaded_fi
         } else {
             if (ftp_put($conn_id, $remote_path, $local_path, FTP_BINARY)) {
                 $uploaded_files[] = ['success' => $remote_path];
-                sendEvent(" $current_count|Uploaded file: $remote_path");
+                // sendEvent(" $current_count|Uploaded file: $remote_path");
             } else {
                 $uploaded_files[] = ['error' => "Failed to upload $remote_path"];
-                sendEvent("$current_count|Error uploading file: $remote_path");
+                // sendEvent("$current_count|Error uploading file: $remote_path");
             }
         }
     }
@@ -107,15 +108,15 @@ $dist_folder = isset($_GET['ftp_src']) ? __DIR__ . DIRECTORY_SEPARATOR . urldeco
 $workspace_folder = isset($_GET['ftp_workspace']) ?  __DIR__ . DIRECTORY_SEPARATOR . urldecode($_GET['ftp_workspace']) . DIRECTORY_SEPARATOR : __DIR__ . DIRECTORY_SEPARATOR;
 
 // 1. Delete dist folder
-sendEvent('10|Deleting dist folder...');
+// sendEvent('10|Deleting dist folder...');
 deleteDirectory($dist_folder);
 
 // 2. Copy files to dist
-sendEvent('20|Copying files to dist...');
+// sendEvent('20|Copying files to dist...');
 $excluded_files = [
     'dist', '.DS_Store', '.git', '.gitignore', 'node_modules', 'package.json', 'ftp_sse.php',
     'ftp.php', 'yarn.lock', 'LICENSE', 'README.md', '.vscode', '.env', '.env.production', '_passwords.txt',
-    'vendor', // remove vendor folder from exception if needed to upload (big files)
+    // 'vendor', // remove vendor folder from exception if needed to upload (big files)
 ];
 copyFilesRecursively($workspace_folder, $dist_folder, $excluded_files);
 copyFilesRecursively("$workspace_folder.env.production", "$dist_folder.env");
@@ -123,43 +124,41 @@ copyFilesRecursively("$workspace_folder.env.production", "$dist_folder.env");
 
 // // 3. Connect to FTP
 // sendEvent('40|Connecting to FTP...');
-// $conn_id = ftp_connect($ftp_server, 21);
-// if (!$conn_id) {
-//     sendEvent('45|Could not connect to FTP server');
-//     exit;
-// }
+$conn_id = ftp_connect($ftp_server, 21);
+if (!$conn_id) {
+    // sendEvent('45|Could not connect to FTP server');
+    exit;
+}
 
 // // 4. Authenticate to FTP
 // sendEvent('50|Authenticating to FTP...');
-// if (!ftp_login($conn_id, $ftp_username, $ftp_password)) {
-//     sendEvent('55|FTP login failed');
-//     exit;
-// }
+if (!ftp_login($conn_id, $ftp_username, $ftp_password)) {
+    // sendEvent('55|FTP login failed');
+    exit;
+}
 
 
 // // 5. Change directory
 // sendEvent('60|Change Current Directory on FTP...');
-// if (!ftp_pasv($conn_id, true) || !ftp_chdir($conn_id, $ftp_directory)) {
-//     sendEvent("65|Failed to change directory to $ftp_directory");
-//     exit;
-// }
+if (!ftp_pasv($conn_id, true) || !ftp_chdir($conn_id, $ftp_directory)) {
+    // sendEvent("65|Failed to change directory to $ftp_directory");
+    exit;
+}
 
 // // 6. Upload files
-// $files = array_diff(scandir($dist_folder), ['.', '..']);
-// $count_files = (1 / count($files)) * 39;
-// $i = 0;
+$files = array_diff(scandir($dist_folder), ['.', '..']);
 
-// $dirExists = ftpDirectoryExists($conn_id, $ftp_directory); // it says true;
+$dirExists = ftpDirectoryExists($conn_id, $ftp_directory); // it says true;
 
-// if (!$dirExists) {
-//     sendEvent("65|Failed to change directory to $ftp_directory");
-//     exit;
-// }
+if (!$dirExists) {
+    // sendEvent("65|Failed to change directory to $ftp_directory");
+    exit;
+}
 
-// $uploaded_files = [];
-// uploadFilesRecursively($conn_id, $dist_folder, $ftp_directory, $uploaded_files, 60);
+$uploaded_files = [];
+uploadFilesRecursively($conn_id, $dist_folder, $ftp_directory, $uploaded_files, 60);
 
-// ftp_close($conn_id);
-sendEvent('100|' . json_encode($uploaded_files));
+ftp_close($conn_id);
+// // sendEvent('100|' . json_encode($uploaded_files));
 
-exit;
+die(json_encode($uploaded_files));
