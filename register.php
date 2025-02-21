@@ -30,13 +30,13 @@ if (isset($_POST['add_student'])) {
                   or die(mysqli_error($conn));
         if (mysqli_query($conn, $query)) {
             echo "<script type='text/javascript'>alert('Student Successfully Registered!');
-            document.location='index.php'</script>";
+            document.location='$BASE_URL'</script>";
         } else {
             echo "Error: " . $query . "<br>" . mysqli_error($conn);
         }
     } else {
         echo "<script type='text/javascript'>alert('Password did not match!');
-            document.location='register.php'</script>";
+            document.location='register'</script>";
     }
 }
 ?>

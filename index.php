@@ -48,11 +48,15 @@ if (get_uri_path() === get_base_uri_path() . "/_hash_passwords") {
 if ($user_id === null || $account_type === null) {
     unset($_SESSION['user_id']);
     unset($_SESSION['account_type']);
-    if (get_uri_path() !== get_base_uri_path() . "/") {
+    if (
+        get_uri_path() !== get_base_uri_path() . "/" &&
+        substr(get_uri_path(), strlen(get_base_uri_path())) !== "/register"
+    ) {
         header("Location: " . get_base_uri());
     }
+    $page_to_redirect = substr(get_uri_path(), strlen(get_base_uri_path())) === "/register" ? "register" : "login_page";
     render(
-        implode(DIRECTORY_SEPARATOR, [__DIR__, "login_page"]),
+        implode(DIRECTORY_SEPARATOR, [__DIR__, $page_to_redirect]),
         [
             "BASE_URL" => get_base_uri(),
             "conn" => $conn,
