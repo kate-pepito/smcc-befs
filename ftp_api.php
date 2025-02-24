@@ -143,7 +143,10 @@ function uploadFilesRecursively($conn_id, $local_base_dir, $local_file, $remote_
 function getDirectoryFilesRecursively($dir_path, &$directory_files, $excluded_files = [])
 {
     $local_dir_path = __DIR__ . DIRECTORY_SEPARATOR . trim(rtrim(ltrim(str_replace("/", DIRECTORY_SEPARATOR, $dir_path), "/"), "/"));
-    $files = array_filter(array_diff(scandir($local_dir_path), ['.', '..']), fn($v) => !in_array($v, $excluded_files));
+    if (!is_dir($local_dir_path) && !is_file($local_dir_path)) return;
+    $dirscan = scandir($local_dir_path);
+    $dir = array_diff($dirscan, ['.', '..']);
+    $files = array_filter($dir, fn($v) => !in_array($v, $excluded_files));
     $i = 0;
     foreach ($files as $file) {
         $directory_files[] = [
