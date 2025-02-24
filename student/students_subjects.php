@@ -1,6 +1,8 @@
 <?php
 
-$query = mysqli_query($conn, "select
+$user_id = user_id();
+
+$query = mysqli_query(conn(), "select
 students.profile_image as profile_image,
 students.lrn_num as lrn_num,
 students.fname as fname,
@@ -22,8 +24,8 @@ where
 students.year_level_id = year_level.id and 
 students.course_id = course.id and
 students.section_id = section.id and
-students.id = '$user_id'
-") or die(mysqli_error($conn));
+students.id = '" . $user_id . "'
+") or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_array($query)) {
   $lrn_num = $row['lrn_num'];
   $fname = $row['fname'];
@@ -36,26 +38,26 @@ if ($row = mysqli_fetch_array($query)) {
   $sec_desc = $row['sec_desc'];
   $about = $row['about'];
   $level = $row['level'];
-  $profile_image = "$BASE_URL/" . $row['profile_image'];
+  $profile_image = base_url() . "/" . $row['profile_image'];
 
   // Set a default profile image if none is provided
   if (empty($profile_image)) {
-    $profile_image = "$BASE_URL/assets/img/profile-img2.jpg";
+    $profile_image = base_url() . "/assets/img/profile-img2.jpg";
   }
 } else {
-  echo "Error: " . $query . "<br>" . mysqli_error($conn);
+  echo "Error: " . $query . "<br>" . mysqli_error(conn());
 }
 
-$query = mysqli_query($conn, "select count(subjects_id) as sub_count
+$query = mysqli_query(conn(), "select count(subjects_id) as sub_count
 from 
 students_subjects
 where 
-students_id = '$user_id'
-") or die(mysqli_error($conn));
+students_id = '" . $user_id . "'
+") or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_array($query)) {
   $sub_count = $row['sub_count'];
 } else {
-  echo "Error: " . $query . "<br>" . mysqli_error($conn);
+  echo "Error: " . $query . "<br>" . mysqli_error(conn());
 }
 ?>
 <!DOCTYPE html>
@@ -70,24 +72,24 @@ if ($row = mysqli_fetch_array($query)) {
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-  <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 
   <!-- =======================================================
   * Template Name: NiceAdmin
@@ -101,7 +103,7 @@ if ($row = mysqli_fetch_array($query)) {
 <body class="toggle-sidebar">
   <?php
 
-  $query = mysqli_query($conn, "select * from students where id = '$user_id'") or die(mysqli_error($conn));
+  $query = mysqli_query(conn(), "select * from students where id = '" . $user_id . "'") or die(mysqli_error(conn()));
   if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -115,7 +117,7 @@ if ($row = mysqli_fetch_array($query)) {
 
     <div class="d-flex align-items-center justify-content-between">
       <a href="students_home_sc" class="logo d-flex align-items-center">
-        <img src="<?= $BASE_URL ?>/images/Smcc_logo.gif" alt="">
+        <img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="">
         <span class="d-none d-lg-block">SMCC - BEFS</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -150,7 +152,7 @@ if ($row = mysqli_fetch_array($query)) {
                 <span>Back</span>
               </a>
               </a>
-              <a href="<?= $BASE_URL ?>/log_out_sc" class="dropdown-item"><i class="bi bi-box-arrow-right"></i>
+              <a href="<?= base_url() ?>/log_out_sc" class="dropdown-item"><i class="bi bi-box-arrow-right"></i>
                 Log Out
               </a>
             </li>
@@ -191,7 +193,7 @@ if ($row = mysqli_fetch_array($query)) {
 
               <?php
               // Query to calculate the sum of the average scores for all subjects in PREBOARD 1
-              $stmt = $conn->prepare("
+              $stmt = conn()->prepare("
     SELECT SUM(average) AS total_average
     FROM student_score
     WHERE stud_id = ? 
@@ -232,7 +234,7 @@ if ($row = mysqli_fetch_array($query)) {
                 <tbody>
                   <?php
                   
-                  $query = mysqli_query($conn, "
+                  $query = mysqli_query(conn(), "
                     SELECT 
     subjects.code AS code,
     subjects.description AS description,
@@ -256,12 +258,12 @@ LEFT JOIN
     subject_percent 
     ON subject_percent.sub_id = subjects.id
 WHERE 
-    student_score.stud_id = '$user_id' 
+    student_score.stud_id = '" . $user_id . "' 
     AND student_score.level = 'PREBOARD1'
     AND students_subjects.level = 'PREBOARD1'
 GROUP BY 
     subjects.code, subjects.description;
-                ") or die(mysqli_error($conn));
+                ") or die(mysqli_error(conn()));
 
                   while ($row = mysqli_fetch_array($query)) {
                     $code = $row['code'];
@@ -308,7 +310,7 @@ GROUP BY
 
               <?php
               // Query to calculate the sum of the average scores for all subjects in PREBOARD 1
-              $stmt = $conn->prepare("
+              $stmt = conn()->prepare("
     SELECT SUM(average) AS total_average
     FROM student_score
     WHERE stud_id = ? 
@@ -349,7 +351,7 @@ GROUP BY
                 <tbody>
                   <?php
                   
-                  $query = mysqli_query($conn, "
+                  $query = mysqli_query(conn(), "
                    SELECT 
     subjects.code AS code,
     subjects.description AS description,
@@ -373,13 +375,13 @@ LEFT JOIN
     subject_percent 
     ON subject_percent.sub_id = subjects.id
 WHERE 
-    student_score.stud_id = '$user_id' 
+    student_score.stud_id = '" . $user_id . "' 
     AND student_score.level = 'PREBOARD2'
     AND students_subjects.level = 'PREBOARD2'
 GROUP BY 
     subjects.code, subjects.description;
 
-                ") or die(mysqli_error($conn));
+                ") or die(mysqli_error(conn()));
 
                   while ($row = mysqli_fetch_array($query)) {
                     $code = $row['code'];
@@ -429,17 +431,17 @@ GROUP BY
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/echarts/echarts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/quill/quill.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/php-email-form/validate.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+  <script src="<?= base_url() ?>/assets/js/main.js"></script>
 
 </body>
 

@@ -2,18 +2,7 @@
 
 authenticated_page("dean");
 
-$query = mysqli_query($conn, "select * from users where id = '$user_id'") or die(mysqli_error($conn));
-if ($row = mysqli_fetch_array($query)) {
-    $logged_in = $row['logged_in'];
-    if ($logged_in == "NO" || $logged_in == null) {
-        echo "<script type='text/javascript'>alert('Please login again!');
-		document.location='index.php'</script>";
-    } else {
-    }
-}
-
-// Get the current school year
-$current_school_year_query = mysqli_query($conn, "SELECT id, description FROM school_year WHERE status = 'Current Set' LIMIT 1") or die(mysqli_error($conn));
+$current_school_year_query = mysqli_query(conn(), "SELECT id, description FROM school_year WHERE status = 'Current Set' LIMIT 1") or die(mysqli_error(conn()));
 if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
     $current_school_year_id = $current_school_year_row['id'];
     $current_school_year_description = $current_school_year_row['description'];
@@ -35,30 +24,30 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 </head>
 
 <body>
     <?php
 
-    $query = mysqli_query($conn, "select * from users where id = '$user_id'") or die(mysqli_error($conn));
+    $query = mysqli_query(conn(), "select * from users where id = '" . user_id() . "'") or die(mysqli_error(conn()));
     if ($row = mysqli_fetch_array($query)) {
         $fname = $row['fname'];
         $lname = $row['lname'];
@@ -110,11 +99,11 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
 
                                         <?php
                                         // Fetch the dean's course
-                                        $course_query = mysqli_query($conn, "
+                                        $course_query = mysqli_query(conn(), "
                         SELECT description FROM course 
                         JOIN dean_course ON course.id = dean_course.course_id 
-                        WHERE dean_course.user_id = '$user_id'
-                    ") or die(mysqli_error($conn));
+                        WHERE dean_course.user_id = '" . user_id() . "'
+                    ") or die(mysqli_error(conn()));
 
                                         if ($course_row = mysqli_fetch_array($course_query)) {
                                             $deans_course = $course_row['description'];
@@ -123,13 +112,13 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
                                         }
 
                                         // Query to count the pending students based on the dean's course
-                                        $query = mysqli_query($conn, "
+                                        $query = mysqli_query(conn(), "
                         SELECT COUNT(students.id) AS student_count_for_approval 
                         FROM students 
                         JOIN course ON students.course_id = course.id 
                         WHERE students.status = 'For Approval' 
                         AND course.description = '$deans_course'
-                    ") or die(mysqli_error($conn));
+                    ") or die(mysqli_error(conn()));
 
                                         if ($row = mysqli_fetch_array($query)) {
                                             $student_count_for_approval = $row['student_count_for_approval'];
@@ -161,11 +150,11 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
 
                                         <?php
                                         // Fetch the dean's course
-                                        $course_query = mysqli_query($conn, "
+                                        $course_query = mysqli_query(conn(), "
                         SELECT description FROM course 
                         JOIN dean_course ON course.id = dean_course.course_id 
-                        WHERE dean_course.user_id = '$user_id'
-                    ") or die(mysqli_error($conn));
+                        WHERE dean_course.user_id = '" . user_id() . "'
+                    ") or die(mysqli_error(conn()));
 
                                         if ($course_row = mysqli_fetch_array($course_query)) {
                                             $deans_course = $course_row['description'];
@@ -174,13 +163,13 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
                                         }
 
                                         // Query to count the active students based on the dean's course
-                                        $query = mysqli_query($conn, "
+                                        $query = mysqli_query(conn(), "
                         SELECT COUNT(students.id) AS student_count_active 
                         FROM students 
                         JOIN course ON students.course_id = course.id 
                         WHERE students.status = 'Active' 
                         AND course.description = '$deans_course'
-                    ") or die(mysqli_error($conn));
+                    ") or die(mysqli_error(conn()));
 
                                         if ($row = mysqli_fetch_array($query)) {
                                             $student_count_active = $row['student_count_active'];
@@ -212,13 +201,13 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
 
                                         <?php
                                         // Query to count the inactive students based on the dean's course
-                                        $query = mysqli_query($conn, "
+                                        $query = mysqli_query(conn(), "
                         SELECT COUNT(students.id) AS student_count_inactive 
                         FROM students 
                         JOIN course ON students.course_id = course.id 
                         WHERE students.status = 'Inactive' 
                         AND course.description = '$deans_course'
-                    ") or die(mysqli_error($conn));
+                    ") or die(mysqli_error(conn()));
 
                                         if ($row = mysqli_fetch_array($query)) {
                                             $student_count_inactive = $row['student_count_inactive'];
@@ -245,7 +234,7 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
                 $school_year_id = isset($_GET['school_year_id']) ? $_GET['school_year_id'] : $current_school_year_id; // Default to current school year if not provided
 
                 // Query to calculate the total average per subject for students under the dean's course, filtered by school year
-                $query = mysqli_query($conn, "
+                $query = mysqli_query(conn(), "
     SELECT 
         subjects.description AS subject_name,
         AVG(student_score.average) AS avg_score,
@@ -261,13 +250,13 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
     LEFT JOIN 
         subject_percent ON subject_percent.sub_id = subjects.id
     WHERE 
-        dean_course.user_id = $user_id
+        dean_course.user_id = '". user_id() ."'
         AND students.school_year_id = $school_year_id -- Filter by selected school year
     GROUP BY 
         subjects.id
     ORDER BY 
         avg_score DESC
-") or die(mysqli_error($conn));
+") or die(mysqli_error(conn()));
 
                 // Prepare arrays for chart data
                 $subject_names = [];
@@ -292,7 +281,7 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
                                 <label for="school_year_id">School Year:</label>
                                 <select name="school_year_id" id="school_year_id">
                                     <?php
-                                    $school_year_query = mysqli_query($conn, "SELECT id, description FROM school_year ORDER BY id ASC");
+                                    $school_year_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY id ASC");
                                     while ($row = mysqli_fetch_array($school_year_query)) {
                                         $selected = ($row['id'] == $school_year_id) ? 'selected' : '';
                                         echo "<option value='{$row['id']}' $selected>{$row['description']}</option>";
@@ -397,10 +386,9 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
                                     // Get the selected school year, user_id, and dean_course from the query string
                                     $selected_school_year = isset($_GET['school_year_id']) ? $_GET['school_year_id'] : $current_school_year_id; // Default to current school year if not provided
                                     $dean_course = isset($_GET['dean_course']) ? $_GET['dean_course'] : '';
-                                    $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : '';
 
                                     // Modify the query to only show students linked to the dean_course table for the given user_id
-                                    $query = mysqli_query($conn, "
+                                    $query = mysqli_query(conn(), "
                 SELECT
                     year_level.description AS yr_desc,
                     section.description AS sec_desc,
@@ -424,10 +412,10 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
                 JOIN section ON students.section_id = section.id
                 WHERE ('$selected_school_year' = '' OR students.school_year_id = '$selected_school_year')
                 AND ('$dean_course' = '' OR students.course_id = '$dean_course')
-                AND students.course_id IN (SELECT course_id FROM dean_course WHERE user_id = '$user_id')
+                AND students.course_id IN (SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "')
                 ORDER BY sum_average DESC
                 LIMIT 10
-                ") or die(mysqli_error($conn));
+                ") or die(mysqli_error(conn()));
 
                                     while ($row = mysqli_fetch_array($query)) {
                                         $stud_id = $row['stud_id'];
@@ -484,17 +472,17 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
-    <script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/echarts/echarts.min.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/quill/quill.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/php-email-form/validate.js"></script>
 
     <!-- Template Main JS File -->
-    <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+    <script src="<?= base_url() ?>/assets/js/main.js"></script>
 
 </body>
 

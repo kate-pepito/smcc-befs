@@ -2,9 +2,9 @@
 
 authenticated_page("reviewer");
 
-$sub_id = mysqli_real_escape_string($conn, $_REQUEST['sub_id']);
+$sub_id = mysqli_real_escape_string(conn(), $_REQUEST['sub_id']);
 
-$subject_query = mysqli_query($conn, "SELECT description FROM subjects WHERE id = '$sub_id'") or die(mysqli_error($conn));
+$subject_query = mysqli_query(conn(), "SELECT description FROM subjects WHERE id = '$sub_id'") or die(mysqli_error(conn()));
 $subject_description = "Subject Not Found"; // Default value if query fails
 if ($subject_row = mysqli_fetch_assoc($subject_query)) {
     $subject_description = $subject_row['description'];
@@ -20,29 +20,29 @@ if ($subject_row = mysqli_fetch_assoc($subject_query)) {
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-  <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 </head>
 
 <body>
 <?php 
-$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
+$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = ucfirst(strtolower($row['fname']));
     $lname = ucfirst(strtolower($row['lname']));
@@ -105,7 +105,7 @@ if ($row = mysqli_fetch_array($query)) {
                     </thead>
                     <tbody>
 <?php
-$query = mysqli_query($conn, "
+$query = mysqli_query(conn(), "
     SELECT 
         students.lname AS slname,
         students.fname AS sfname,
@@ -122,7 +122,7 @@ $query = mysqli_query($conn, "
     INNER JOIN section ON students.section_id = section.id
     WHERE student_score.sub_id = '$sub_id' AND student_score.level = 'PREBOARD1'
     ORDER BY students.lname ASC
-") or die(mysqli_error($conn));
+") or die(mysqli_error(conn()));
 
 $counter = 1;
 while ($row = mysqli_fetch_array($query)) {
@@ -148,7 +148,7 @@ while ($row = mysqli_fetch_array($query)) {
             <form method='POST' action='reviewer_update_remarks'>
                 <input type='hidden' name='sid' value='{$sid}'>
                 <input type='hidden' name='sub_id' value='{$sub_id}'>
-                <input type='hidden' name='user_id' value='{$user_id}'>
+                <input type='hidden' name='user_id' value='{user_id()}'>
                 <input type='hidden' name='level' value='PREBOARD1'>
                 <textarea name='remarks' class='form-control' rows='2'>" . htmlspecialchars($remarks) . "</textarea>
                 <button type='submit' class='btn btn-primary btn-sm mt-2'>Save</button>
@@ -181,7 +181,7 @@ while ($row = mysqli_fetch_array($query)) {
                     </thead>
                     <tbody>
 <?php
-$query = mysqli_query($conn, "
+$query = mysqli_query(conn(), "
     SELECT 
         students.lname AS slname,
         students.fname AS sfname,
@@ -198,7 +198,7 @@ $query = mysqli_query($conn, "
     INNER JOIN section ON students.section_id = section.id
     WHERE student_score.sub_id = '$sub_id' AND student_score.level = 'PREBOARD2'
     ORDER BY students.lname ASC
-") or die(mysqli_error($conn));
+") or die(mysqli_error(conn()));
 
 $counter = 1;
 while ($row = mysqli_fetch_array($query)) {
@@ -224,7 +224,7 @@ while ($row = mysqli_fetch_array($query)) {
             <form method='POST' action='reviewer_update_remarks'>
                 <input type='hidden' name='sid' value='{$sid}'>
                 <input type='hidden' name='sub_id' value='{$sub_id}'>
-                <input type='hidden' name='user_id' value='{$user_id}'>
+                <input type='hidden' name='user_id' value='{user_id()}'>
                 <input type='hidden' name='level' value='PREBOARD2'>
                 <input type='hidden' name='active-tab' value='Preboard'>
                 <textarea name='remarks' class='form-control' rows='2'>" . htmlspecialchars($remarks) . "</textarea>
@@ -253,7 +253,7 @@ while ($row = mysqli_fetch_array($query)) {
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= base_url() ?>/assets/js/main.js"></script>
 </body>
 </html>

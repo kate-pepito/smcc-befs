@@ -6,7 +6,7 @@ authenticated_page("reviewer");
 $stud_id = htmlspecialchars($_REQUEST['stud_id'], ENT_QUOTES, 'UTF-8');
 
 // Fetch student details using prepared statement
-$stmt = $conn->prepare("SELECT
+$stmt = conn()->prepare("SELECT
     students.profile_image AS student_profile_image,
     students.lrn_num AS lrn_num,
     students.fname AS fname,
@@ -41,11 +41,11 @@ if ($row = $result->fetch_array()) {
     $about = $row['about'];
     $student_profile_image = $row['student_profile_image'];
 } else {
-    echo "Error: " . mysqli_error($conn);
+    echo "Error: " . mysqli_error(conn());
 }
 
 // Fetch subject count using prepared statement
-$stmt = $conn->prepare("SELECT COUNT(subjects_id) AS sub_count
+$stmt = conn()->prepare("SELECT COUNT(subjects_id) AS sub_count
     FROM students_subjects
     WHERE students_id = ?");
 $stmt->bind_param("i", $stud_id);
@@ -54,11 +54,13 @@ $result = $stmt->get_result();
 if ($row = $result->fetch_array()) {
     $sub_count = $row['sub_count'];
 } else {
-    echo "Error: " . mysqli_error($conn);
+    echo "Error: " . mysqli_error(conn());
 }
 
+$user_id = user_id();
+
 // Fetch dean/user details using prepared statement
-$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+$stmt = conn()->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -78,18 +80,18 @@ if ($row = $result->fetch_array()) {
     <title>Active Students - SMCC</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -128,7 +130,7 @@ if ($row = $result->fetch_array()) {
                                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
                                     <form>
                                         </br>
-                                        <img src='<?php echo !empty($student_profile_image) ? "$BASE_URL/{$student_profile_image}" : "$BASE_URL/assets/img/profile-img2.jpg"; ?>' alt='Profile Image' class='rounded-circle' width='100'>
+                                        <img src='<?php echo !empty($student_profile_image) ? base_url() . "/{$student_profile_image}" : base_url() . "/assets/img/profile-img2.jpg"; ?>' alt='Profile Image' class='rounded-circle' width='100'>
                                         </br>
 
                                         <h5 class="card-title">About</h5>
@@ -187,7 +189,7 @@ if ($row = $result->fetch_array()) {
                                         <div class="row">
                                             <div class="col-lg-3 col-md-4 label">Average Score</div>
                                             <?php
-                                            $stmt = $conn->prepare("SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = ?");
+                                            $stmt = conn()->prepare("SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = ?");
                                             $stmt->bind_param("i", $stud_id);
                                             $stmt->execute();
                                             $result = $stmt->get_result();
@@ -212,7 +214,7 @@ if ($row = $result->fetch_array()) {
 
                                                         <?php
                                                         // Query to calculate the total average score for PREBOARD 1
-                                                        $stmt = $conn->prepare("
+                                                        $stmt = conn()->prepare("
                         SELECT AVG(average) AS total_average
                         FROM student_score
                         WHERE stud_id = ? 
@@ -249,7 +251,7 @@ if ($row = $result->fetch_array()) {
                                                             <tbody>
                                                                 <?php
                                                                 // Query to fetch subjects and their individual averages for PREBOARD 1
-                                                                $query = mysqli_query($conn, "
+                                                                $query = mysqli_query(conn(), "
                                 SELECT 
                                     subjects.code AS code,
                                     subjects.description AS description,
@@ -277,7 +279,7 @@ if ($row = $result->fetch_array()) {
                                     AND student_score.level = 'PREBOARD1'
                                 GROUP BY 
                                     subjects.code, subjects.description;
-                            ") or die(mysqli_error($conn));
+                            ") or die(mysqli_error(conn()));
 
                                                                 while ($row = mysqli_fetch_array($query)) {
                                                                     $code = $row['code'];
@@ -335,7 +337,7 @@ if ($row = $result->fetch_array()) {
                                                             </thead>
                                                             <tbody>
                                                                 <?php
-                                                                $query = mysqli_query($conn, "
+                                                                $query = mysqli_query(conn(), "
                                                                     SELECT 
                                                                         subjects.code AS code,
                                                                         subjects.description AS description,
@@ -364,7 +366,7 @@ if ($row = $result->fetch_array()) {
                                                                         AND students_subjects.level = 'PREBOARD2'
                                                                     GROUP BY 
                                                                         subjects.code, subjects.description;
-                                                                ") or die(mysqli_error($conn));
+                                                                ") or die(mysqli_error(conn()));
 
                                                                 while ($row = mysqli_fetch_array($query)) {
                                                                     $code = $row['code'];
@@ -408,13 +410,13 @@ if ($row = $result->fetch_array()) {
     </main>
 
     <!-- Vendor JS Files -->
-    <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/php-email-form/validate.js"></script>
 
     <!-- Template Main JS File -->
-    <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+    <script src="<?= base_url() ?>/assets/js/main.js"></script>
 </body>
 
 </html>

@@ -13,7 +13,7 @@ function is_current_unauthenticated_page()
         "/register",
         "/_hash_passwords",
         "/ftp",
-        "/ftp_sse",
+        "/ftp_api",
     ];
     $bsp = strlen(get_base_uri_path()) === 0 ? null : get_base_uri_path();
     $trimed_uri = $bsp === null ? get_uri_path() : substr(get_uri_path(), strlen($bsp));
@@ -25,6 +25,7 @@ function get_current_path()
     $bsp = strlen(get_base_uri_path()) === 0 ? null : get_base_uri_path();
     return $bsp === null ? get_uri_path() : substr(get_uri_path(), strlen($bsp));
 }
+
 
 function load_dotenv($filename = ".env")
 {
@@ -48,6 +49,15 @@ function load_dotenv($filename = ".env")
     }
 }
 
+function conn()
+{
+    global $conn;
+    if (!isset($conn)) {
+        require_once __DIR__ . DIRECTORY_SEPARATOR . './dbconnect.php';
+        return $conn;
+    }
+    return $conn;
+}
 
 function redirect_to_no_php_path()
 {
@@ -68,7 +78,7 @@ function redirect_to_no_php_path()
     }
 }
 
-function get_base_uri()
+function base_url(): string
 {
     return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . get_base_uri_path();
 }
@@ -179,12 +189,20 @@ function is_nav_active(...$uri_paths): bool
     return false;
 }
 
+function user_id()
+{
+    return $_SESSION['user_id'] ?? null;
+}
+
+function account_type()
+{
+    return $_SESSION['account_type'] ?? null;
+}
+
 function authenticated_page(string $accType = "")
 {
-    $user_id = $_SESSION['user_id'] ?? null;
-    $account_type = $_SESSION['account_type'] ?? null;
-    if (($user_id === null || $account_type === null)) {
-        header("Location: " . get_base_uri());
+    if ((user_id() === null || account_type() === null)) {
+        header("Location: " . base_url());
         exit;
     }
     $accs = [
@@ -193,9 +211,9 @@ function authenticated_page(string $accType = "")
         "reviewer" => "reviewer",
         "student" => "smcc-students"
     ];
-    if ($accType !== $account_type) {
-        $redirect_to = get_base_uri_path() . "/" . $accs[$account_type];
-        switch ($account_type) {
+    if ($accType !== account_type()) {
+        $redirect_to = get_base_uri_path() . "/" . $accs[account_type()];
+        switch (account_type()) {
             case "admin":
                 $redirect_to .= "/admin_home";
                 break;
@@ -214,11 +232,10 @@ function authenticated_page(string $accType = "")
     }
 }
 
-function render(string $page_file_path = "", array $global_var_args = [])
+function render(string $page_file_path = "")
 {
     try {
-        extract($global_var_args);
-        if ($user_id !== null && get_uri_path() === get_base_uri_path() . "/") {
+        if (user_id() !== null && get_uri_path() === get_base_uri_path() . "/") {
             authenticated_page();
         }
         if (strlen($page_file_path) > 0 &&
@@ -243,7 +260,7 @@ function render(string $page_file_path = "", array $global_var_args = [])
         // Page error
         require_once "error_page.php";
     } finally {
-        $conn->close();
+        conn()->close();
         exit;
     }
 }

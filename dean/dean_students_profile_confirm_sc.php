@@ -3,7 +3,7 @@
 authenticated_page("dean");
 
   // The admin's user ID
-$stud_id = mysqli_real_escape_string($conn, $_REQUEST['stud_id']);  // The student ID to enroll
+$stud_id = mysqli_real_escape_string(conn(), $_REQUEST['stud_id']);  // The student ID to enroll
 
 if (isset($_POST['enroll_student'])) {
 
@@ -17,7 +17,7 @@ if (isset($_POST['enroll_student'])) {
               WHERE id = '$stud_id'";
 
     // Execute the query
-    if (mysqli_query($conn, $query)) {
+    if (mysqli_query(conn(), $query)) {
         // Successfully enrolled, redirect with alert
         echo "<script type='text/javascript'>
                 alert('Student Successfully Approve!');
@@ -25,7 +25,7 @@ if (isset($_POST['enroll_student'])) {
               </script>";
     } else {
         // Query failed, display error message
-        echo "Error: " . mysqli_error($conn);
+        echo "Error: " . mysqli_error(conn());
     }
 }
 ?>

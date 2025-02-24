@@ -28,7 +28,7 @@
     </a>
   </li>
   <li class="nav-item">
-    <a class="nav-link collapsed" href="dean_recommended">
+    <a class="nav-link collapsed" href="dean_forecasting">
         <i class="bi bi-bar-chart"></i> <!-- A bar chart icon represents forecasting and analytics -->
         <span>Forecasting</span>
     </a>

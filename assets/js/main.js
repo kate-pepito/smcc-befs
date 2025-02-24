@@ -44,7 +44,8 @@
    */
   if (select('.toggle-sidebar-btn')) {
     on('click', '.toggle-sidebar-btn', function(e) {
-      select('body').classList.toggle('toggle-sidebar')
+      select('body').classList.toggle('toggle-sidebar');
+      window.sessionStorage.setItem('toggle-sidebar', JSON.stringify(select('body').classList.contains('toggle-sidebar')));
     })
   }
 
@@ -73,6 +74,12 @@
         navbarlink.classList.remove('active')
       }
     })
+    // toggle sidebar from sessionStorage
+    let toggle = sessionStorage.getItem('toggle-sidebar') === 'true';
+    if ((toggle && !select('body').classList.contains('toggle-sidebar')) ||
+      (!toggle && select('body').classList.contains('toggle-sidebar'))) {
+        select('body').classList.toggle('toggle-sidebar');
+    }
   }
   window.addEventListener('load', navbarlinksActive)
   onscroll(document, navbarlinksActive)

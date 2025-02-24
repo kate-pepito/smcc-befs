@@ -2,9 +2,9 @@
 
 authenticated_page("student");
 
-$stud_id = $user_id;
+$stud_id = user_id();
 
-$query = mysqli_query($conn, "select * from students where id = '$user_id'") or die(mysqli_error($conn));
+$query = mysqli_query(conn(), "select * from students where id = '" . user_id() . "'") or die(mysqli_error(conn()));
 
 while ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
@@ -24,7 +24,7 @@ while ($row = mysqli_fetch_array($query)) {
     <meta content="" name="description">
 
     <!-- Favicon -->
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,14 +36,14 @@ while ($row = mysqli_fetch_array($query)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Libraries Stylesheet -->
-    <link href="<?= $BASE_URL ?>/smcc-students/lib/animate/animate.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/smcc-students/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/smcc-students/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/smcc-students/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
     <!-- Customized Bootstrap Stylesheet -->
-    <link href="<?= $BASE_URL ?>/smcc-students/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/smcc-students/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Template Stylesheet -->
-    <link href="<?= $BASE_URL ?>/smcc-students/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/smcc-students/css/style.css" rel="stylesheet">
 
     <script type="text/javascript">
         window.onload = function() {
@@ -99,7 +99,7 @@ while ($row = mysqli_fetch_array($query)) {
 
 
                 // Modified query to include faculty name
-                $query = mysqli_query($conn, "
+                $query = mysqli_query(conn(), "
     SELECT 
         subjects.id AS sub_id, 
         subjects.code AS code, 
@@ -109,10 +109,10 @@ while ($row = mysqli_fetch_array($query)) {
     INNER JOIN subjects ON students_subjects.subjects_id = subjects.id
     LEFT JOIN faculty_subjects ON faculty_subjects.subjects_id = subjects.id
     LEFT JOIN users ON faculty_subjects.faculty_id = users.id
-    WHERE students_subjects.students_id = $user_id
+    WHERE students_subjects.students_id = user_id()
     AND students_subjects.status = 'NOT TAKEN'
     AND students_subjects.level = '$level'
-") or die(mysqli_error($conn));
+") or die(mysqli_error(conn()));
 
                 while ($row = mysqli_fetch_array($query)) {
                     $sub_id = $row['sub_id'];
@@ -122,7 +122,7 @@ while ($row = mysqli_fetch_array($query)) {
                 ?>
                     <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="service-item text-center pt-3">
-                            <a href="exam_form&sub_id=<?php echo $sub_id; ?>">
+                            <a href="exam_form?sub_id=<?php echo $sub_id; ?>">
                                 <div class="p-4">
                                     <i class="fa fa-3x fa-graduation-cap text-primary mb-4"></i>
                                     <p><?php echo $code; ?></p>
@@ -156,7 +156,7 @@ while ($row = mysqli_fetch_array($query)) {
 
                 <?php
 
-                $query = mysqli_query($conn, "select * from students") or die(mysqli_error($conn));
+                $query = mysqli_query(conn(), "select * from students") or die(mysqli_error(conn()));
                 while ($row = mysqli_fetch_array($query)) {
                     $fname = $row['fname'];
                     $about = $row['about'];

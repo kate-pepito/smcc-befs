@@ -1,7 +1,7 @@
 <?php
 
-if ($user_id !== null) {
-    header("Location: $BASE_URL");
+if (user_id() !== null) {
+    header("Location: " . base_url());
     exit;
 }
 
@@ -13,11 +13,11 @@ $stud_id = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize and retrieve inputs
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $username = mysqli_real_escape_string(conn(), $_POST['username']);
     $mypassword = $_POST['password'];
 
     // Query the users table
-    $query = mysqli_query($conn, "SELECT * FROM users WHERE username = '$username'") or die(mysqli_error($conn));
+    $query = mysqli_query(conn(), "SELECT * FROM users WHERE username = '$username'") or die(mysqli_error(conn()));
 
     // Check if user exists
     if (mysqli_num_rows($query) > 0) {
@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verify password and status
         if (password_verify($mypassword, $password_hashed) && $status == 'Active') {
             // Update logged_in status
-            mysqli_query($conn, "UPDATE users SET logged_in = 'YES' WHERE id = '$id'") or die(mysqli_error($conn));
+            mysqli_query(conn(), "UPDATE users SET logged_in = 'YES' WHERE id = '$id'") or die(mysqli_error(conn()));
             $_SESSION["user_id"] = $id;
             $_SESSION["account_type"] = strtolower($type);
             switch ($type){
@@ -47,13 +47,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     echo "<script>alert('Welcome, Dean!'); document.location='dean/dean_home_page';</script>";
             }
         } else {
-            echo "<script>alert('Invalid credentials or inactive account.'); document.location='$BASE_URL';</script>";
+            echo "<script>alert('Invalid credentials or inactive account.'); document.location='" . base_url() . "';</script>";
         }
     }
     // If not a user, check students table
     else {
         $sql = "SELECT * FROM students WHERE username = '$username'";
-        $result = mysqli_query($conn, $sql);
+        $result = mysqli_query(conn(), $sql);
 
         if (mysqli_num_rows($result) == 1) {
             $row = mysqli_fetch_assoc($result);
@@ -63,16 +63,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if (password_verify($mypassword, $password_hashed) && $status == 'Active') {
                 // Update logged_in status
-                mysqli_query($conn, "UPDATE students SET logged_in = 'YES' WHERE id = '$stud_id'") or die(mysqli_error($conn));
+                mysqli_query(conn(), "UPDATE students SET logged_in = 'YES' WHERE id = '$stud_id'") or die(mysqli_error(conn()));
                 $_SESSION["user_id"] = $stud_id;
                 $_SESSION["account_type"] = "student";
                 echo "<script>alert('Welcome, Student!'); document.location='smcc-students';</script>";
             } else {
-                echo "<script>alert('Invalid credentials or inactive account.'); document.location='$BASE_URL';</script>";
+                echo "<script>alert('Invalid credentials or inactive account.'); document.location='" . base_url() . "';</script>";
             }
 
         } else {
-            echo "<script>alert('Invalid credentials or inactive account.'); document.location='$BASE_URL';</script>";
+            echo "<script>alert('Invalid credentials or inactive account.'); document.location='" . base_url() . "';</script>";
         }
     }
 }
@@ -85,9 +85,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Login - SMCC</title>
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -103,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="row justify-content-center">
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
                             <div class="d-flex justify-content-center py-4">
-                                <img src="<?= $BASE_URL ?>/images/Smcc_logo.gif" alt="" width="150" height="150">
+                                <img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="" width="150" height="150">
                             </div>
                             <div class="card mb-3">
                                 <div class="card-body">
@@ -143,9 +143,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </section>
         </div>
     </main>
-    <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
-        fetch("<?= $BASE_URL ?>/_hash_passwords")
+        fetch("<?= base_url() ?>/_hash_passwords")
             .then()
             .catch();
     </script>

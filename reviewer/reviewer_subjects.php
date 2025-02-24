@@ -4,12 +4,12 @@ authenticated_page("reviewer");
 
 
 // Fetch the "Current Set" school year
-$current_school_year_query = mysqli_query($conn, "SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error($conn));
+$current_school_year_query = mysqli_query(conn(), "SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error(conn()));
 $current_school_year = mysqli_fetch_assoc($current_school_year_query);
 $current_school_year_id = $current_school_year['id'] ?? null;
 
 // Determine selected school year (default to "Current Set")
-$selected_school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ?? $current_school_year_id);
+$selected_school_year = mysqli_real_escape_string(conn(), $_GET['school_year'] ?? $current_school_year_id);
 
 ?>
 <!DOCTYPE html>
@@ -24,30 +24,30 @@ $selected_school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ??
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-  <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 
 </head>
 
 <body>
 <?php 
-$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
+$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = ucfirst(strtolower($row['fname']));
     $lname = ucfirst(strtolower($row['lname']));
@@ -83,7 +83,7 @@ if ($row = mysqli_fetch_array($query)) {
               <option value="" selected>All</option>
               <?php
                // Fetch all available school years
-          $sy_query = mysqli_query($conn, "SELECT id, description FROM school_year ORDER BY description ASC");
+          $sy_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY description ASC");
           while ($sy_row = mysqli_fetch_assoc($sy_query)) {
             $selected = ($sy_row['id'] == $selected_school_year) ? 'selected' : '';
             echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";
@@ -120,7 +120,7 @@ if ($row = mysqli_fetch_array($query)) {
                 <?php
                // Build the query with the school year filter
               $school_year_filter = $selected_school_year ? "AND subjects.school_year_id = '$selected_school_year'" : '';
-                $query = mysqli_query($conn, "
+                $query = mysqli_query(conn(), "
                 SELECT DISTINCT
                     subjects.id AS s_id, 
                     subjects.code AS s_code, 
@@ -143,9 +143,9 @@ if ($row = mysqli_fetch_array($query)) {
                 JOIN faculty_subjects ON subjects.id = faculty_subjects.subjects_id
                 WHERE 
                     subjects.status = 'Active' AND
-                    faculty_subjects.faculty_id = '$user_id'
+                    faculty_subjects.faculty_id = '" . user_id() . "'
                     $school_year_filter
-              ") or die(mysqli_error($conn));              
+              ") or die(mysqli_error(conn()));              
                 
                 while ($row = mysqli_fetch_array($query)) {
                     $s_id = $row['s_id'];
@@ -170,7 +170,7 @@ if ($row = mysqli_fetch_array($query)) {
                       <td><?php echo $timer; ?></td>
                       <td class="d-flex justify-content-between align-items-center">
                         <div>
-                          <a href="reviewer_test_questions&s_id=<?php echo $s_id; ?>" class="text-decoration-none">
+                          <a href="reviewer_test_questions?s_id=<?php echo $s_id; ?>" class="text-decoration-none">
                               Manage Test Questions
                           </a> /
                           <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#timerModal">
@@ -178,7 +178,7 @@ if ($row = mysqli_fetch_array($query)) {
                           </a>
                         </div>
                         <div>
-                          <a href="reviewer_students_view&sub_id=<?php echo $s_id; ?>" class="btn btn-primary btn-sm">
+                          <a href="reviewer_students_view?sub_id=<?php echo $s_id; ?>" class="btn btn-primary btn-sm">
                               View
                           </a>
                         </div>
@@ -205,17 +205,17 @@ if ($row = mysqli_fetch_array($query)) {
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/echarts/echarts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/quill/quill.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/php-email-form/validate.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+  <script src="<?= base_url() ?>/assets/js/main.js"></script>
 
   <!-- Modal -->
 <div class="modal fade" id="timerModal" tabindex="-1" aria-labelledby="timerModalLabel" aria-hidden="true">

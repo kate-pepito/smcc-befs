@@ -1,3 +1,3 @@
 <?php
 
-header("Location: $BASE_URL/smcc-students");
+header("Location: " . base_url() . "/smcc-students");

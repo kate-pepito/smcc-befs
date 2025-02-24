@@ -3,18 +3,18 @@
 authenticated_page("dean");
 
 // Validate and fetch parameters from the URL
-$user_id = mysqli_real_escape_string($conn, isset($_GET['user_id']) ? $_GET['user_id'] : null); // Dean ID
-$faculty_id = mysqli_real_escape_string($conn, isset($_GET['faculty_id']) ? $_GET['faculty_id'] : null); // Faculty ID
-$school_year = mysqli_real_escape_string($conn, isset($_GET['school_year']) ? $_GET['school_year'] : null); // School Year
-$course_id = mysqli_real_escape_string($conn, isset($_GET['course_id']) ? $_GET['course_id'] : null); // Course ID
+user_id() = mysqli_real_escape_string(conn(), isset($_GET['user_id']) ? $_GET['user_id'] : null); // Dean ID
+$faculty_id = mysqli_real_escape_string(conn(), isset($_GET['faculty_id']) ? $_GET['faculty_id'] : null); // Faculty ID
+$school_year = mysqli_real_escape_string(conn(), isset($_GET['school_year']) ? $_GET['school_year'] : null); // School Year
+$course_id = mysqli_real_escape_string(conn(), isset($_GET['course_id']) ? $_GET['course_id'] : null); // Course ID
 
 // Ensure all required parameters are present
-if (!$user_id || !$faculty_id || !$school_year || !$course_id) {
+if (!user_id() || !$faculty_id || !$school_year || !$course_id) {
     die("Error: Missing required parameters. Please log in again.");
 }
 
 // Fetch DEAN's details
-$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id' AND type = 'DEAN'") or die(mysqli_error($conn));
+$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "' AND type = 'DEAN'") or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_assoc($query)) {
     $fname = ucfirst(strtolower($row['fname']));
     $lname = ucfirst(strtolower($row['lname']));
@@ -24,7 +24,7 @@ if ($row = mysqli_fetch_assoc($query)) {
 }
 
 // Fetch FACULTY's details
-$faculty_query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$faculty_id' AND type = 'REVIEWER'") or die(mysqli_error($conn));
+$faculty_query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '$faculty_id' AND type = 'REVIEWER'") or die(mysqli_error(conn()));
 if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
     $faculty_fname = ucfirst(strtolower($faculty_row['fname']));
     $faculty_lname = ucfirst(strtolower($faculty_row['lname']));
@@ -38,31 +38,31 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Assign Subjects - SMCC</title>
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
-    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
+    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 </head>
 
 <body>
     <header id="header" class="header fixed-top d-flex align-items-center">
         <div class="d-flex align-items-center justify-content-between">
             <a href="admin_home" class="logo d-flex align-items-center">
-                <img src="<?= $BASE_URL ?>/images/Smcc_logo.gif" alt="">
+                <img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="">
                 <span class="d-none d-lg-block">SMCC - BEFS</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -155,7 +155,7 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query = mysqli_query($conn, "
+                                    $query = mysqli_query(conn(), "
                                 SELECT 
                                     subjects.id AS sub_id, 
                                     subjects.code, 
@@ -173,7 +173,7 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
                                         FROM faculty_subjects 
                                         WHERE faculty_id = '$faculty_id'
                                     )
-                            ") or die(mysqli_error($conn));
+                            ") or die(mysqli_error(conn()));
                                     while ($row = mysqli_fetch_assoc($query)) {
                                     ?>
                                         <tr>
@@ -211,7 +211,7 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query = mysqli_query($conn, "
+                                    $query = mysqli_query(conn(), "
                                 SELECT 
                                     faculty_subjects.subjects_id AS sid, 
                                     subjects.code, 
@@ -225,7 +225,7 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
                                     year_level ON subjects.year_level_id = year_level.id
                                 WHERE 
                                     faculty_subjects.faculty_id = '$faculty_id'
-                            ") or die(mysqli_error($conn));
+                            ") or die(mysqli_error(conn()));
                                     while ($row = mysqli_fetch_assoc($query)) {
                                     ?>
                                         <tr>
@@ -251,7 +251,7 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
     </main>
 
     <?php require_once get_footer(); ?>
-    <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+    <script src="<?= base_url() ?>/assets/js/main.js"></script>
 </body>
 
 </html>

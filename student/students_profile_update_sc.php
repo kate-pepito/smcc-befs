@@ -1,8 +1,8 @@
 <?php // Adjust the path as needed
 
 if (isset($_POST['update_profile'])) {
-    $about = mysqli_real_escape_string($conn, $_POST['about']);
-    $address = mysqli_real_escape_string($conn, $_POST['address']);
+    $about = mysqli_real_escape_string(conn(), $_POST['about']);
+    $address = mysqli_real_escape_string(conn(), $_POST['address']);
     $image_path = '';
 
     // Handle profile image upload
@@ -36,12 +36,12 @@ if (isset($_POST['update_profile'])) {
                   about = '$about', 
                   complete_address = '$address', 
                   profile_image = '$image_path' 
-              WHERE id = '$user_id'";
+              WHERE id = '" . user_id() . "'";
 
-    if (mysqli_query($conn, $query)) {
+    if (mysqli_query(conn(), $query)) {
         echo "<script>alert('Profile Successfully Updated!');
         document.location='students_profile';</script>";
     } else {
-        echo "Error: " . mysqli_error($conn);
+        echo "Error: " . mysqli_error(conn());
     }
 }

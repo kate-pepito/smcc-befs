@@ -4,8 +4,8 @@ authenticated_page("admin");
 
 // Handle course registration
 if (isset($_POST['add_course'])) {
-    $code_no = mysqli_real_escape_string($conn, $_POST['code_no']);
-    $description = mysqli_real_escape_string($conn, $_POST['description']);
+    $code_no = mysqli_real_escape_string(conn(), $_POST['code_no']);
+    $description = mysqli_real_escape_string(conn(), $_POST['description']);
 
     date_default_timezone_set("Asia/Manila");
     $dt = date("Y-m-d") . " " . date("h:i:sa");
@@ -13,10 +13,10 @@ if (isset($_POST['add_course'])) {
     $query = "INSERT INTO course (description, date_entry, status, code_no) 
               VALUES ('$description', '$dt', 'Active', '$code_no')";
 
-    if (mysqli_query($conn, $query)) {
+    if (mysqli_query(conn(), $query)) {
         echo "<script type='text/javascript'>alert('Course Successfully Saved!'); document.location='admin_course';</script>";
     } else {
-        echo "Error: " . $query . "<br>" . mysqli_error($conn);
+        echo "Error: " . $query . "<br>" . mysqli_error(conn());
     }
 }
 ?>
@@ -32,24 +32,24 @@ if (isset($_POST['add_course'])) {
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 
 </head>
 
@@ -57,7 +57,7 @@ if (isset($_POST['add_course'])) {
 
 <?php 
 // User info fetching
-$query = mysqli_query($conn,"SELECT * FROM users WHERE id = '$user_id'")or die(mysqli_error($conn));
+$query = mysqli_query(conn(),"SELECT * FROM users WHERE id = '" . user_id() . "'")or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -112,10 +112,10 @@ if ($row = mysqli_fetch_array($query)) {
                             </thead>
                             <tbody>
                             <?php
-                                $query = mysqli_query($conn, "SELECT course.id as i, course.code_no as cn, course.description as c_desc, 
+                                $query = mysqli_query(conn(), "SELECT course.id as i, course.code_no as cn, course.description as c_desc, 
                                                               course.date_entry as de, course.status as s 
                                                               FROM course 
-                                                              WHERE course.status = 'Active'") or die(mysqli_error($conn));
+                                                              WHERE course.status = 'Active'") or die(mysqli_error(conn()));
                                 while ($row = mysqli_fetch_array($query)) {
                                     $id = $row['i'];
                                     $code_no = $row['cn'];
@@ -177,10 +177,10 @@ if ($row = mysqli_fetch_array($query)) {
 </div>
 
 <!-- Vendor JS Files -->
-<script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <!-- Template Main JS File -->
-<script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+<script src="<?= base_url() ?>/assets/js/main.js"></script>
 
 </body>
 </html>

@@ -3,24 +3,24 @@
 authenticated_page("reviewer");
 
 
-$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
+$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_array($query)) {
     $logged_in = $row['logged_in'];
     if ($logged_in == "NO" || $logged_in == null) {
-        echo "<script type='text/javascript'>alert('Please login again!'); document.location='$BASE_URL'</script>";
+        echo "<script type='text/javascript'>alert('Please login again!'); document.location='" . base_url() . "'</script>";
     } else {
         // Get user details
         $fname = ucfirst(strtolower($row['fname']));
         $lname = ucfirst(strtolower($row['lname']));
         $type = ucfirst(strtolower($row['type']));
-        $profile_image = "$BASE_URL/" . ($row['profile_image'] ? $row['profile_image'] : 'assets/img/default-profile.jpg');
+        $profile_image = base_url() . "/" . ($row['profile_image'] ? $row['profile_image'] : 'assets/img/default-profile.jpg');
     }
 }
 
 // Handle profile update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fname = mysqli_real_escape_string($conn, $_POST['fname']);
-    $lname = mysqli_real_escape_string($conn, $_POST['lname']);
+    $fname = mysqli_real_escape_string(conn(), $_POST['fname']);
+    $lname = mysqli_real_escape_string(conn(), $_POST['lname']);
 
     // Validate input
     if (empty($fname) || empty($lname)) {
@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Update user profile in the database
-    $query_update = "UPDATE users SET fname = '$fname', lname = '$lname', profile_image = '$image_path_url' WHERE id = '$user_id'";
-    if (mysqli_query($conn, $query_update)) {
+    $query_update = "UPDATE users SET fname = '$fname', lname = '$lname', profile_image = '$image_path_url' WHERE id = '" . user_id() . "'";
+    if (mysqli_query(conn(), $query_update)) {
         echo "<script>alert('Profile updated successfully!'); window.location='reviewer_profile';</script>";
     } else {
         echo "<script>alert('Failed to update profile.'); history.back();</script>";
@@ -70,24 +70,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Profile - SMCC</title>
 
     <!-- Favicons -->
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
-    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
+    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 </head>
 <body>
 <?php require_once get_reviewer_header(); ?>
@@ -157,16 +157,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php require_once get_footer(); ?>
 
 <!-- Vendor JS Files -->
-<script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
-<script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
-<script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
-<script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
-<script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-<script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
-<script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/chart.js/chart.umd.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/echarts/echarts.min.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/quill/quill.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/php-email-form/validate.js"></script>
 
 <!-- Template Main JS File -->
-<script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+<script src="<?= base_url() ?>/assets/js/main.js"></script>
 </body>
 </html>

@@ -2,10 +2,10 @@
 
 authenticated_page("student");
 
-$stud_id = $user_id;
+$stud_id = user_id();
 
 
-$query = mysqli_query($conn, "select * from students where id = '$stud_id'") or die(mysqli_error($conn));
+$query = mysqli_query(conn(), "select * from students where id = '$stud_id'") or die(mysqli_error(conn()));
 
 while ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
@@ -25,8 +25,8 @@ while ($row = mysqli_fetch_array($query)) {
     <meta content="" name="description">
 
     <!-- Favicon -->
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-    <link href="<?= $BASE_URL ?>/smcc-students/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/smcc-students/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,14 +38,14 @@ while ($row = mysqli_fetch_array($query)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Libraries Stylesheet -->
-    <link href="<?= $BASE_URL ?>/smcc-students/lib/animate/animate.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/smcc-students/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/smcc-students/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/smcc-students/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
     <!-- Customized Bootstrap Stylesheet -->
-    <link href="<?= $BASE_URL ?>/smcc-students/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/smcc-students/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Template Stylesheet -->
-    <link href="<?= $BASE_URL ?>/smcc-students/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/smcc-students/css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -60,7 +60,7 @@ while ($row = mysqli_fetch_array($query)) {
 
     <!-- Navbar Start -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-        <a href="<?= $BASE_URL ?>/smcc-students" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+        <a href="<?= base_url() ?>/smcc-students" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
             <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>Saint Michael College of Caraga - BEFS</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -68,7 +68,7 @@ while ($row = mysqli_fetch_array($query)) {
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="<?= $BASE_URL ?>/smcc-students" class="nav-item nav-link active">Home</a>
+                <a href="<?= base_url() ?>/smcc-students" class="nav-item nav-link active">Home</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">PROFILE</a>
                     <div class="dropdown-menu fade-down m-0">
@@ -87,7 +87,7 @@ while ($row = mysqli_fetch_array($query)) {
     <div class="container-fluid p-0 mb-5">
         <div class="owl-carousel header-carousel position-relative">
             <div class="owl-carousel-item position-relative">
-                <img class="img-fluid" src="<?= $BASE_URL ?>/smcc-students/img/smccnasipit_cover.jpeg" alt="" style="width: 100%; height: 900px;">
+                <img class="img-fluid" src="<?= base_url() ?>/smcc-students/img/smccnasipit_cover.jpeg" alt="" style="width: 100%; height: 900px;">
                 <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
                     <div class="container">
                         <div class="row justify-content-start">
@@ -107,7 +107,7 @@ while ($row = mysqli_fetch_array($query)) {
                 </div>
             </div>
             <div class="owl-carousel-item position-relative">
-                <img class="img-fluid" src="<?= $BASE_URL ?>/smcc-students/img/smcc-staffs.jpg" alt="" style="width: 100%; height: 900px;">
+                <img class="img-fluid" src="<?= base_url() ?>/smcc-students/img/smcc-staffs.jpg" alt="" style="width: 100%; height: 900px;">
                 <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
                     <div class="container">
                         <div class="row justify-content-start">
@@ -129,7 +129,7 @@ while ($row = mysqli_fetch_array($query)) {
                 </div>
             </div>
             <div class="owl-carousel-item position-relative">
-                <img class="img-fluid" src="<?= $BASE_URL ?>/smcc-students/img/smcc.jpg" alt="" style="width: 100%; height: 900px;">
+                <img class="img-fluid" src="<?= base_url() ?>/smcc-students/img/smcc.jpg" alt="" style="width: 100%; height: 900px;">
                 <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
                     <div class="container">
                         <div class="row justify-content-start">
@@ -223,7 +223,7 @@ while ($row = mysqli_fetch_array($query)) {
             <div class="row g-5">
                 <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s" style="min-height: 400px;">
                     <div class="position-relative h-100">
-                        <img class="img-fluid position-absolute w-100 h-100" src="<?= $BASE_URL ?>/smcc-students/img/2019-01-10.jpg" alt="" style="object-fit: cover;">
+                        <img class="img-fluid position-absolute w-100 h-100" src="<?= base_url() ?>/smcc-students/img/2019-01-10.jpg" alt="" style="object-fit: cover;">
                     </div>
                 </div>
                 <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
@@ -260,7 +260,7 @@ while ($row = mysqli_fetch_array($query)) {
 
                 <?php
                 
-                $query = mysqli_query($conn, "select * from students") or die(mysqli_error($conn));
+                $query = mysqli_query(conn(), "select * from students") or die(mysqli_error(conn()));
                 while ($row = mysqli_fetch_array($query)) {
                     $fname = $row['fname'];
                     $about = $row['about'];

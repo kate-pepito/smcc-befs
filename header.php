@@ -2,7 +2,7 @@
 
     <div class="d-flex align-items-center justify-content-between">
       <a href="admin_home" class="logo d-flex align-items-center">
-        <img src="<?= $BASE_URL ?>/images/Smcc_logo.gif" alt="">
+        <img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="">
         <span class="d-none d-lg-block">SMCC - BEFS</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -23,7 +23,7 @@
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
         <?php 
         // Assuming you have a field 'profile_image' in the users table
-        $profile_image = !empty($row['profile_image']) ? $row['profile_image'] : "$BASE_URL/assets/img/profile-img2.jpg";
+        $profile_image = !empty($row['profile_image']) ? $row['profile_image'] : base_url() . "/assets/img/profile-img2.jpg";
         ?>
         <img src="<?php echo $profile_image; ?>" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $lname; ?></span>
@@ -45,7 +45,7 @@
               </a>
             <li>
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="<?= $BASE_URL ?>/change_password">
+              <a class="dropdown-item d-flex align-items-center" href="<?= base_url() ?>/change_password">
                 <i class="bi bi-question-circle"></i>
                 <span>Change Password</span>
               </a>
@@ -55,7 +55,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="<?= $BASE_URL ?>/log_out_sc">
+              <a class="dropdown-item d-flex align-items-center" href="<?= base_url() ?>/log_out_sc">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>

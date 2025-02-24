@@ -4,10 +4,10 @@ authenticated_page("admin");
 
 
 if (isset($_POST['add_faculty'])) {
-    $fname = mysqli_real_escape_string($conn, $_POST['fname']);
-    $lname = mysqli_real_escape_string($conn, $_POST['lname']);
-    $course = mysqli_real_escape_string($conn, $_POST['course']);
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $fname = mysqli_real_escape_string(conn(), $_POST['fname']);
+    $lname = mysqli_real_escape_string(conn(), $_POST['lname']);
+    $course = mysqli_real_escape_string(conn(), $_POST['course']);
+    $username = mysqli_real_escape_string(conn(), $_POST['username']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
@@ -20,36 +20,36 @@ if (isset($_POST['add_faculty'])) {
         // Insert user data into the 'users' table
         $query = "INSERT INTO users (username, password, type, status, fname, lname, date_created, logged_in) 
                   VALUES ('$username', '$password', 'REVIEWER', 'Active', '$fname', '$lname', '$dt', 'NO')";
-        if (mysqli_query($conn, $query)) {
+        if (mysqli_query(conn(), $query)) {
             // Get the newly inserted user ID
             $query = "SELECT * FROM users WHERE fname = '$fname' AND lname = '$lname'";
-            $result = mysqli_query($conn, $query);
+            $result = mysqli_query(conn(), $query);
             if ($row = mysqli_fetch_array($result)) {
                 $f_id = $row['id'];
 
                 // Get the current school year
                 $query = "SELECT * FROM school_year WHERE status = 'Current Set'";
-                $result = mysqli_query($conn, $query);
+                $result = mysqli_query(conn(), $query);
                 if ($row = mysqli_fetch_array($result)) {
                     $school_year_id = $row['id'];
 
                     // Insert the faculty course and school year relation
                     $query = "INSERT INTO faculty_course_school_year (user_id, course_id, school_year_id) 
                               VALUES ('$f_id', '$course', '$school_year_id')";
-                    if (mysqli_query($conn, $query)) {
+                    if (mysqli_query(conn(), $query)) {
                         echo "<script type='text/javascript'>alert('Reviewer Successfully Saved!'); 
                         document.location='admin_faculty'</script>";
                     } else {
-                        echo "Error: " . $query . "<br>" . mysqli_error($conn);
+                        echo "Error: " . $query . "<br>" . mysqli_error(conn());
                     }
                 } else {
-                    echo "Error: Could not find current school year.<br>" . mysqli_error($conn);
+                    echo "Error: Could not find current school year.<br>" . mysqli_error(conn());
                 }
             } else {
-                echo "Error: Faculty not found after insertion.<br>" . mysqli_error($conn);
+                echo "Error: Faculty not found after insertion.<br>" . mysqli_error(conn());
             }
         } else {
-            echo "Error: " . $query . "<br>" . mysqli_error($conn);
+            echo "Error: " . $query . "<br>" . mysqli_error(conn());
         }
     } else {
         // Passwords do not match
@@ -58,7 +58,7 @@ if (isset($_POST['add_faculty'])) {
     }
 }
 
-$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
+$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -78,18 +78,18 @@ if ($row = mysqli_fetch_array($query)) {
     <title>Reviewer - SMCC</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -143,7 +143,7 @@ if ($row = mysqli_fetch_array($query)) {
                                         <div class="col-sm-10">
                                             <select name="course" class="form-select">
                                                 <?php
-                                                $query = mysqli_query($conn, "SELECT * FROM course WHERE status = 'Active' ORDER BY description ASC");
+                                                $query = mysqli_query(conn(), "SELECT * FROM course WHERE status = 'Active' ORDER BY description ASC");
                                                 while ($row = mysqli_fetch_array($query)) {
                                                     $id = $row['id'];
                                                     $description = $row['description'];
@@ -206,7 +206,7 @@ if ($row = mysqli_fetch_array($query)) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query = mysqli_query($conn, "SELECT DISTINCT 
+                                    $query = mysqli_query(conn(), "SELECT DISTINCT 
                         users.id AS id, 
                         users.lname AS lname, 
                         users.fname AS fname, 
@@ -258,8 +258,8 @@ if ($row = mysqli_fetch_array($query)) {
     <?php require_once get_footer(); ?>
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-    <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= base_url() ?>/assets/js/main.js"></script>
 </body>
 
 </html>

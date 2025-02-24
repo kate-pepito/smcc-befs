@@ -1,0 +1,17 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Watch Modified files and transfer to xampp",
+            "type": "shell",
+            "command": "${workspaceFolder}\\watch.bat C:\\xampp\\xampp-7.4.3\\htdocs\\smcc-befs",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

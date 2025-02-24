@@ -1,8 +1,7 @@
 <?php
 
-
 // Fetch the student's profile and related details from the database
-$query = mysqli_query($conn, "
+$query = mysqli_query(conn(), "
     SELECT
         students.profile_image AS profile_image,
         students.lrn_num AS lrn_num,
@@ -23,8 +22,8 @@ $query = mysqli_query($conn, "
     INNER JOIN course ON students.course_id = course.id
     INNER JOIN section ON students.section_id = section.id
     WHERE 
-        students.id = '$user_id'
-") or die("Error fetching data: " . mysqli_error($conn));
+        students.id = '" . user_id() . "'
+") or die("Error fetching data: " . mysqli_error(conn()));
 
 // Check if the query returned any result
 if ($row = mysqli_fetch_array($query)) {
@@ -41,11 +40,11 @@ if ($row = mysqli_fetch_array($query)) {
     $sec_desc = $row['sec_desc'];
     $about = $row['about'];
     $level = $row['level'];
-    $profile_image = "$BASE_URL/" . $row['profile_image'];
+    $profile_image = base_url() . "/" . $row['profile_image'];
 
     // Set a default profile image if none is provided
     if (empty($profile_image)) {
-        $profile_image = "$BASE_URL/assets/img/profile-img2.jpg";
+        $profile_image = base_url() . "/assets/img/profile-img2.jpg";
     }
 } else {
     // Handle case where student is not found
@@ -54,12 +53,12 @@ if ($row = mysqli_fetch_array($query)) {
     exit;
 }
 
-$query=mysqli_query($conn,"select count(subjects_id) as sub_count
+$query=mysqli_query(conn(),"select count(subjects_id) as sub_count
 from 
 students_subjects
 where 
-students_id = '$user_id' and level = '$level'
-")or die(mysqli_error($conn));
+students_id = '" . user_id() . "' and level = '$level'
+")or die(mysqli_error(conn()));
 
 if($row=mysqli_fetch_array($query))
 {
@@ -67,8 +66,9 @@ if($row=mysqli_fetch_array($query))
 }
 else
 {
-  echo "Error: " . $query . "<br>" . mysqli_error($conn);
+  echo "Error: " . $query . "<br>" . mysqli_error(conn());
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -81,24 +81,24 @@ else
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-  <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 
   <!-- =======================================================
   * Template Name: NiceAdmin
@@ -112,7 +112,7 @@ else
 <body class="toggle-sidebar">
 <?php 
 
-  $query=mysqli_query($conn,"select * from students where id = '$user_id'")or die(mysqli_error($conn));
+  $query=mysqli_query(conn(),"select * from students where id = '" . user_id() . "'")or die(mysqli_error(conn()));
   if($row=mysqli_fetch_array($query))
   {
     $fname=$row['fname'];
@@ -127,7 +127,7 @@ else
 
     <div class="d-flex align-items-center justify-content-between">
       <a href="students_home_sc" class="logo d-flex align-items-center">
-        <img src="<?= $BASE_URL ?>/images/Smcc_logo.gif" alt="">
+        <img src="images/Smcc_logo.gif" alt="">
         <span class="d-none d-lg-block">SMCC-BEFS</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -163,7 +163,7 @@ else
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Back</span>
               </a>
-              <a href="<?= $BASE_URL ?>/log_out_sc" class="dropdown-item"><i class="bi bi-box-arrow-right"></i>
+              <a href="<?= base_url() ?>/log_out_sc" class="dropdown-item"><i class="bi bi-box-arrow-right"></i>
               Log Out
             </a>
             </li>
@@ -187,7 +187,7 @@ else
       <h1>Profile</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="students_home_sc?stud_id=<?php echo $user_id; ?>">Home Page</a></li>
+          <li class="breadcrumb-item"><a href="students_home_sc">Home Page</a></li>
           <li class="breadcrumb-item">My Profile</li>
         </ol>
       </nav>
@@ -406,9 +406,9 @@ else
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Average Score</div>
                     <?php 
-                        // $query = mysqli_query($conn, "SELECT SUM(average)/COUNT(average) AS sum_average FROM student_score WHERE stud_id = '$user_id'") or die(mysqli_error());
+                        // $query = mysqli_query(conn(), "SELECT SUM(average)/COUNT(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "'") or die(mysqli_error());
                         if($level == 'PREBOARD1'){
-                              $query = mysqli_query($conn, "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '$user_id' and level ='$level'") or die(mysqli_error($conn));
+                              $query = mysqli_query(conn(), "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "' and level ='$level'") or die(mysqli_error(conn()));
                               if ($row = mysqli_fetch_array($query)) {
                                   $sum_average = $row['sum_average'];
                                   if ($sum_average == "") {
@@ -427,7 +427,7 @@ else
                       <?php
                         }
                         else{
-                          $query = mysqli_query($conn, "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '$user_id' and level ='$level'") or die(mysqli_error($conn));
+                          $query = mysqli_query(conn(), "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "' and level ='$level'") or die(mysqli_error(conn()));
                               if ($row = mysqli_fetch_array($query)) {
                                   $sum_average = $row['sum_average'];
                                   if ($sum_average == "") {
@@ -459,7 +459,7 @@ else
                 <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
 
                   <!-- Profile Edit Form -->
-                  <form action="./students_profile_update_sc?stud_id=<?php echo $user_id; ?>" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
+                  <form action="./students_profile_update_sc" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
                     
                   <div class="row mb-3">
                      <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
@@ -497,7 +497,7 @@ else
 
                 <div class="tab-pane fade pt-3" id="profile-change-password">
                   <!-- Change Password Form -->
-                  <form action="./students_profile_change_password_sc?stud_id=<?php echo $user_id; ?>" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
+                  <form action="./students_profile_change_password_sc" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
 
                     <div class="row mb-3">
                       <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
@@ -547,17 +547,17 @@ else
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/echarts/echarts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/quill/quill.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/php-email-form/validate.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+  <script src="<?= base_url() ?>/assets/js/main.js"></script>
 
 </body>
 

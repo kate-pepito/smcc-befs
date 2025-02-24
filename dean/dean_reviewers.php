@@ -2,12 +2,8 @@
 
 authenticated_page("dean");
 
-if (!$user_id) {
-    die("Error: Missing user ID. Please log in again.");
-}
-
 // Get the selected school year from the form submission
-$selected_school_year = mysqli_real_escape_string($conn, isset($_GET['school_year']) ? $_GET['school_year'] : '');
+$selected_school_year = mysqli_real_escape_string(conn(), isset($_GET['school_year']) ? $_GET['school_year'] : '');
 
 // Build the query to fetch reviewers based on the dean's course
 $sql = "
@@ -34,7 +30,7 @@ $sql = "
     WHERE 
         users.type = 'REVIEWER' 
         AND users.`status` = 'Active' 
-        AND dean_course.user_id = '" . $user_id . "'";
+        AND dean_course.user_id = '" . user_id() . "'";
 
 // Apply the school year filter if selected
 if (!empty($selected_school_year)) {
@@ -45,7 +41,7 @@ if (!empty($selected_school_year)) {
 $sql .= " ORDER BY users.lname ASC";
 
 // Execute the query
-$result = mysqli_query($conn, $sql) or die("Query Error: " . mysqli_error($conn));
+$result = mysqli_query(conn(), $sql) or die("Query Error: " . mysqli_error(conn()));
 
 // Initialize counter
 $counter = 1;
@@ -58,28 +54,28 @@ $counter = 1;
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Reviewers - SMCC</title>
    <!-- Favicons -->
-   <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
-    <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+   <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
+    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 </head>
 <body>
   <?php 
-    $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
+    $query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
     if ($row = mysqli_fetch_array($query)) {
         $fname = ucfirst(strtolower($row['fname']));
         $lname = ucfirst(strtolower($row['lname']));
@@ -110,7 +106,7 @@ $counter = 1;
                 <option value="" selected>All</option>
                 <?php
                   // Fetch all available school years
-                  $sy_query = mysqli_query($conn, "SELECT id, description FROM school_year ORDER BY description ASC");
+                  $sy_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY description ASC");
                   while ($sy_row = mysqli_fetch_array($sy_query)) {
                     $selected = isset($_GET['school_year']) && $_GET['school_year'] == $sy_row['id'] ? 'selected' : '';
                     echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";
@@ -164,7 +160,7 @@ $counter = 1;
 
   <?php require_once get_footer(); ?>
 
-  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= base_url() ?>/assets/js/main.js"></script>
 </body>
 </html>

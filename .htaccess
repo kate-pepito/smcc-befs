@@ -1,22 +1,19 @@
 RewriteEngine On
 
 php_value date.timezone Asia/Manila
-php_value display_errors Off
+# php_value display_errors Off
 
 RewriteCond %{HTTPS} off
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Rewrite to index.php if the request is an existing php file
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} \.php$
 RewriteRule ^.*$ index.php [L,QSA]
 
-# Rewrite if the request is for an existing directory without a specified file
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ ./index.php [L,QSA]
 
-# Rewrite to index.php if a file (not including php) does not exists
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^.*$ index.php [L,QSA]

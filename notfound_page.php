@@ -6,9 +6,9 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Page Not Found - SMCC</title>
-    <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-    <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -24,7 +24,7 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
                             <div class="d-flex justify-content-center py-4">
-                                <img src="<?= $BASE_URL ?>/images/Smcc_logo.gif" alt="" width="150" height="150">
+                                <img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="" width="150" height="150">
                             </div>
                             <div class="card mb-3">
                                 <div class="card-body">
@@ -33,7 +33,7 @@
                                         <p class="text-center small">You are trying to access page that is not found.</p>
                                     </div>
                                     <div class="p-4 w-100 text-center mx-auto">
-                                        <a href="<?= $BASE_URL ?>" class="btn btn-primary btn-lg btn-block">Back to Home</a>
+                                        <a href="<?= base_url() ?>" class="btn btn-primary btn-lg btn-block">Back to Home</a>
                                     </div>
                                 </div>
                             </div>
@@ -49,7 +49,7 @@
             </section>
         </div>
     </main>
-    <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

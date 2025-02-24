@@ -3,12 +3,12 @@
 authenticated_page("dean");
 
 // Fetch the "Current Set" school year
-$current_school_year_query = mysqli_query($conn, "SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error($conn));
+$current_school_year_query = mysqli_query(conn(), "SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error(conn()));
 $current_school_year = mysqli_fetch_assoc($current_school_year_query);
-$current_school_year_id = mysqli_real_escape_string($conn, $current_school_year['id'] ?? null);
+$current_school_year_id = mysqli_real_escape_string(conn(), $current_school_year['id'] ?? null);
 
 // Determine selected school year (default to "Current Set")
-$selected_school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ?? $current_school_year_id);
+$selected_school_year = mysqli_real_escape_string(conn(), $_GET['school_year'] ?? $current_school_year_id);
 
 ?>
 <!DOCTYPE html>
@@ -23,31 +23,31 @@ $selected_school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ??
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-  <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 
 </head>
 
 <body>
 <?php 
   // Fetch user details
-  $query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
+  $query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
   if ($row = mysqli_fetch_array($query)) {
       $fname = ucfirst(strtolower($row['fname']));
       $lname = ucfirst(strtolower($row['lname']));
@@ -81,7 +81,7 @@ $selected_school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ??
               <option value="" selected>All</option>
               <?php
                // Fetch all available school years
-          $sy_query = mysqli_query($conn, "SELECT id, description FROM school_year ORDER BY description ASC");
+          $sy_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY description ASC");
           while ($sy_row = mysqli_fetch_assoc($sy_query)) {
             $selected = ($sy_row['id'] == $selected_school_year) ? 'selected' : '';
             echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";
@@ -119,7 +119,7 @@ $selected_school_year = mysqli_real_escape_string($conn, $_GET['school_year'] ??
  $school_year_filter = $selected_school_year ? "AND subjects.school_year_id = '$selected_school_year'" : '';
 
 // Fetch dean's assigned courses
-$dean_course_query = mysqli_query($conn, "SELECT course_id FROM dean_course WHERE user_id = '$user_id'") or die(mysqli_error($conn));
+$dean_course_query = mysqli_query(conn(), "SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "'") or die(mysqli_error(conn()));
 $course_ids = [];
 while ($row = mysqli_fetch_assoc($dean_course_query)) {
     $course_ids[] = $row['course_id'];
@@ -127,7 +127,7 @@ while ($row = mysqli_fetch_assoc($dean_course_query)) {
 
 if (count($course_ids) > 0) {
     $course_ids_imploded = implode(',', $course_ids);
-    $query = mysqli_query($conn, "
+    $query = mysqli_query(conn(), "
         SELECT 
             subjects.id AS s_id, 
             subjects.code AS s_code, 
@@ -152,7 +152,7 @@ if (count($course_ids) > 0) {
             subjects.course_id IN ($course_ids_imploded) 
             AND subjects.status = 'Active'
             $school_year_filter
-    ") or die(mysqli_error($conn));
+    ") or die(mysqli_error(conn()));
 
     while ($row = mysqli_fetch_array($query)) {
         $s_id = $row['s_id'];
@@ -187,14 +187,14 @@ if (count($course_ids) > 0) {
     </a>
 
     <!-- Remove Button with Icon and Confirm Prompt -->
-    <a href="dean_subjects_remove_sc&s_id=<?php echo $s_id; ?>" 
+    <a href="dean_subjects_remove_sc?s_id=<?php echo $s_id; ?>" 
        class="btn btn-outline-danger btn-sm me-2" 
        onclick="return confirm('Are you sure you want to remove this subject?');">
       <i class="bi bi-trash"></i> Remove
     </a>
 
     <!-- View Button with Icon -->
-    <a href="dean_students&sub_id=<?php echo $s_id; ?>" 
+    <a href="dean_students?sub_id=<?php echo $s_id; ?>" 
        class="btn btn-outline-primary btn-sm me-2">
       <i class="bi bi-eye"></i> View
     </a>
@@ -230,7 +230,7 @@ if (count($course_ids) > 0) {
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Add Subject</h5>
-      <form action="./dean_subjects_add_sc?user_id=<?php echo $user_id; ?>" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
+      <form action="./dean_subjects_add_sc" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
         <div class="row mb-3">
           <label for="inputText" class="col-sm-4 col-form-label">Code</label>
           <div class="col-sm-8">
@@ -247,7 +247,7 @@ if (count($course_ids) > 0) {
         <!-- Hidden Course and Year Level -->
         <?php
           // Fetch the dean's assigned courses
-          $dean_course_query = mysqli_query($conn, "SELECT course_id FROM dean_course WHERE user_id = '$user_id'") or die(mysqli_error($conn));
+          $dean_course_query = mysqli_query(conn(), "SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "'") or die(mysqli_error(conn()));
           $course_ids = [];
           while ($row = mysqli_fetch_assoc($dean_course_query)) {
             $course_ids[] = $row['course_id'];
@@ -286,7 +286,7 @@ if (count($course_ids) > 0) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="./dean_subjects_update_sc?user_id=<?php echo $user_id; ?>" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
+        <form action="./dean_subjects_update_sc" method="POST" enctype="multipart/form-data" class="row g-3 user needs-validation" novalidate>
           <input type="hidden" name="s_id" id="s_id">
           <div class="row mb-3">
             <label for="subject_code" class="col-sm-2 col-form-label">Subject Code</label>
@@ -333,7 +333,7 @@ if (count($course_ids) > 0) {
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form action="./dean_update_percent?user_id=<?php echo $user_id; ?>" method="POST">
+          <form action="./dean_update_percent" method="POST">
             <input type="hidden" name="s_id" id="s_id">
             <div class="mb-3">
               <label for="percent" class="form-label">Exam Percentage</label>
@@ -374,15 +374,15 @@ if (count($course_ids) > 0) {
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/echarts/echarts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/quill/quill.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/php-email-form/validate.js"></script>
+  <script src="<?= base_url() ?>/assets/js/main.js"></script>
 
 </body>
 

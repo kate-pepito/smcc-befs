@@ -5,4 +5,7 @@
     <div class="credits">
       Developed by <a href="#" title="Kate Pepito, Joshua Pilapil, Regie Torregosa">SMCC CAPSTONE GROUP 17</a>
     </div>
-  </footer>
+</footer>
+<script>
+  var BASE_URL = `<?= base_url() ?>`;
+</script>

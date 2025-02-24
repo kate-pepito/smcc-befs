@@ -4,29 +4,29 @@ authenticated_page("admin");
 
 // Handle Add Section
 if (isset($_POST['add_section'])) {
-    $description = mysqli_real_escape_string($conn, $_POST['description']);
+    $description = mysqli_real_escape_string(conn(), $_POST['description']);
 
     date_default_timezone_set("Asia/Manila");
     $dt = date("Y-m-d H:i:s");
 
     // Check for duplicate section
-    $check_duplicate = mysqli_query($conn, "SELECT * FROM section WHERE description = '$description'");
+    $check_duplicate = mysqli_query(conn(), "SELECT * FROM section WHERE description = '$description'");
     if (mysqli_num_rows($check_duplicate) > 0) {
         echo '<script>alert("Section already exists!");window.location="admin_section.php";</script>';
     } else {
         // Insert new section
-        $query = mysqli_query($conn, "INSERT INTO section (description, date_entry, status) VALUES ('$description', '$dt', 'Active')") or die(mysqli_error($conn));
+        $query = mysqli_query(conn(), "INSERT INTO section (description, date_entry, status) VALUES ('$description', '$dt', 'Active')") or die(mysqli_error(conn()));
 
         if ($query) {
-            echo '<script>alert("Section added successfully!");window.location="admin_section.php?user_id=' . $user_id . '";</script>';
+            echo '<script>alert("Section added successfully!");window.location="admin_section";</script>';
         } else {
-            echo '<script>alert("Failed to add section.");window.location="admin_section.php?user_id=' . $user_id . '";</script>';
+            echo '<script>alert("Failed to add section.");window.location="admin_section";</script>';
         }
     }
 }
 
 // Fetch user info
-$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'") or die(mysqli_error($conn));
+$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -37,7 +37,7 @@ if ($row = mysqli_fetch_array($query)) {
 }
 
 // Fetch sections
-$sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'") or die(mysqli_error($conn));
+$sections = mysqli_query(conn(), "SELECT * FROM section WHERE status = 'Active'") or die(mysqli_error(conn()));
 ?>
 
 <!DOCTYPE html>
@@ -46,11 +46,11 @@ $sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'")
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Section - SMCC</title>
-  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -98,7 +98,7 @@ $sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'")
                   <td><?php echo $row['description']; ?></td>
                   <td><?php echo $row['date_entry']; ?></td>
                   <td>
-                    <a href="admin_section_remove&s_id=<?php echo $row['id']; ?>" 
+                    <a href="admin_section_remove?s_id=<?php echo $row['id']; ?>" 
                        class="btn btn-danger btn-sm" 
                        onclick="return confirm('Are you sure you want to remove this section?');">
                        Remove
@@ -140,7 +140,7 @@ $sections = mysqli_query($conn, "SELECT * FROM section WHERE status = 'Active'")
 
 <!-- Footer -->
 <?php require_once get_footer(); ?>
-<script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+<script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<?= base_url() ?>/assets/js/main.js"></script>
 </body>
 </html>

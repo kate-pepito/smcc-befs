@@ -7,7 +7,7 @@ $sql_file = $_ENV["BEFS_MYSQL_IMPORT_FILE"] ?? "database/smcc_befs.sql";
 
 $c1 = new mysqli($mysql_servername, $mysql_username, $mysql_password);
 if ($c1->connect_error) {
-    throw new mysqli_sql_exception("[Connection failed] " . $conn->connect_error);
+    throw new mysqli_sql_exception("[Connection failed] " . conn()->connect_error);
 } else {
     if (!$c1->query("USE $mysql_dbname")) {
         $c1->query("CREATE DATABASE $mysql_dbname");
@@ -19,24 +19,20 @@ if ($c1->connect_error) {
 $conn = new mysqli($mysql_servername, $mysql_username, $mysql_password, $mysql_dbname);
 // Check connection
 if ($conn->connect_error) {
-    throw new mysqli_sql_exception("[Connection failed] " . $conn->connect_error);
+    throw new mysqli_sql_exception("[Connection failed] " . conn()->connect_error);
 }
 
-function check_seed_exists($conn) {
-    $sq = "SELECT * FROM users WHERE id = 1";
-    $result = mysqli_query($conn, $sq);
-    return mysqli_num_rows($result) > 0;
-}
-
-function seed_database()
+function check_seed_exists()
 {
-    global $mysql_servername, $mysql_username, $mysql_password, $mysql_dbname, $sql_file;
-    $mysqli = new mysqli($mysql_servername, $mysql_username, $mysql_password, $mysql_dbname);
-    // Check connection
-    if ($mysqli->connect_error) {
-        throw new mysqli_sql_exception("[Connection failed] " . $mysqli->connect_error);
-    }
-    if (!check_seed_exists($mysqli)) {
+    $sq = "SELECT * FROM users WHERE id = 1";
+    $result = mysqli_query(conn(), $sq);
+    return $result !== false && mysqli_num_rows($result) > 0;
+}
+
+function seed_database($sql_file)
+{
+    if (!check_seed_exists()) {
+        $mysqli = conn();
         // Read the SQL file
         $sql = file_get_contents($sql_file);
         echo mysqli_next_result($mysqli) . "<br/>";
@@ -52,9 +48,7 @@ function seed_database()
             echo "Error importing SQL file: " . $mysqli->error;
         }
     }
-    // Close the connection
-    $mysqli->close();
 }
 
 
-seed_database();
+seed_database($sql_file);

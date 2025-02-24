@@ -2,22 +2,22 @@
 
 authenticated_page("reviewer");
 
-$query = mysqli_query($conn, "select * from users where id = '$user_id'") or die(mysqli_error($conn));
+$query = mysqli_query(conn(), "select * from users where id = '" . user_id() . "'") or die(mysqli_error(conn()));
 if ($row = mysqli_fetch_array($query)) {
     $logged_in = $row['logged_in'];
     if ($logged_in == "NO" || $logged_in == null) {
         echo "<script type='text/javascript'>alert('Please login again!');
-  document.location='$BASE_URL'</script>";
+  document.location='" . base_url() . "'</script>";
     } else {
 ?>
         <!DOCTYPE html>
         <html lang="en">
         <?php
-        $query = mysqli_query($conn, "select * from faculty_course_school_year where user_id = $user_id") or die(mysqli_error($conn));
+        $query = mysqli_query(conn(), "select * from faculty_course_school_year where user_id = user_id()") or die(mysqli_error(conn()));
         if ($row = mysqli_fetch_array($query)) {
             $course_id = $row['course_id'];
         } else {
-            echo "Error: " . $query . "<br>" . mysqli_error($conn);
+            echo "Error: " . $query . "<br>" . mysqli_error(conn());
         }
         ?>
 
@@ -30,31 +30,31 @@ if ($row = mysqli_fetch_array($query)) {
             <meta content="" name="keywords">
 
             <!-- Favicons -->
-            <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-            <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+            <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+            <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
             <!-- Google Fonts -->
             <link href="https://fonts.gstatic.com" rel="preconnect">
             <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
             <!-- Vendor CSS Files -->
-            <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-            <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-            <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-            <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-            <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-            <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-            <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+            <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+            <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+            <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+            <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+            <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+            <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+            <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
             <!-- Template Main CSS File -->
-            <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+            <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 
         </head>
 
         <body>
             <?php
 
-            $query = mysqli_query($conn, "select * from users where id = '$user_id'") or die(mysqli_error($conn));
+            $query = mysqli_query(conn(), "select * from users where id = '" . user_id() . "'") or die(mysqli_error(conn()));
             if ($row = mysqli_fetch_array($query)) {
                 $fname = $row['fname'];
                 $lname = $row['lname'];
@@ -100,11 +100,11 @@ if ($row = mysqli_fetch_array($query)) {
                                         </div>
                                         <?php
                                         // Count active students
-                                        $active_query = mysqli_query($conn, "
+                                        $active_query = mysqli_query(conn(), "
                                 SELECT COUNT(*) AS student_count_active 
                                 FROM students 
                                 WHERE status = 'Active' AND course_id = '$course_id'
-                            ") or die(mysqli_error($conn));
+                            ") or die(mysqli_error(conn()));
 
                                         $student_count_active = 0;
                                         if ($active_row = mysqli_fetch_array($active_query)) {
@@ -131,11 +131,11 @@ if ($row = mysqli_fetch_array($query)) {
                                         </div>
                                         <?php
                                         // Count inactive students
-                                        $inactive_query = mysqli_query($conn, "
+                                        $inactive_query = mysqli_query(conn(), "
                                 SELECT COUNT(*) AS student_count_inactive 
                                 FROM students 
                                 WHERE status = 'Inactive' AND course_id = '$course_id'
-                            ") or die(mysqli_error($conn));
+                            ") or die(mysqli_error(conn()));
 
                                         $student_count_inactive = 0;
                                         if ($inactive_row = mysqli_fetch_array($inactive_query)) {
@@ -185,7 +185,7 @@ if ($row = mysqli_fetch_array($query)) {
                     </thead>
                     <?php
 
-                    $query = mysqli_query($conn, "
+                    $query = mysqli_query(conn(), "
                     SELECT
                         year_level.description AS yr_desc,
                         section.description AS sec_desc,
@@ -208,7 +208,7 @@ if ($row = mysqli_fetch_array($query)) {
                     JOIN year_level ON students.year_level_id = year_level.id
                     JOIN section ON students.section_id = section.id
                     ORDER BY sum_average DESC;
-                    ") or die(mysqli_error($conn));
+                    ") or die(mysqli_error(conn()));
                     while ($row = mysqli_fetch_array($query)) {
                         $stud_id = $row['stud_id'];
                         $lrn_num = $row['lrn_num'];
@@ -283,17 +283,17 @@ if ($row = mysqli_fetch_array($query)) {
             <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
             <!-- Vendor JS Files -->
-            <script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
-            <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-            <script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
-            <script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
-            <script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
-            <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-            <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
-            <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
+            <script src="<?= base_url() ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+            <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="<?= base_url() ?>/assets/vendor/chart.js/chart.umd.js"></script>
+            <script src="<?= base_url() ?>/assets/vendor/echarts/echarts.min.js"></script>
+            <script src="<?= base_url() ?>/assets/vendor/quill/quill.js"></script>
+            <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+            <script src="<?= base_url() ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+            <script src="<?= base_url() ?>/assets/vendor/php-email-form/validate.js"></script>
 
             <!-- Template Main JS File -->
-            <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+            <script src="<?= base_url() ?>/assets/js/main.js"></script>
 
         </body>
 
@@ -302,6 +302,6 @@ if ($row = mysqli_fetch_array($query)) {
     }
 } else {
     echo "<script type='text/javascript'>alert('Please login again!');
-		document.location='$BASE_URL'</script>";
+		document.location='" . base_url() . "'</script>";
 }
 ?>

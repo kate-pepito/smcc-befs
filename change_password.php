@@ -1,6 +1,5 @@
 <?php
 
-$BASE_URL = get_base_uri();
 $homepage = '';
 
 // Check if user_id is passed via the request
@@ -13,12 +12,12 @@ if (isset($_POST['change_password'])) {
 
   if ($password === $confirm_password) {
     $password = password_hash($password, PASSWORD_DEFAULT);
-    $query = "UPDATE users SET password = '$password' WHERE id = '$user_id'";
+    $query = "UPDATE users SET password = '$password' WHERE id = '" . user_id() . "'";
 
-    if (mysqli_query($conn, $query)) {
+    if (mysqli_query(conn(), $query)) {
       // Fetch the user type based on the user_id
-      $user_type_query = "SELECT type FROM users WHERE id = '$user_id'";
-      $result = mysqli_query($conn, $user_type_query);
+      $user_type_query = "SELECT type FROM users WHERE id = '" . user_id() . "'";
+      $result = mysqli_query(conn(), $user_type_query);
 
       if ($result && mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
@@ -45,12 +44,12 @@ if (isset($_POST['change_password'])) {
         // Redirect to the appropriate homepage
         echo "<script type='text/javascript'>
                       alert('Password Successfully Changed!');
-                      window.location.href = '$BASE_URL/$homepage';
+                      window.location.href = '" . base_url() ."/$homepage';
                     </script>";
       } else {
         echo "<script type='text/javascript'>
                         alert('Error: Unable to determine user type.');
-                        window.location.href = '$BASE_URL';
+                        window.location.href = '" . base_url() ."';
                       </script>";
       }
     } else {
@@ -75,17 +74,17 @@ if (isset($_POST['change_password'])) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Change Password</title>
-  <link href="<?= $BASE_URL ?>/images/Smcc_logo.gif" rel="icon">
-  <link href="<?= $BASE_URL ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+  <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
-  <link href="<?= $BASE_URL ?>/assets/css/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -96,7 +95,7 @@ if (isset($_POST['change_password'])) {
           <div class="row justify-content-center">
             <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
               <div class="d-flex justify-content-center py-4">
-                <a><img src="<?= $BASE_URL ?>/images/Smcc_logo.gif" alt="" width="150" height="150"></a>
+                <a><img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="" width="150" height="150"></a>
               </div>
               <div class="card mb-3">
                 <div class="card-body">
@@ -121,9 +120,6 @@ if (isset($_POST['change_password'])) {
                     <div class="col-12">
                       <button class="btn btn-primary w-100" name="change_password" type="submit">Change Password</button>
                     </div>
-                    <!-- <div class="col-12">
-                    <a class="btn btn-warning w-100" href="<?php echo $BASE_URL . '/' . $homepage; ?>">Back to Dashboard</a>
-                  </div> -->
                   </form>
                 </div>
               </div>
@@ -140,15 +136,15 @@ if (isset($_POST['change_password'])) {
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <script src="<?= $BASE_URL ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/echarts/echarts.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/quill/quill.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/vendor/php-email-form/validate.js"></script>
-  <script src="<?= $BASE_URL ?>/assets/js/main.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/echarts/echarts.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/quill/quill.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?= base_url() ?>/assets/vendor/php-email-form/validate.js"></script>
+  <script src="<?= base_url() ?>/assets/js/main.js"></script>
 </body>
 
 </html>
