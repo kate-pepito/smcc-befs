@@ -63,7 +63,7 @@ function conn()
         $mysql_username = $_ENV["BEFS_MYSQL_USERNAME"] ?? "root";
         $mysql_password = $_ENV["BEFS_MYSQL_PASSWORD"] ?? "";
         $mysql_dbname = $_ENV["BEFS_MYSQL_DBNAME"] ?? "smcc_befs";
-        $sql_file = $_ENV["BEFS_MYSQL_IMPORT_FILE"] ?? "database/smcc_befs.sql";
+        $sql_file = __DIR__ . DIRECTORY_SEPARATOR . ($_ENV["BEFS_MYSQL_IMPORT_FILE"] ?? "database/smcc_befs.sql");
         
         $c1 = new mysqli($mysql_servername, $mysql_username, $mysql_password);
         if (!$c1 || $c1->connect_error) {
@@ -94,9 +94,12 @@ function conn()
 
 function check_seed_exists($mysqli)
 {
-    $sq = "SELECT * FROM users WHERE id = 1";
-    $result = mysqli_query($mysqli, $sq);
-    return $result !== false && mysqli_num_rows($result) > 0;
+    try {
+        $sq = "SELECT * FROM users WHERE id = 1";
+        $result = mysqli_query($mysqli, $sq);
+        return $result !== false && mysqli_num_rows($result) > 0;
+    } catch (\Throwable $e) {/* database tables not yet created */}
+    return false;
 }
 
 function seed_database($mysqli, $sql_file)
