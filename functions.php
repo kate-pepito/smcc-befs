@@ -426,7 +426,9 @@ function student_html_head(string $title_page = "Page Title", array $imports = [
 function student_html_body_end(array $imports = [])
 {
     default_html_body_end([
+        [ "type" => "script", "src" => "https://code.jquery.com/jquery-3.4.1.min.js" ],
         [ "type" => "script", "src" => "assets/vendor/bootstrap/js/bootstrap.bundle.min.js" ],
+        [ "type" => "script", "src" => "smcc-students/lib/wow/wow.min.js" ],
         ...$imports
     ]);
 }

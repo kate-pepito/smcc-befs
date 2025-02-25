@@ -12,49 +12,26 @@ while ($row = mysqli_fetch_array($query)) {
     $level = $row['level'];
 }
 
+
+student_html_head('Home', [
+    [ "type" => "style", "href" => "smcc-students/lib/owlcarousel/assets/owl.carousel.min.css" ],
+    [ "type" => "style", "href" => "smcc-students/css/style.css" ],
+    [ "type" => "custom", "content" => function () {
+            ?>
+            <script type="text/javascript">
+                window.onload = function() {
+
+                    sessionStorage.clear();
+
+
+                };
+            </script>
+            <?php
+        }
+    ],
+]);
+
 ?>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <title>Home - SMCC</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
-
-    <!-- Favicon -->
-    <link href="<?= base_url() ?>/images/android-icon-192x192.png" rel="icon">
-
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Libraries Stylesheet -->
-    <link href="<?= base_url() ?>/smcc-students/lib/animate/animate.min.css" rel="stylesheet">
-    <link href="<?= base_url() ?>/smcc-students/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="<?= base_url() ?>/smcc-students/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Template Stylesheet -->
-    <link href="<?= base_url() ?>/smcc-students/css/style.css" rel="stylesheet">
-
-    <script type="text/javascript">
-        window.onload = function() {
-
-            sessionStorage.clear();
-
-
-        };
-    </script>
-
-</head>
 
 <body>
     <?php student_nav(base_url() . "/smcc-students", "Back to Dashboard"); ?>
@@ -158,21 +135,11 @@ while ($row = mysqli_fetch_array($query)) {
     ?>
     <!-- Footer End -->
 
+    <?php student_html_body_end([
+        [ "type" => "script", "src" => "/smcc-students/lib/owlcarousel/owl.carousel.min.js" ],
+        [ "type" => "script", "src" => "/smcc-students/js/main.js" ],
+    ]); ?>
 
-    <!-- Back to Top -->
-
-
-
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/wow/wow.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/waypoints/waypoints.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-
-    <!-- Template Javascript -->
-    <script src="js/main.js"></script>
 </body>
 
 </html>
