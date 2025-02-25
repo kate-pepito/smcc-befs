@@ -53,10 +53,10 @@ if ($row = mysqli_fetch_array($query)) {
     exit;
 }
 
-$query=mysqli_query(conn(),"select count(subjects_id) as sub_count
-from 
+$query=mysqli_query(conn(),"SELECT count(subjects_id) as sub_count
+FROM 
 students_subjects
-where 
+WHERE 
 students_id = '" . user_id() . "' and level = '$level'
 ")or die(mysqli_error(conn()));
 
@@ -69,59 +69,23 @@ else
   echo "Error: " . $query . "<br>" . mysqli_error(conn());
 }
 
+$query=mysqli_query(conn(),"select * from students where id = '" . user_id() . "'")or die(mysqli_error(conn()));
+if($row=mysqli_fetch_array($query))
+{
+  $fname=$row['fname'];
+  $lname=$row['lname'];
+  $fname = ucfirst(strtolower($fname));
+  $lname = ucfirst(strtolower($lname));
+}
+
+admin_html_head("Profile", [
+  // [ "type" => "style", "href" => "assets/vendor/simple-datatables/style.css" ],
+  [ "type" => "style", "href" => "assets/css/style.css" ],
+]); // html head
+
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-  <title>Users / Profile - SMCC</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
-
-  <!-- Favicons -->
-  <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
-  <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
-  <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
-  <!-- Template Main CSS File -->
-  <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
-
-  <!-- =======================================================
-  * Template Name: NiceAdmin
-  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
-  * Updated: Apr 20 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
-</head>
 
 <body class="toggle-sidebar">
-<?php 
-
-  $query=mysqli_query(conn(),"select * from students where id = '" . user_id() . "'")or die(mysqli_error(conn()));
-  if($row=mysqli_fetch_array($query))
-  {
-    $fname=$row['fname'];
-    $lname=$row['lname'];
-    $fname = ucfirst(strtolower($fname));
-    $lname = ucfirst(strtolower($lname));
-  }
-
-?>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -407,7 +371,7 @@ else
                     <div class="col-lg-3 col-md-4 label">Average Score</div>
                     <?php 
                         // $query = mysqli_query(conn(), "SELECT SUM(average)/COUNT(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "'") or die(mysqli_error());
-                        if($level == 'PREBOARD1'){
+                        if($level === 'PREBOARD1'){
                               $query = mysqli_query(conn(), "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "' and level ='$level'") or die(mysqli_error(conn()));
                               if ($row = mysqli_fetch_array($query)) {
                                   $sum_average = $row['sum_average'];
@@ -546,18 +510,10 @@ else
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
-  
-  
-  
-  
-  
-  <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  
-  
-
-  <!-- Template Main JS File -->
-  <script src="<?= base_url() ?>/assets/js/main.js"></script>
+  <?php admin_html_body_end([
+      // ["type" => "script", "src" => "assets/vendor/simple-datatables/simple-datatables.js"],
+      ["type" => "script", "src" => "assets/js/main.js"],
+  ]); ?>
 
 </body>
 

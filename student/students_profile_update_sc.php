@@ -14,7 +14,7 @@ if (isset($_POST['update_profile'])) {
         $allowed_extensions = ['jpg', 'jpeg', 'png'];
         if (in_array($image_ext, $allowed_extensions)) {
             $new_image_name = uniqid() . '.' . $image_ext;
-            $image_upload_path = 'uploads/' . $new_image_name;
+            $image_upload_path = "uploads/$new_image_name";
 
             // Ensure the uploads directory exists and is writable
             if (!is_dir('uploads')) {
