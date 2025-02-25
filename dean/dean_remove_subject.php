@@ -3,11 +3,10 @@
 authenticated_page("dean");
 
 // Validate and fetch parameters from the URL
-user_id() = mysqli_real_escape_string(conn(), isset($_GET['user_id']) ? $_GET['user_id'] : null); // Dean ID
-$faculty_id = mysqli_real_escape_string(conn(), isset($_GET['faculty_id']) ? $_GET['faculty_id'] : null); // Faculty ID
-$school_year = mysqli_real_escape_string(conn(), isset($_GET['school_year']) ? $_GET['school_year'] : null); // School Year
-$course_id = mysqli_real_escape_string(conn(), isset($_GET['course_id']) ? $_GET['course_id'] : null); // Course ID
-$sub_id = mysqli_real_escape_string(conn(), isset($_GET['sub_id']) ? $_GET['sub_id'] : null); // Subject ID to remove
+$faculty_id = mysqli_real_escape_string(conn(), $_GET['faculty_id'] ?? null); // Faculty ID
+$school_year = mysqli_real_escape_string(conn(), $_GET['school_year'] ?? null); // School Year
+$course_id = mysqli_real_escape_string(conn(), $_GET['course_id'] ?? null); // Course ID
+$sub_id = mysqli_real_escape_string(conn(), $_GET['sub_id'] ?? null); // Subject ID to remove
 
 // Ensure all required parameters are present
 if (!user_id() || !$faculty_id || !$school_year || !$course_id || !$sub_id) {
@@ -23,4 +22,3 @@ if (mysqli_query(conn(), $query)) {
 } else {
     die("Error: Could not remove the subject. Please try again.");
 }
-?>

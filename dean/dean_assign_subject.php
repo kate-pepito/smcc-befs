@@ -3,11 +3,10 @@
 authenticated_page("dean");
 
 // Validate required parameters
-user_id() = isset($_GET['user_id']) ? $_GET['user_id'] : null;
-$course_id = isset($_GET['course_id']) ? $_GET['course_id'] : null;
-$sub_id = isset($_GET['sub_id']) ? $_GET['sub_id'] : null;
-$faculty_id = isset($_GET['faculty_id']) ? $_GET['faculty_id'] : null;
-$school_year = isset($_GET['school_year']) ? $_GET['school_year'] : null;
+$course_id = $_GET['course_id'] ?? null;
+$sub_id = $_GET['sub_id'] ?? null;
+$faculty_id = $_GET['faculty_id'] ?? null;
+$school_year = $_GET['school_year'] ?? null;
 
 // Ensure all required parameters are provided
 if (!user_id() || !$course_id || !$sub_id || !$faculty_id || !$school_year) {
@@ -15,7 +14,6 @@ if (!user_id() || !$course_id || !$sub_id || !$faculty_id || !$school_year) {
 }
 
 // Escape input to prevent SQL injection
-user_id() = mysqli_real_escape_string(conn(), user_id());
 $course_id = mysqli_real_escape_string(conn(), $course_id);
 $sub_id = mysqli_real_escape_string(conn(), $sub_id);
 $faculty_id = mysqli_real_escape_string(conn(), $faculty_id);
@@ -51,4 +49,3 @@ if ($assign_result) {
 } else {
     die("Error: Could not assign the subject. " . mysqli_error(conn()));
 }
-?>

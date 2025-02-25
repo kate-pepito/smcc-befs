@@ -10,7 +10,7 @@ $timer=mysqli_real_escape_string(conn(), $_POST['timer']);
 $query="update subjects_timer set timer = '$timer' where subjects_id = '$s_id'" or die(mysqli_error(conn()));	  
 if (mysqli_query(conn(), $query)) 
 {
-			echo "<script type='text/javascript'>window.alert('hello world');
+			echo "<script type='text/javascript'>window.alert('Updated');
 </script>";
 
 			header("location: reviewer_subjects");

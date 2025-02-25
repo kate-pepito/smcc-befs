@@ -28,4 +28,3 @@ if (isset($_POST['enroll_student'])) {
         echo "Error: " . mysqli_error(conn());
     }
 }
-?>

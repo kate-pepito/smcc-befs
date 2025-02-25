@@ -254,6 +254,8 @@ while ($row = mysqli_fetch_array($query)) {
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   
-  <script src="<?= base_url() ?>/assets/js/main.js"></script>
+  <?php admin_html_body_end([
+        ["type" => "script", "src" => "assets/js/main.js"],
+    ]); ?>
 </body>
 </html>

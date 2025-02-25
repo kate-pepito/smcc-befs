@@ -19,5 +19,4 @@ if (mysqli_query(conn(), $query_delete)) {
 } else {
     echo "Error removing subject: " . mysqli_error(conn());
 }
-?>
 

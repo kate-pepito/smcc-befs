@@ -3,7 +3,6 @@
 authenticated_page("dean");
 
 // Validate and fetch parameters from the URL
-user_id() = mysqli_real_escape_string(conn(), isset($_GET['user_id']) ? $_GET['user_id'] : null); // Dean ID
 $faculty_id = mysqli_real_escape_string(conn(), isset($_GET['faculty_id']) ? $_GET['faculty_id'] : null); // Faculty ID
 $school_year = mysqli_real_escape_string(conn(), isset($_GET['school_year']) ? $_GET['school_year'] : null); // School Year
 $course_id = mysqli_real_escape_string(conn(), isset($_GET['course_id']) ? $_GET['course_id'] : null); // Course ID
@@ -29,34 +28,13 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
     $faculty_fname = ucfirst(strtolower($faculty_row['fname']));
     $faculty_lname = ucfirst(strtolower($faculty_row['lname']));
 }
+
+admin_html_head("Assign Subjects", [
+    [ "type" => "style", "href" => "assets/vendor/simple-datatables/style.css" ],
+    [ "type" => "style", "href" => "assets/css/style.css" ],
+]); // html head
+
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Assign Subjects - SMCC</title>
-    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon" type="image/gif">
-    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-
-    <!-- Vendor CSS Files -->
-    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
-    <!-- Template Main CSS File -->
-    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
-</head>
 
 <body>
     <header id="header" class="header fixed-top d-flex align-items-center">
@@ -251,7 +229,11 @@ if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
     </main>
 
     <?php require_once get_footer(); ?>
-    <script src="<?= base_url() ?>/assets/js/main.js"></script>
+
+    <?php admin_html_body_end([
+        ["type" => "script", "src" => "assets/js/main.js"],
+    ]); ?>
+
 </body>
 
 </html>

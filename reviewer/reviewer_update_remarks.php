@@ -7,7 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check if the necessary POST variables are set
     $sid = isset($_POST['sid']) ? mysqli_real_escape_string(conn(), $_POST['sid']) : null;
     $sub_id = isset($_POST['sub_id']) ? mysqli_real_escape_string(conn(), $_POST['sub_id']) : null;
-    user_id() = isset($_POST['user_id']) ? mysqli_real_escape_string(conn(), $_POST['user_id']) : null;
     $remarks = isset($_POST['remarks']) ? mysqli_real_escape_string(conn(), $_POST['remarks']) : null;
     $level = isset($_POST['level']) ? mysqli_real_escape_string(conn(), $_POST['level']) : null;
     $active_tab = isset($_POST['active-tab']) ? $_POST['active-tab'] : 'Preboard1'; // Default to Preboard1 if not set

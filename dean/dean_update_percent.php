@@ -13,4 +13,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $percent !== null) {
         echo "<script>alert('Error updating percent.');</script>";
     }
 }
-?>

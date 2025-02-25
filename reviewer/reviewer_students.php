@@ -216,7 +216,9 @@ if (empty($_GET['school_year']) && $current_school_year) {
   
 
   <!-- Template Main JS File -->
-  <script src="<?= base_url() ?>/assets/js/main.js"></script>
+  <?php admin_html_body_end([
+        ["type" => "script", "src" => "assets/js/main.js"],
+    ]); ?>
 
 </body>
 

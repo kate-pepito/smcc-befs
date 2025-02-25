@@ -167,6 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 <!-- Template Main JS File -->
-<script src="<?= base_url() ?>/assets/js/main.js"></script>
+<?php admin_html_body_end([
+        ["type" => "script", "src" => "assets/js/main.js"],
+    ]); ?>
 </body>
 </html>

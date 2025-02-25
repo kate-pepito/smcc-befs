@@ -215,7 +215,9 @@ if ($row = mysqli_fetch_array($query)) {
   
 
   <!-- Template Main JS File -->
-  <script src="<?= base_url() ?>/assets/js/main.js"></script>
+  <?php admin_html_body_end([
+        ["type" => "script", "src" => "assets/js/main.js"],
+    ]); ?>
 
   <!-- Modal -->
 <div class="modal fade" id="timerModal" tabindex="-1" aria-labelledby="timerModalLabel" aria-hidden="true">

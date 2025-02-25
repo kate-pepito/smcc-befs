@@ -6,12 +6,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check if the necessary POST variables are set
     $sid = isset($_POST['sid']) ? mysqli_real_escape_string(conn(), $_POST['sid']) : null;
     $sub_id = isset($_POST['sub_id']) ? mysqli_real_escape_string(conn(), $_POST['sub_id']) : null;
-    user_id() = isset($_POST['user_id']) ? mysqli_real_escape_string(conn(), $_POST['user_id']) : null;
     $remarks2 = isset($_POST['remarks']) ? mysqli_real_escape_string(conn(), $_POST['remarks']) : null;
     $level = isset($_POST['level']) ? mysqli_real_escape_string(conn(), $_POST['level']) : null;
 
     // Determine which tab was active
-    $active_tab = isset($_POST['tab']) ? $_POST['tab'] : '';
+    $active_tab = $_POST['tab'] ?? '';
 
     // Make sure all required fields are set
     if ($sid && $sub_id && $remarks2 !== null && $level) {
@@ -39,4 +38,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-?>

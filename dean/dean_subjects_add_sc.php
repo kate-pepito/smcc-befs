@@ -60,4 +60,3 @@ if (isset($_POST['add_subjects'])) {
         echo "Error: Failed to insert subject. " . mysqli_error(conn());
     }
 }
-?>

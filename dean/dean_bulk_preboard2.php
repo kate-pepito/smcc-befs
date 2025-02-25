@@ -21,4 +21,3 @@ if (mysqli_query(conn(), $update_query)) {
     header("Location: dean_students_all?message=error");
     exit;
 }
-?>
