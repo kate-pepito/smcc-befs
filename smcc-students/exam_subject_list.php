@@ -78,7 +78,7 @@ while ($row = mysqli_fetch_array($query)) {
     INNER JOIN subjects ON students_subjects.subjects_id = subjects.id
     LEFT JOIN faculty_subjects ON faculty_subjects.subjects_id = subjects.id
     LEFT JOIN users ON faculty_subjects.faculty_id = users.id
-    WHERE students_subjects.students_id = user_id()
+    WHERE students_subjects.students_id = $stud_id
     AND students_subjects.status = 'NOT TAKEN'
     AND students_subjects.level = '$level'
 ") or die(mysqli_error(conn()));
