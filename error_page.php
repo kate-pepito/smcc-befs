@@ -1,5 +1,5 @@
 <?php
-default_html_head("Internal Server Error", [
+admin_html_head("Internal Server Error", [
     [ "type" => "style", "href" => "assets/css/style.css" ],
 ]);
 ?>
@@ -12,7 +12,7 @@ default_html_head("Internal Server Error", [
                     <div class="row justify-content-center">
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
                             <div class="d-flex justify-content-center py-4">
-                                <img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="" width="150" height="150">
+                                <img src="<?= base_url() ?>/images/android-icon-192x192.png" alt="" width="150" height="150">
                             </div>
                             <div class="card mb-3">
                                 <div class="card-body">
@@ -23,7 +23,9 @@ default_html_head("Internal Server Error", [
                                     <div class="ps-3 pe-3 py-2 pb-2 w-100 border border-danger rounded" style="min-height: 150px;">
                                         <code class="w-100">
                                             Error: <?= $error->getMessage(); ?><hr />
+                                            <?php if (($_ENV['BEFS_LOG_LEVEL'] ?? "development") === "development"): ?>
                                             Line <?= $error->getLine(); ?> in <?= substr($error->getFile(), strpos($error->getFile(),str_replace("/", DIRECTORY_SEPARATOR, get_base_uri_path()))); ?><br />
+                                            <?php endif; ?>
                                         </code>
                                     </div>
                                     <div class="p-4 w-100 text-center mx-auto">

@@ -58,7 +58,7 @@ admin_html_head("Register", [
 
               <div class="d-flex justify-content-center py-4">
               <a>
-                  <img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="" width="150" height="150">
+                  <img src="<?= base_url() ?>/images/android-icon-192x192.png" alt="" width="150" height="150">
                 </a>
               </div><!-- End Logo -->
 

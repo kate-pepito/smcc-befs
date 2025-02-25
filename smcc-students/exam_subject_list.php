@@ -24,7 +24,7 @@ while ($row = mysqli_fetch_array($query)) {
     <meta content="" name="description">
 
     <!-- Favicon -->
-    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/images/android-icon-192x192.png" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,38 +57,7 @@ while ($row = mysqli_fetch_array($query)) {
 </head>
 
 <body>
-    <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
-    <!-- Spinner End -->
-
-
-    <!-- Navbar Start -->
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-        <a href="index" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>Saint Michael College of Caraga - BEFS</h2>
-        </a>
-        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-            <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="index" class="nav-item nav-link active">Home</a>
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">PROFILE</a>
-                    <div class="dropdown-menu fade-down m-0">
-                        <a href="edit_profile_sc" class="dropdown-item">My Profile</a>
-                        <a href="log_out_sc" class="dropdown-item">Log Out</a>
-                    </div>
-                </div>
-            </div>
-            <a href="index" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Back to Dashboard<i class="fa fa-arrow-right ms-3"></i></a>
-        </div>
-    </nav>
-    <!-- Navbar End -->
+    <?php student_nav(base_url() . "/smcc-students", "Back to Dashboard"); ?>
 
     <!-- Service Start -->
     <div class="container-xxl py-5">

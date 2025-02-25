@@ -52,8 +52,13 @@ function load_dotenv($filename = ".env")
 function conn()
 {
     global $conn;
-    if (!isset($conn)) {
-        require_once __DIR__ . DIRECTORY_SEPARATOR . './dbconnect.php';
+    if (!isset($conn) || !$conn || !$conn->ping()) {
+        try {
+            require_once __DIR__ . '/dbconnect.php';
+        } catch (\Throwable $error) {
+            require_once __DIR__ . '/error_page.php';
+            exit;
+        }
         return $conn;
     }
     return $conn;
@@ -275,25 +280,34 @@ function default_html_head(string $title_page = "Login", array $imports = [])
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
     <title><?= $title_page ?> - SMCC BEFS</title>
-    <meta content="" name="description">
-    <meta content="" name="keywords">
     <!-- Favicons -->
-    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
-    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-    <!-- Google Fonts -->
-    <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-    <!-- Vendor CSS Files -->
-    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link rel="apple-touch-icon" sizes="57x57" href="<?= base_url() ?>/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="<?= base_url() ?>/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="<?= base_url() ?>/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="<?= base_url() ?>/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="<?= base_url() ?>/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="<?= base_url() ?>/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="<?= base_url() ?>/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="<?= base_url() ?>/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url() ?>/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="<?= base_url() ?>/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url() ?>/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="<?= base_url() ?>/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url() ?>/favicon-16x16.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
     <?php foreach ($imports as $import_item): ?>
     <?php   switch ($import_item['type'] ?? ""):
                 case 'style': ?>
     <link href="<?= strpos($import_item['href'] ?? "", "http") === 0 ? $import_item['href'] : base_url() . "/" . ltrim($import_item['href'] ?? "", "/") ?>" rel="<?= ($import_item['rel'] ?? 'stylesheet') ?: 'stylesheet' ?>">
     <?php       break;
                 case 'script': ?>
-    <script src="<?= strpos($import_item['src'] ?? "", "http") === 0 ? $import_item['src'] : base_url() . "/" . ltrim($import_item['src'] ?? "", "/") ?>" <?= isset($import_item['script_type']) ? 'type="' . ($import_item['script_type'] ?: 'application/javascript') . '"' : '' ?>></script>
+    <script src="<?= strpos($import_item['src'] ?? "", "http") === 0 ? $import_item['src'] : base_url() . "/" . ltrim($import_item['src'] ?? "", "/") ?>" <?= isset($import_item['script_type']) ? 'type="' . ($import_item['script_type'] ?: 'text/javascript') . '"' : '' ?>></script>
     <?php       break;
                 case 'custom': ?>
     <?php $import_item['content'] ?? "" ?>
@@ -312,7 +326,7 @@ function default_html_body_end(array $imports = [])
 <?php foreach ($imports as $import_item):
         switch ($import_item['type'] ?? ""):
             case 'script': ?>
-<script src="<?= strpos($import_item['src'] ?? "", "http") === 0 ? $import_item['src'] : base_url() . "/" . ltrim($import_item['src'] ?? "", "/") ?>" <?= isset($import_item['script_type']) ? 'type="' . ($import_item['script_type'] ?: 'application/javascript') . '"' : '' ?>></script>
+<script src="<?= strpos($import_item['src'] ?? "", "http") === 0 ? $import_item['src'] : base_url() . "/" . ltrim($import_item['src'] ?? "", "/") ?>" <?= isset($import_item['script_type']) ? 'type="' . ($import_item['script_type'] ?: 'text/javascript') . '"' : '' ?>></script>
 <?php       break;
             case 'custom': ?>
 <?php isset($import_item['content']) ? (is_callable($import_item['content']) ? call_user_func($import_item['content']) : $import_item['content']) : $import_item['content'] ?>    <?php       break;
@@ -324,7 +338,9 @@ function default_html_body_end(array $imports = [])
 function admin_html_head(string $title_page = "Page Title", array $imports = [])
 {
     default_html_head($title_page, [
-        [ "type" => "style", "href" => "assets/vendor/bootstrap-icons/bootstrap-icons.css" ],
+        [ "type" => "style", "href" => "https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" ],
+        [ "type" => "style", "href" => "assets/vendor/bootstrap/css/bootstrap.min.css" ],
+        [ "type" => "style", "href" => "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" ],
         ...$imports
     ]);
 }
@@ -335,4 +351,65 @@ function admin_html_body_end(array $imports = [])
         [ "type" => "script", "src" => "assets/vendor/bootstrap/js/bootstrap.bundle.min.js" ],
         ...$imports
     ]);
+}
+
+
+function student_html_head(string $title_page = "Page Title", array $imports = [])
+{
+    default_html_head($title_page, [
+        [ "tyoe" => "style", "href" => "https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" ],
+        [ "type" => "style", "href" => "smcc-students/css/bootstrap.min.css" ],
+        [ "type" => "style", "href" => "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" ],
+        [ "type" => "style", "href" => "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"],
+        ...$imports
+    ]);
+}
+
+function student_html_body_end(array $imports = [])
+{
+    default_html_body_end([
+        [ "type" => "script", "src" => "assets/vendor/bootstrap/js/bootstrap.bundle.min.js" ],
+        ...$imports
+    ]);
+}
+
+
+function student_nav($main_nav_link = null, $main_nav_label = null)
+{
+?>
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Navbar Start -->
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <a href="<?= base_url() ?>/smcc-students" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>Saint Michael College of Caraga - BEFS</h2>
+        </a>
+        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                <a href="<?= base_url() ?>/smcc-students" class="nav-item nav-link active">Home</a>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">PROFILE</a>
+                    <div class="dropdown-menu fade-down m-0">
+                        <a href="edit_profile_sc" class="dropdown-item">My Profile</a>
+                        <a href="log_out_sc" class="dropdown-item">Log Out</a>
+                    </div>
+                </div>
+            </div>
+            <?php if ($main_nav_link !== null && $main_nav_label !== null): ?>
+                <a href="<?= $main_nav_link ?>" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block"><?= $main_nav_label ?><i class="fa fa-arrow-right ms-3"></i></a>
+            <?php endif; ?>
+        </div>
+    </nav>
+    <!-- Navbar End -->
+<?php
 }

@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-default_html_head("Login", [
+admin_html_head("Login", [
     [ "type" => "style", "href" => "assets/css/style.css" ],
 ]);
 
@@ -91,7 +91,7 @@ default_html_head("Login", [
                     <div class="row justify-content-center">
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
                             <div class="d-flex justify-content-center py-4">
-                                <img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="" width="150" height="150">
+                                <img src="<?= base_url() ?>/images/android-icon-192x192.png" alt="" width="150" height="150">
                             </div>
                             <div class="card mb-3">
                                 <div class="card-body">

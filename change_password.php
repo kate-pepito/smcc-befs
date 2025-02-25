@@ -79,7 +79,7 @@ admin_html_head("Change Password", [
           <div class="row justify-content-center">
             <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
               <div class="d-flex justify-content-center py-4">
-                <a><img src="<?= base_url() ?>/images/Smcc_logo.gif" alt="" width="150" height="150"></a>
+                <a><img src="<?= base_url() ?>/images/android-icon-192x192.png" alt="" width="150" height="150"></a>
               </div>
               <div class="card mb-3">
                 <div class="card-body">

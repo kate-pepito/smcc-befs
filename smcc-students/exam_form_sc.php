@@ -58,9 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 $query=mysqli_query(conn(),"select * from subjects_timer where subjects_id = '$sub_id'")or die(mysqli_error(conn()));
-  if($row=mysqli_fetch_array($query))
-  {
-    $timer=$row['timer'];
-  }
+if($row=mysqli_fetch_array($query))
+{
+  $timer=$row['timer'];
+}
 
 

@@ -15,13 +15,8 @@ load_dotenv(".env");
 // rewrite uri (removing .php) if uri ends with .php
 redirect_to_no_php_path();
 
-// load database connection
-try {
-require_once __DIR__ . '/dbconnect.php';
-} catch (\Throwable $error) {
-    require_once "error_page.php";
-    exit;
-}
+// try to load database connection first for early errors
+conn()->close();
 
 
 // check if user is logged in

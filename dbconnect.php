@@ -6,7 +6,7 @@ $mysql_dbname = $_ENV["BEFS_MYSQL_DBNAME"] ?? "smcc_befs";
 $sql_file = $_ENV["BEFS_MYSQL_IMPORT_FILE"] ?? "database/smcc_befs.sql";
 
 $c1 = new mysqli($mysql_servername, $mysql_username, $mysql_password);
-if ($c1->connect_error) {
+if (!$c1 || $c1->connect_error) {
     throw new mysqli_sql_exception("[Connection failed] " . conn()->connect_error);
 } else {
     if (!$c1->query("USE $mysql_dbname")) {
@@ -18,7 +18,7 @@ if ($c1->connect_error) {
 // Create connection
 $conn = new mysqli($mysql_servername, $mysql_username, $mysql_password, $mysql_dbname);
 // Check connection
-if ($conn->connect_error) {
+if (!$conn || $conn->connect_error) {
     throw new mysqli_sql_exception("[Connection failed] " . conn()->connect_error);
 }
 
