@@ -224,7 +224,7 @@ admin_html_head("Dashboard", [
     LEFT JOIN 
         subject_percent ON subject_percent.sub_id = subjects.id
     WHERE 
-        dean_course.user_id = '". user_id() . "'" ."'
+        dean_course.user_id = '". user_id() . "'
         AND students.school_year_id = $school_year_id -- Filter by selected school year
     GROUP BY 
         subjects.id
