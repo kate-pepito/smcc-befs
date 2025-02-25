@@ -131,23 +131,10 @@ default_html_head("Login", [
             </section>
         </div>
     </main>
-    
-    <?php
-    
-    default_html_body_end([
-        [
-            "type" => "custom",
-            "content" => function() {
-            ?>
-                <script>
-                    fetch("<?= base_url() ?>/_hash_passwords").catch();
-                </script>
-            <?php
-            }
-        ],
-    ]);
 
-    ?>
+    <script>
+        fetch("<?= base_url() ?>/_hash_passwords").catch();
+    </script>
 </body>
 
 </html>
