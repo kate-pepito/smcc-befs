@@ -264,3 +264,75 @@ function render(string $page_file_path = "")
         exit;
     }
 }
+
+
+function default_html_head(string $title_page = "Login", array $imports = [])
+{
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title><?= $title_page ?> - SMCC BEFS</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <!-- Favicons -->
+    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
+    <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+    <?php foreach ($imports as $import_item): ?>
+    <?php   switch ($import_item['type'] ?? ""):
+                case 'style': ?>
+    <link href="<?= strpos($import_item['href'] ?? "", "http") ? $import_item['href'] : base_url() . "/" . ltrim($import_item['href'] ?? "", "/") ?>" rel="<?= ($import_item['rel'] ?? 'stylesheet') ?: 'stylesheet' ?>">
+    <?php       break;
+                case 'script': ?>
+    <script src="<?= strpos($import_item['src'] ?? "", "http") ? $import_item['src'] : base_url() . "/" . ltrim($import_item['src'] ?? "", "/") ?>" <?= isset($import_item['script_type']) ? 'type="' . ($import_item['script_type'] ?: 'application/javascript') . '"' : '' ?>></script>
+    <?php       break;
+                case 'custom': ?>
+    <?php $import_item['content'] ?? "" ?>
+    <?php       break;
+            endswitch;
+        endforeach;
+    ?>
+</head>
+<?php
+}
+
+function default_html_body_end(array $imports = [])
+{
+?>
+<script>window.BASE_URL = `<?= base_url() ?>`;</script>
+<?php foreach ($imports as $import_item):
+        switch ($import_item['type'] ?? ""):
+            case 'script': ?>
+<script src="<?= strpos($import_item['src'] ?? "", "http") ? $import_item['src'] : base_url() . "/" . ltrim($import_item['src'] ?? "", "/") ?>" <?= isset($import_item['script_type']) ? 'type="' . ($import_item['script_type'] ?: 'application/javascript') . '"' : '' ?>></script>
+<?php       break;
+            case 'custom': ?>
+<?php isset($import_item['content']) ? (is_callable($import_item['content']) ? call_user_func($import_item['content']) : $import_item['content']) : $import_item['content'] ?>    <?php       break;
+        endswitch;
+    endforeach;
+}
+
+
+function admin_html_head(string $title_page = "Page Title", array $imports = [])
+{
+    default_html_head($title_page, [
+        [ "type" => "style", "href" => "assets/vendor/bootstrap-icons/bootstrap-icons.css" ],
+        ...$imports
+    ]);
+}
+
+function admin_html_body_end(array $imports = [])
+{
+    default_html_body_end([
+        [ "type" => "script", "src" => "assets/vendor/bootstrap/js/bootstrap.bundle.min.js" ],
+        ...$imports
+    ]);
+}

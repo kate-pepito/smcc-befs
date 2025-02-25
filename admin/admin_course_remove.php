@@ -6,7 +6,7 @@ $c_id = mysqli_real_escape_string(conn(), $_REQUEST['c_id']);
 
 // Check if parameters are passed correctly
 if (!user_id() || !$c_id) {
-    echo "Error: Missing user_id or c_id.";
+    echo "Error: Missing authentication or course id.";
     exit();
 }
 
@@ -18,7 +18,7 @@ echo "Query: $query<br>";  // Remove this after debugging
 $result = mysqli_query(conn(), $query);
 
 if ($result) {
-    // If the update is successful, redirect back to the admin_course.php page
+    // If the update is successful, redirect back to the admin_course page
     header("Location: admin_course");
     exit();
 } else {

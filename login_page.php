@@ -76,24 +76,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
+default_html_head("Login", [
+    [ "type" => "style", "href" => "assets/css/style.css" ],
+]);
+
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Login - SMCC</title>
-    <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
-    <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-
-</head>
 
 <body>
     <main>
@@ -143,12 +131,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </section>
         </div>
     </main>
-    <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script>
-        fetch("<?= base_url() ?>/_hash_passwords")
-            .then()
-            .catch();
-    </script>
+    
+    <?php
+    
+    default_html_body_end([
+        [
+            "type" => "custom",
+            "content" => function() {
+            ?>
+                <script>
+                    fetch("<?= base_url() ?>/_hash_passwords").catch();
+                </script>
+            <?php
+            }
+        ],
+    ]);
+
+    ?>
 </body>
 
 </html>

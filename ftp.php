@@ -45,19 +45,23 @@
 </div>
 
 <!-- Vendor JS Files -->
-<script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script>
     var fetchOnLoad = false;
     var stopAllFetch = false;
+    var fetchings = {};
     async function onTransferAction(event, id, enableAfterUpload = false) {
         if (!id) {
             event.preventDefault();
         }
         const btn = !id ? event.target : document.getElementById(id);
         const filename = !id ? btn.id : id;
+        if (!Object.keys(fetchings).includes(filename)) {
+            fetchings[filename] = true;
+        }
         const body = {
             "source": filename,
             "destination": `dist/${filename}`
@@ -87,10 +91,12 @@
                             }, filename, true).catch(console.log)    
                         }, 500)
                     }
+                    fetchings[filename] = false;
                     resolve()
                 })
                 .fail((...errors) => {
                     console.log(...errors)
+                    fetchings[filename] = false;
                     resolve();
                 })
         })
@@ -108,6 +114,52 @@
         await onGetModifiedFiles();
 
         fetchOnLoad = false;
+    }
+
+    async function divideGetModifiedFiles(body, ftp_files, enableAfterUpload = false) {
+        return new Promise((resolve) => {
+            fetchOnLoad = true;
+            if (stopAllFetch) {
+                resolve();
+            }
+            body['ftp_files'] = typeof(ftp_files) === "string" ? ftp_files : ftp_files.join(",");
+            if (!body['ftp_files']) return;
+            body['ftp_files'].split(",").forEach((filename) => {
+                if (!Object.keys(fetchings).includes(filename)) {
+                    fetchings[filename] = true;
+                }
+            })
+            $.post('ftp_api?command=check_ftp_modified', body)
+                .done(modified_files => {
+                    if (modified_files.success) {
+                        let f = modified_files.data;
+                        f.forEach((file) => {
+                            let filename = file.file;
+
+                            let is_modified = file.is_modified ? `<button class="btn btn-primary" id="upload_${filename}" data-upload-name="${filename}" onclick="onUploadAction(event, true)">Upload FTP</button>` : 'No';
+                            let modid = `modified_${filename}`;
+                            window.localStorage.removeItem(modid);
+                            window.localStorage.setItem(modid, is_modified);
+                            fetchings[filename] = false;
+                        })
+                    }
+                    if (enableAfterUpload) {
+                        fetchOnLoad = false;
+                    }
+                    resolve();
+                })
+                .fail((...errors) => {
+                    console.log(errors);
+                    ftp_files.split(",").forEach((f) => {
+                        let modid = `modified_${f}`;
+                        window.localStorage.removeItem(modid);
+                        window.localStorage.setItem(modid, `<button class="btn btn-primary" id="upload_${f}" data-upload-name="${f}" onclick="onUploadAction(event, true)">Upload FTP</button>`);
+                        fetchings[f] = false;
+                    })
+                    resolve();
+                });
+        });
+        
     }
 
     async function onUploadAction(filenames, enableAfterUpload = false) {
@@ -129,61 +181,21 @@
                 resolve();
             }
             $.post(`ftp_api?command=upload`, body)
-                .done(jsonData => {
+                .done(async jsonData => {
+                    await divideGetModifiedFiles(body, filenames, filenames.split(",").length === 1).catch(console.log);
                     if (enableAfterUpload) {
                         fetchOnLoad = false;
                     }
-                    setTimeout(() => {
-                        divideGetModifiedFiles(body, filenames, true).catch(console.log)    
-                    }, 500);
                     resolve(jsonData);
                 })
-                .fail((...errors) => {
+                .fail(async (...errors) => {
+                    await divideGetModifiedFiles(body, filenames, filenames.split(",").length === 1).catch(console.log);
                     if (enableAfterUpload) {
                         fetchOnLoad = false;
                     }
                     resolve(errors);
                 })
         })
-    }
-
-    async function divideGetModifiedFiles(body, ftp_files, enableAfterUpload = false) {
-        return new Promise((resolve) => {
-            fetchOnLoad = true;
-            if (stopAllFetch) {
-                resolve();
-            }
-            body['ftp_files'] = typeof(ftp_files) === "string" ? ftp_files : ftp_files.join(",");
-            if (!body['ftp_files']) return;
-            $.post('ftp_api?command=check_ftp_modified', body)
-                .done(modified_files => {
-                    if (modified_files.success) {
-                        let f = modified_files.data;
-                        f.forEach((file) => {
-                            let filename = file.file;
-
-                            let is_modified = file.is_modified ? `<button class="btn btn-primary" id="upload_${filename}" data-upload-name="${filename}" onclick="onUploadAction(event, true)">Upload FTP</button>` : 'No';
-                            let modid = `modified_${filename}`;
-                            window.localStorage.removeItem(modid);
-                            window.localStorage.setItem(modid, is_modified);
-                        })
-                    }
-                    if (enableAfterUpload) {
-                        fetchOnLoad = false;
-                    }
-                    resolve();
-                })
-                .fail((...errors) => {
-                    console.log(errors);
-                    ftp_files.split(",").forEach((f) => {
-                        let modid = `modified_${f}`;
-                        window.localStorage.removeItem(modid);
-                        window.localStorage.setItem(modid, `<button class="btn btn-primary" id="upload_${f}" data-upload-name="${f}" onclick="onUploadAction(event, true)">Upload FTP</button>`);
-                    })
-                    resolve();
-                });
-        });
-        
     }
 
     async function onGetModifiedFiles() {
@@ -202,14 +214,13 @@
             ftp_directory: "/smcc-befs.infinityfreeapp.com/htdocs/",
             local_src_directory: "dist/",
         };
-        let limit = 40;
+        let limit = 30;
         let divided = btns.items.length / limit;
         for (let i = 0; i < divided; i++) {
             let start = i * limit;
             let end = Math.min((i+1) * limit, btns.items.length);
             let files = btns.items.slice(start, end);
             await divideGetModifiedFiles(body, files);
-            await new Promise((resolve) => setTimeout(resolve, 100));
             if (stopAllFetch) {
                 return;
             }
@@ -231,18 +242,17 @@
                     btns.items.push([]);
                 }
                 btns.items[batch_current].push(filename);
-                if (x % 15 === 14) {
+                if (x % 8 === 7) {
                     batch_current++;
                 }
                 x++;
-                $(this).prop('disabled', true);
             }
         });
         for (let i = 0; i < btns.items.length; i++) {
             if (stopAllFetch) {
                 return
             }
-            await Promise.all(btns.items[i].map((f) => onUploadAction(f, true)));
+            await Promise.all(btns.items[i].map((f) => onUploadAction(f)));
             if (stopAllFetch) {
                 return;
             }
@@ -279,11 +289,19 @@
                     
                 }
 
-                let modid = `modified_${id}`;
-                let span = document.getElementById(modid);
-                let is_modified = localStorage.getItem(modid);
-                if (span && !!is_modified && is_modified !== span.innerHTML) {
-                    span.innerHTML = is_modified;
+                if (!fetchings[id]) {
+                    let modid = `modified_${id}`;
+                    let span = document.getElementById(modid);
+                    let is_modified = localStorage.getItem(modid);
+                    if (span && !!is_modified && is_modified !== span.innerHTML) {
+                        if (("" + span.innerHTML).toString().substring(0, 2) !== is_modified.substring(0, 2)) {
+                            span.innerHTML = is_modified;
+                        }
+                        let b = document.getElementById(`upload_${id}`);
+                        if (fetchOnLoad && !!b) {
+                            b.disabled = true;
+                        }
+                    }
                 }
             });
             if (!$('button').prop('disabled') && fetchOnLoad) {

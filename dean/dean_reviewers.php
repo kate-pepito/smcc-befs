@@ -160,7 +160,7 @@ $counter = 1;
 
   <?php require_once get_footer(); ?>
 
-  <script src="<?= base_url() ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  
   <script src="<?= base_url() ?>/assets/js/main.js"></script>
 </body>
 </html>

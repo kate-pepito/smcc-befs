@@ -194,7 +194,7 @@
   const useDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const isSmallScreen = window.matchMedia('(max-width: 1023.5px)').matches;
 
-  tinymce.init({
+  typeof tinymce !== 'undefined' && tinymce.init({
     selector: 'textarea.tinymce-editor',
     plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
     editimage_cors_hosts: ['picsum.photos'],
@@ -317,7 +317,7 @@
     setTimeout(() => {
       new ResizeObserver(function() {
         select('.echart', true).forEach(getEchart => {
-          echarts.getInstanceByDom(getEchart).resize();
+          typeof echarts !== 'undefined' ? echarts.getInstanceByDom(getEchart).resize() : null;
         })
       }).observe(mainContainer);
     }, 200);
