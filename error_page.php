@@ -23,7 +23,7 @@ admin_html_head("Internal Server Error", [
                                     <div class="ps-3 pe-3 py-2 pb-2 w-100 border border-danger rounded" style="min-height: 150px;">
                                         <code class="w-100">
                                             Error: <?= $error->getMessage(); ?><hr />
-                                            <?php if (($_ENV['BEFS_LOG_LEVEL'] ?? "development") === "development"): ?>
+                                            <?php if (($_ENV['BEFS_LOG_LEVEL'] ?? "production") === "development"): ?>
                                             Line <?= $error->getLine(); ?> in <?= substr($error->getFile(), strpos($error->getFile(),str_replace("/", DIRECTORY_SEPARATOR, get_base_uri_path()))); ?><br />
                                             <?php endif; ?>
                                         </code>

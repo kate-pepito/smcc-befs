@@ -15,9 +15,8 @@ load_dotenv(".env");
 // rewrite uri (removing .php) if uri ends with .php
 redirect_to_no_php_path();
 
-// try to load database connection first for early errors
+// try to load database connection first for early connection errors
 conn()->close();
-
 
 // check if user is logged in
 if (user_id() === null || account_type() === null) {

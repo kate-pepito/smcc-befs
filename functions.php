@@ -1,5 +1,7 @@
 <?php
 
+$mysqli_object = [];
+
 function get_base_uri_path()
 {
     return $_ENV['BEFS_BASE_URI'] ?? "/smcc-befs";
@@ -51,17 +53,70 @@ function load_dotenv($filename = ".env")
 
 function conn()
 {
-    global $conn;
-    if (!isset($conn) || !$conn || !$conn->ping()) {
-        try {
-            require_once __DIR__ . '/dbconnect.php';
-        } catch (\Throwable $error) {
-            require_once __DIR__ . '/error_page.php';
-            exit;
+    global $mysqli_object;
+    try {
+        end($mysqli_object)->ping();
+        return end($mysqli_object);
+    } catch (\Throwable $err) {/* mysqli object is null or $conn is already closed */}
+    try {
+        $mysql_servername = $_ENV["BEFS_MYSQL_HOST"] ?? "localhost";
+        $mysql_username = $_ENV["BEFS_MYSQL_USERNAME"] ?? "root";
+        $mysql_password = $_ENV["BEFS_MYSQL_PASSWORD"] ?? "";
+        $mysql_dbname = $_ENV["BEFS_MYSQL_DBNAME"] ?? "smcc_befs";
+        $sql_file = $_ENV["BEFS_MYSQL_IMPORT_FILE"] ?? "database/smcc_befs.sql";
+        
+        $c1 = new mysqli($mysql_servername, $mysql_username, $mysql_password);
+        if (!$c1 || $c1->connect_error) {
+            throw new mysqli_sql_exception("[Connection failed] " . $c1->connect_error);
+        } else {
+            if (!$c1->query("USE $mysql_dbname")) {
+                $c1->query("CREATE DATABASE $mysql_dbname");
+            }
+            $c1->close();
         }
-        return $conn;
+
+        // Create connection
+        $mysqli = new mysqli($mysql_servername, $mysql_username, $mysql_password, $mysql_dbname);
+        // Check connection
+        if (!$mysqli || $mysqli->connect_error) {
+            throw new mysqli_sql_exception("[Connection failed] " . $mysqli->connect_error);
+        }
+        array_splice($mysqli_object, 0);
+        seed_database($mysqli, $sql_file);
+        $mysqli_object[] = $mysqli;
+        return $mysqli;
+    } catch (\Throwable $error) {
+        require_once __DIR__ . '/error_page.php';
+        exit;
     }
-    return $conn;
+}
+
+
+function check_seed_exists($mysqli)
+{
+    $sq = "SELECT * FROM users WHERE id = 1";
+    $result = mysqli_query($mysqli, $sq);
+    return $result !== false && mysqli_num_rows($result) > 0;
+}
+
+function seed_database($mysqli, $sql_file)
+{
+    if (!check_seed_exists($mysqli)) {
+        // Read the SQL file
+        $sql = file_get_contents($sql_file);
+        echo mysqli_next_result($mysqli) . "<br/>";
+        // Execute the SQL file
+        if ($mysqli->multi_query($sql)) {
+            do {
+                // Store the result set (if any)
+                if ($result = $mysqli->store_result()) {
+                    $result->free();
+                }
+            } while ($mysqli->more_results() && $mysqli->next_result());
+        } else {
+            echo "Error importing SQL file: " . $mysqli->error;
+        }
+    }
 }
 
 function redirect_to_no_php_path()
