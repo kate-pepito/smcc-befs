@@ -29,6 +29,4 @@ if (isset($_REQUEST['confirmed']) && $_REQUEST['confirmed'] == '1') {
             }
           </script>";
 }
-?>
-
 

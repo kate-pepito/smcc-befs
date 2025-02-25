@@ -26,4 +26,4 @@ if ($result) {
     echo "Error updating course: " . mysqli_error(conn());
     exit();
 }
-?>
+

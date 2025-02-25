@@ -12,5 +12,4 @@ if (mysqli_query(conn(), $query))
 
 			header("location: admin_section");
 }
-?>
 
