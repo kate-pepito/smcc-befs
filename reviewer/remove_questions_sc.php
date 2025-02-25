@@ -4,7 +4,7 @@ authenticated_page("reviewer");
 
 $qid = mysqli_real_escape_string(conn(), $_REQUEST['qid']);
 $s_id = $_REQUEST['s_id'];
-$active_tab = isset($_REQUEST['active_tab']) ? $_REQUEST['active_tab'] : ''; // Default to empty if not set
+$active_tab = $_REQUEST['active_tab'] ?? ''; // Default to empty if not set
 
 $query = "DELETE FROM question_answer WHERE id = '$qid'" or die(mysqli_error(conn()));
 
@@ -18,4 +18,3 @@ if (mysqli_query(conn(), $query)) {
     }
     exit;
 }
-?>

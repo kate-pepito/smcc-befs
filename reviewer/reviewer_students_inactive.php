@@ -37,49 +37,25 @@ if (!empty($school_year)) {
 $stmt->execute();
 $result = $stmt->get_result();
 $counter = 1; // Initialize counter outside the loop
+
+$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+if($row = mysqli_fetch_array($query)) {
+    $fname = $row['fname'];
+    $lname = $row['lname'];
+    $type = $row['type'];
+    $fname = ucfirst(strtolower($fname));
+    $lname = ucfirst(strtolower($lname));
+    $type = ucfirst(strtolower($type));
+}
+
+admin_html_head("Inactive Students", [
+  [ "type" => "style", "href" => "assets/vendor/simple-datatables/style.css" ],
+  [ "type" => "style", "href" => "assets/css/style.css" ],
+]); // html head
+
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-  <title>Inactive Students - SMCC</title>
-
-  <!-- Favicons -->
-  <link href="<?= base_url() ?>/images/Smcc_logo.gif" rel="icon">
-  <link href="<?= base_url() ?>/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
-  <link href="<?= base_url() ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="<?= base_url() ?>/assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
-  <!-- Template Main CSS File -->
-  <link href="<?= base_url() ?>/assets/css/style.css" rel="stylesheet">
-
-</head>
 <body>
-  <?php 
-    $query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
-    if($row = mysqli_fetch_array($query)) {
-        $fname = $row['fname'];
-        $lname = $row['lname'];
-        $type = $row['type'];
-        $fname = ucfirst(strtolower($fname));
-        $lname = ucfirst(strtolower($lname));
-        $type = ucfirst(strtolower($type));
-    }
-  ?>
   <!-- ======= Header ======= -->
   <?php require_once get_reviewer_header(); ?>
   <!-- End Header -->
@@ -93,7 +69,7 @@ $counter = 1; // Initialize counter outside the loop
     <div class="pagetitle">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <h1>List of Active Students</h1>
+          <h1>List of Inactive Students</h1>
           <nav>
             <ol class="breadcrumb">
               <li class="breadcrumb-item">
@@ -184,20 +160,10 @@ $counter = 1; // Initialize counter outside the loop
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
-  
-  
-  
-  
-  
-  <script src="<?= base_url() ?>/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  
-  
-
-  <!-- Template Main JS File -->
   <?php admin_html_body_end([
-        ["type" => "script", "src" => "assets/js/main.js"],
-    ]); ?>
+      ["type" => "script", "src" => "assets/vendor/simple-datatables/simple-datatables.js"],
+      ["type" => "script", "src" => "assets/js/main.js"],
+  ]); ?>
 
 </body>
 </html>

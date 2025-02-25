@@ -3,7 +3,7 @@
 authenticated_page("reviewer");
 
 $s_id = mysqli_real_escape_string(conn(), $_REQUEST['s_id']);
-$active_tab = isset($_REQUEST['active_tab']) ? $_REQUEST['active_tab'] : 'preboard'; // Default to 'preboard' if not set
+$active_tab = $_REQUEST['active_tab'] ?? 'preboard'; // Default to 'preboard' if not set
 
 if (isset($_POST['add_prelim_question1'])) {
 

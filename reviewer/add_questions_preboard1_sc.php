@@ -30,10 +30,3 @@ if (isset($_POST['add_prelim_question'])) {
         }
     }
 }
-?>
-
-
-
-
-
-
