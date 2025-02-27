@@ -5,7 +5,7 @@ from pydantic import BaseModel
 class TrainCreateSessionRequest(BaseModel):
     username: str
     session_key: str
-    algo: Literal["Logistic Regression", "XGBoost Classifier"]
+    algo: Optional[Literal["Logistic Regression", "XGBoost Classifier"]] = None
 
 class TrainCreateSessionResponse(BaseModel):
     session_token: str
@@ -53,7 +53,7 @@ class TrainingStatesResponse(BaseModel):
 
 class CommandRequest(BaseModel):
     action: str
-    data: Union[str,dict,list,float,int]
+    data: Optional[Union[str,dict,list,float,int]] = None
 
 class SaveMLModelResponse(BaseModel):
     state: Literal["save_start", "save_end", "save_failed"]
