@@ -6,7 +6,9 @@ skl2onnx
 onnxmltools
 onnx
 pydantic
-"fastapi[standard]"
+fastapi[standard]
 onnxruntime
 websockets
 uvicorn
+redis
+python-dotenv
