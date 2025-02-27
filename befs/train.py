@@ -22,8 +22,8 @@ from skl2onnx.common.shape_calculator import (
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 
 class BaseMLTrainer:
-    def __init__(self, session_id: str, username: str, token: str, redis: Redis, valid_parameters: List[str], algo: Literal["Logistic Regression", "XGBoost Classifier"]):
-        self.valid_hyperparameters = valid_parameters
+    def __init__(self, session_id: str, username: str, token: str, redis: Redis, valid_hyperparameters: List[str], algo: Literal["Logistic Regression", "XGBoost Classifier"]):
+        self.valid_hyperparameters = valid_hyperparameters
         self.algo = algo
         self.session_id = session_id
         self.username = username
@@ -48,7 +48,7 @@ class BaseMLTrainer:
             username=username,
             token=token,
             scaler={},
-            valid_hyperparameters=valid_parameters,
+            valid_hyperparameters=valid_hyperparameters,
             hyperparameters={},
             column_names=[],
             features=[],

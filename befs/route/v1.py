@@ -15,17 +15,28 @@ router.prefix = "/v1"
 
 @router.post("/train/create")
 async def create_training_session(data: TrainCreateSessionRequest, request: Request, redis: Redis = Depends(get_redis)):
-    session_token = redis.get(f"training_session:{data.username}_{data.session_key}")
+    session_token = await redis.get(f"training_session:{data.username}_{data.session_key}")
     if session_token is not None:
         return JSONResponse(TrainCreateSessionResponse(session_token=session_token), 200)
     session_token = secrets.token_hex(16)
     # Initialize training state
     training_classes: Dict[str, LogisticRegressionTrainer] = request.app.training_classes
-    redis = await get_redis()
     training_classes[session_token] = LogisticRegressionTrainer(session_id=data.session_key, username=data.username, token=session_token, redis=redis)
     train_key = f"training_session:{data.username}_{data.session_key}"
-    redis.set(train_key, session_token)
+    await redis.set(train_key, session_token)
     return JSONResponse(TrainCreateSessionResponse(session_token=session_token), 201)
+
+
+@router.post("/train/destroy")
+async def destroy_training_session(data: TrainCreateSessionRequest, request: Request, redis: Redis = Depends(get_redis)):
+    session_token = await redis.get(f"training_session:{data.username}_{data.session_key}")
+    if session_token is not None:
+        train_key = f"training_session:{data.username}_{data.session_key}"
+        await redis.delete(train_key)
+        training_classes: Dict[str, LogisticRegressionTrainer] = request.app.training_classes
+        if session_token in training_classes.keys():
+            del training_classes[session_token]
+    return JSONResponse({"success": True}, 200)
 
 @router.websocket("/train")
 async def websocket_endpoint(websocket: WebSocket):
