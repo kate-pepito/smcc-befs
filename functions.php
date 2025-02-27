@@ -51,7 +51,131 @@ function load_dotenv($filename = ".env")
     }
 }
 
-function conn()
+class DB {
+    private mysqli $conn;
+    private string $mysql_servername;
+    private string $mysql_username;
+    private string $mysql_password;
+    private string $mysql_dbname;
+    /**
+     * @var mysqli_result|bool
+     */
+    private $query_result;
+
+    public function sanitize($string)
+    {
+        $res = $this->conn->real_escape_string($string);
+        return $res;
+    }
+
+    public function __construct() {
+        $this->mysql_servername = $_ENV["BEFS_MYSQL_HOST"] ?? "localhost";
+        $this->mysql_username = $_ENV["BEFS_MYSQL_USERNAME"] ?? "root";
+        $this->mysql_password = $_ENV["BEFS_MYSQL_PASSWORD"] ?? "";
+        $this->mysql_dbname = $_ENV["BEFS_MYSQL_DBNAME"] ?? "smcc_befs";
+        try {
+            $this->conn = $this->tryConnect();
+        } catch (mysqli_sql_exception $e) {
+            $this->createDatabase();
+            $this->conn = $this->tryConnect();
+        }
+    }
+
+    private function tryConnect() {
+        $mysqli = new mysqli($this->mysql_servername, $this->mysql_username, $this->mysql_password, $this->mysql_dbname);
+        // Check connection
+        if (!$mysqli || $mysqli->connect_error) {
+            throw new mysqli_sql_exception("[Connection failed] " . $mysqli->connect_error);
+        }
+        return $mysqli;
+    }
+
+    private function createDatabase() {
+        $c1 = new mysqli($this->mysql_servername,$this->mysql_username, $this->mysql_password);
+        if (!$c1 || $c1->connect_error) {
+            throw new mysqli_sql_exception("[Connection failed] " . $c1->connect_error);
+        } else {
+            $dbname = $this->mysql_dbname;
+            if (!$c1->query("USE $dbname")) {
+                $c1->query("CREATE DATABASE $dbname");
+            }
+            $c1->close();
+        }
+    }
+
+    public function query(string $sql)
+    {
+        $this->query_result = $this->conn->query($sql);
+        return $this->query_result;
+    }
+
+    public function num_rows()
+    {
+        return $this->query_result ? $this->query_result->num_rows : 0;
+    }
+
+    public function multi_query(string $sql)
+    {
+        if ($this->conn->multi_query($sql)) {
+            do {
+                // Store the result set (if any)
+                if ($result = $this->conn->store_result()) {
+                    $result->free();
+                }
+            } while ($this->conn->more_results() && $this->conn->next_result());
+        } else {
+            throw new mysqli_sql_exception("Error importing SQL file: " . $this->conn->error);
+        }
+        $this->conn->close();
+        $this->conn = $this->tryConnect();
+    }
+
+    public function ping()
+    {
+        return $this->conn->ping();
+    }
+
+    public function get_conn()
+    {
+        return $this->conn;
+    }
+
+    public function __destruct() {
+        if ($this->query_result) {
+            $this->query_result->free();
+        }
+        if ($this->conn) {
+            $this->conn->close();
+        }
+    }
+}
+
+
+function check_seed_exists()
+{
+    $mysqli = new DB();
+    $r = false;
+    try {
+        $sq = "SELECT * FROM users WHERE id = 1";
+        $mysqli->query($sq);
+        $r = $mysqli->num_rows() > 0;
+    } catch (\Throwable $e) {/* database tables not yet created */}
+    return $r;
+}
+
+function seed_database($sql_file)
+{
+    if (!check_seed_exists()) {
+        $mysqli = new DB();        
+        // Read the SQL file
+        $sql = file_get_contents($sql_file);
+        // Execute the SQL file
+        $mysqli->multi_query($sql);
+    }
+}
+
+
+function conn(): DB
 {
     global $mysqli_object;
     try {
@@ -59,68 +183,17 @@ function conn()
         return end($mysqli_object);
     } catch (\Throwable $err) {/* mysqli object is null or $conn is already closed */}
     try {
-        $mysql_servername = $_ENV["BEFS_MYSQL_HOST"] ?? "localhost";
-        $mysql_username = $_ENV["BEFS_MYSQL_USERNAME"] ?? "root";
-        $mysql_password = $_ENV["BEFS_MYSQL_PASSWORD"] ?? "";
-        $mysql_dbname = $_ENV["BEFS_MYSQL_DBNAME"] ?? "smcc_befs";
         $sql_file = __DIR__ . DIRECTORY_SEPARATOR . ($_ENV["BEFS_MYSQL_IMPORT_FILE"] ?? "database/smcc_befs.sql");
-        
-        $c1 = new mysqli($mysql_servername, $mysql_username, $mysql_password);
-        if (!$c1 || $c1->connect_error) {
-            throw new mysqli_sql_exception("[Connection failed] " . $c1->connect_error);
-        } else {
-            if (!$c1->query("USE $mysql_dbname")) {
-                $c1->query("CREATE DATABASE $mysql_dbname");
-            }
-            $c1->close();
-        }
-
-        // Create connection
-        $mysqli = new mysqli($mysql_servername, $mysql_username, $mysql_password, $mysql_dbname);
-        // Check connection
-        if (!$mysqli || $mysqli->connect_error) {
-            throw new mysqli_sql_exception("[Connection failed] " . $mysqli->connect_error);
-        }
+        seed_database($sql_file);
         array_splice($mysqli_object, 0);
-        seed_database($mysqli, $sql_file);
-        $mysqli_object[] = $mysqli;
-        return $mysqli;
+        $mysqli_object[] = new DB();
     } catch (\Throwable $error) {
         require_once __DIR__ . '/error_page.php';
         exit;
     }
+    return end($mysqli_object);
 }
 
-
-function check_seed_exists($mysqli)
-{
-    try {
-        $sq = "SELECT * FROM users WHERE id = 1";
-        $result = mysqli_query($mysqli, $sq);
-        return $result !== false && mysqli_num_rows($result) > 0;
-    } catch (\Throwable $e) {/* database tables not yet created */}
-    return false;
-}
-
-function seed_database($mysqli, $sql_file)
-{
-    if (!check_seed_exists($mysqli)) {
-        // Read the SQL file
-        $sql = file_get_contents($sql_file);
-        echo mysqli_next_result($mysqli) . "<br/>";
-        // Execute the SQL file
-        if ($mysqli->multi_query($sql)) {
-            do {
-                // Store the result set (if any)
-                if ($result = $mysqli->store_result()) {
-                    $result->free();
-                }
-            } while ($mysqli->more_results() && $mysqli->next_result());
-        } else {
-            echo "Error importing SQL file: " . $mysqli->error;
-        }
-    }
-}
 
 function redirect_to_no_php_path()
 {
@@ -323,7 +396,6 @@ function render(string $page_file_path = "")
         // Page error
         require_once "error_page.php";
     } finally {
-        conn()->close();
         exit;
     }
 }

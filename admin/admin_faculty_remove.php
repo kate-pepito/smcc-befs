@@ -2,12 +2,12 @@
 
 authenticated_page("admin");
 
-$f_id = mysqli_real_escape_string(conn(), $_REQUEST['f_id']);
+$f_id = conn()->sanitize($_REQUEST['f_id']);
 
 if (isset($_REQUEST['confirmed']) && $_REQUEST['confirmed'] == '1') {
     // If the confirmation is received, process the query
     $query = "UPDATE users SET status = 'Inactive' WHERE id = '$f_id'";
-    if (mysqli_query(conn(), $query)) {
+    if (conn()->query($query)) {
         echo "<script type='text/javascript'>
                 alert('Reviewer successfully removed!');
                 window.location.href = 'admin_faculty';

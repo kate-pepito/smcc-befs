@@ -41,7 +41,7 @@ if ($row = $result->fetch_array()) {
     $about = $row['about'];
     $student_profile_image = $row['student_profile_image'];
 } else {
-    echo "Error: " . mysqli_error(conn());
+    echo "Error: " . mysqli_error(conn()->get_conn());
 }
 
 // Fetch subject count using prepared statement
@@ -54,7 +54,7 @@ $result = $stmt->get_result();
 if ($row = $result->fetch_array()) {
     $sub_count = $row['sub_count'];
 } else {
-    echo "Error: " . mysqli_error(conn());
+    echo "Error: " . mysqli_error(conn()->get_conn());
 }
 $user_id = user_id();
 // Fetch dean/user details using prepared statement
@@ -235,7 +235,7 @@ admin_html_head("Student Profile", [
                                                             <tbody>
                                                                 <?php
                                                                 // Query to fetch subjects and their individual averages for PREBOARD 1
-                                                                $query = mysqli_query(conn(), "
+                                                                $query = conn()->query("
                                 SELECT 
                                     subjects.code AS code,
                                     subjects.description AS description,
@@ -263,7 +263,7 @@ admin_html_head("Student Profile", [
                                     AND student_score.level = 'PREBOARD1'
                                 GROUP BY 
                                     subjects.code, subjects.description;
-                            ") or die(mysqli_error(conn()));
+                            ") or die(mysqli_error(conn()->get_conn()));
 
                                                                 while ($row = mysqli_fetch_array($query)) {
                                                                     $code = $row['code'];
@@ -348,7 +348,7 @@ admin_html_head("Student Profile", [
                                                             </thead>
                                                             <tbody>
                                                                 <?php
-                                                                $query = mysqli_query(conn(), "
+                                                                $query = conn()->query("
                                                                     SELECT 
                                                                         subjects.code AS code,
                                                                         subjects.description AS description,
@@ -377,7 +377,7 @@ admin_html_head("Student Profile", [
                                                                         AND students_subjects.level = 'PREBOARD2'
                                                                     GROUP BY 
                                                                         subjects.code, subjects.description;
-                                                                ") or die(mysqli_error(conn()));
+                                                                ") or die(mysqli_error(conn()->get_conn()));
 
                                                                 while ($row = mysqli_fetch_array($query)) {
                                                                     $code = $row['code'];

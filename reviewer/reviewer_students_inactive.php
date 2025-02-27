@@ -2,7 +2,7 @@
 
 authenticated_page("reviewer");
 
-$school_year = mysqli_real_escape_string(conn(), $_GET['school_year'] ?? ''); // Get the selected school year, if any
+$school_year = conn()->sanitize($_GET['school_year'] ?? ''); // Get the selected school year, if any
 
 // Base query to get students assigned to the courses under the faculty member for the specific school year
 $sql = "
@@ -38,7 +38,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 $counter = 1; // Initialize counter outside the loop
 
-$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -91,7 +91,7 @@ admin_html_head("Inactive Students", [
                 <?php
                   
                   // Fetch all available school years
-                  $sy_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY description ASC");
+                  $sy_query = conn()->query("SELECT id, description FROM school_year ORDER BY description ASC");
                   while ($sy_row = mysqli_fetch_array($sy_query)) {
                     $selected = isset($_GET['school_year']) && $_GET['school_year'] == $sy_row['id'] ? 'selected' : '';
                     echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";

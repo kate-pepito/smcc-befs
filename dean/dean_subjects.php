@@ -3,12 +3,12 @@
 authenticated_page("dean");
 
 // Fetch the "Current Set" school year
-$current_school_year_query = mysqli_query(conn(), "SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error(conn()));
+$current_school_year_query = conn()->query("SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error(conn()->get_conn()));
 $current_school_year = mysqli_fetch_assoc($current_school_year_query);
-$current_school_year_id = mysqli_real_escape_string(conn(), $current_school_year['id'] ?? null);
+$current_school_year_id = conn()->sanitize($current_school_year['id'] ?? null);
 
 // Determine selected school year (default to "Current Set")
-$selected_school_year = mysqli_real_escape_string(conn(), $_GET['school_year'] ?? $current_school_year_id);
+$selected_school_year = conn()->sanitize($_GET['school_year'] ?? $current_school_year_id);
 
 admin_html_head("Subjects", [
   [ "type" => "style", "href" => "assets/vendor/simple-datatables/style.css" ],
@@ -20,7 +20,7 @@ admin_html_head("Subjects", [
 <body>
 <?php 
   // Fetch user details
-  $query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+  $query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
   if ($row = mysqli_fetch_array($query)) {
       $fname = ucfirst(strtolower($row['fname']));
       $lname = ucfirst(strtolower($row['lname']));
@@ -54,7 +54,7 @@ admin_html_head("Subjects", [
               <option value="" selected>All</option>
               <?php
                // Fetch all available school years
-          $sy_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY description ASC");
+          $sy_query = conn()->query("SELECT id, description FROM school_year ORDER BY description ASC");
           while ($sy_row = mysqli_fetch_assoc($sy_query)) {
             $selected = ($sy_row['id'] == $selected_school_year) ? 'selected' : '';
             echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";
@@ -92,7 +92,7 @@ admin_html_head("Subjects", [
  $school_year_filter = $selected_school_year ? "AND subjects.school_year_id = '$selected_school_year'" : '';
 
 // Fetch dean's assigned courses
-$dean_course_query = mysqli_query(conn(), "SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$dean_course_query = conn()->query("SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 $course_ids = [];
 while ($row = mysqli_fetch_assoc($dean_course_query)) {
     $course_ids[] = $row['course_id'];
@@ -100,7 +100,7 @@ while ($row = mysqli_fetch_assoc($dean_course_query)) {
 
 if (count($course_ids) > 0) {
     $course_ids_imploded = implode(',', $course_ids);
-    $query = mysqli_query(conn(), "
+    $query = conn()->query("
         SELECT 
             subjects.id AS s_id, 
             subjects.code AS s_code, 
@@ -125,7 +125,7 @@ if (count($course_ids) > 0) {
             subjects.course_id IN ($course_ids_imploded) 
             AND subjects.status = 'Active'
             $school_year_filter
-    ") or die(mysqli_error(conn()));
+    ") or die(mysqli_error(conn()->get_conn()));
 
     while ($row = mysqli_fetch_array($query)) {
         $s_id = $row['s_id'];
@@ -220,7 +220,7 @@ if (count($course_ids) > 0) {
         <!-- Hidden Course and Year Level -->
         <?php
           // Fetch the dean's assigned courses
-          $dean_course_query = mysqli_query(conn(), "SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "'") or die(mysqli_error(conn()));
+          $dean_course_query = conn()->query("SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
           $course_ids = [];
           while ($row = mysqli_fetch_assoc($dean_course_query)) {
             $course_ids[] = $row['course_id'];

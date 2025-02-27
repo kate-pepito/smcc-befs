@@ -8,18 +8,18 @@ $sub_id = $_REQUEST['sub_id'];
 require_once get_student_exam_form_sc();
 shuffle($questions);
 
-$query = mysqli_query(conn(), "select * from subject_percent where sub_id = '$sub_id'") or die(mysqli_error(conn()));
+$query = conn()->query("select * from subject_percent where sub_id = '$sub_id'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $percent = $row['percent'];
 }
 
 
-$query = mysqli_query(conn(), "select * from students where id = '$stud_id'") or die(mysqli_error(conn()));
+$query = conn()->query("select * from students where id = '$stud_id'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $level = $row['level'];
 }
 
-$query = mysqli_query(conn(), "select count(id) as c from question_answer where subject_id = '$sub_id'") or die(mysqli_error(conn()));
+$query = conn()->query("select count(id) as c from question_answer where subject_id = '$sub_id'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $c = $row['c'];
 }
@@ -141,18 +141,18 @@ student_html_head('Home', [
         date_default_timezone_set("Asia/Manila");
         $dt = date("Y-m-d") . " " . date("h:i:sa");
 
-        $query = "insert into student_score (score,total_items,stud_id,average,sub_id,date_accomplished,level) values ('$score','$count_questions','$stud_id','$get_average','$sub_id','$dt','$level') " or die(mysqli_error(conn()));
-        if (mysqli_query(conn(), $query)) {
+        $query = "insert into student_score (score,total_items,stud_id,average,sub_id,date_accomplished,level) values ('$score','$count_questions','$stud_id','$get_average','$sub_id','$dt','$level') " or die(mysqli_error(conn()->get_conn()));
+        if (conn()->query($query)) {
             $s_id = $_REQUEST['s_id'];
 
-            $query = "update students_subjects set status = 'TAKEN' where students_id = '$stud_id' and subjects_id = '$sub_id' and level = '$level'" or die(mysqli_error(conn()));
-            if (mysqli_query(conn(), $query)) {
+            $query = "update students_subjects set status = 'TAKEN' where students_id = '$stud_id' and subjects_id = '$sub_id' and level = '$level'" or die(mysqli_error(conn()->get_conn()));
+            if (conn()->query($query)) {
                 echo "<script type='text/javascript'>alert('Exam Successfully Submited!');
                     document.location='exam_subject_list'</script>";
                 conn()->close();
             }
         } else {
-            echo "Error: " . $query . "<br>" . mysqli_error(conn());
+            echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
             conn()->close();
         }
         conn()->close();

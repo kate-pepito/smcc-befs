@@ -3,7 +3,7 @@
 authenticated_page("reviewer");
 
 
-$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     // Get user details
     $fname = ucfirst(strtolower($row['fname']));
@@ -14,8 +14,8 @@ if ($row = mysqli_fetch_array($query)) {
 
 // Handle profile update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fname = mysqli_real_escape_string(conn(), $_POST['fname']);
-    $lname = mysqli_real_escape_string(conn(), $_POST['lname']);
+    $fname = conn()->sanitize($_POST['fname']);
+    $lname = conn()->sanitize($_POST['lname']);
 
     // Validate input
     if (empty($fname) || empty($lname)) {
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Update user profile in the database
     $query_update = "UPDATE users SET fname = '$fname', lname = '$lname', profile_image = '$image_path_url' WHERE id = '" . user_id() . "'";
-    if (mysqli_query(conn(), $query_update)) {
+    if (conn()->query($query_update)) {
         echo "<script>alert('Profile updated successfully!'); window.location='reviewer_profile';</script>";
     } else {
         echo "<script>alert('Failed to update profile.'); history.back();</script>";

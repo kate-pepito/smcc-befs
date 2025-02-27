@@ -3,9 +3,9 @@
 authenticated_page("dean");
 
 // Validate and fetch parameters from the URL
-$faculty_id = mysqli_real_escape_string(conn(), isset($_GET['faculty_id']) ? $_GET['faculty_id'] : null); // Faculty ID
-$school_year = mysqli_real_escape_string(conn(), isset($_GET['school_year']) ? $_GET['school_year'] : null); // School Year
-$course_id = mysqli_real_escape_string(conn(), isset($_GET['course_id']) ? $_GET['course_id'] : null); // Course ID
+$faculty_id = conn()->sanitize(isset($_GET['faculty_id']) ? $_GET['faculty_id'] : null); // Faculty ID
+$school_year = conn()->sanitize(isset($_GET['school_year']) ? $_GET['school_year'] : null); // School Year
+$course_id = conn()->sanitize(isset($_GET['course_id']) ? $_GET['course_id'] : null); // Course ID
 
 // Ensure all required parameters are present
 if (!user_id() || !$faculty_id || !$school_year || !$course_id) {
@@ -13,7 +13,7 @@ if (!user_id() || !$faculty_id || !$school_year || !$course_id) {
 }
 
 // Fetch DEAN's details
-$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "' AND type = 'DEAN'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "' AND type = 'DEAN'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_assoc($query)) {
     $fname = ucfirst(strtolower($row['fname']));
     $lname = ucfirst(strtolower($row['lname']));
@@ -23,7 +23,7 @@ if ($row = mysqli_fetch_assoc($query)) {
 }
 
 // Fetch FACULTY's details
-$faculty_query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '$faculty_id' AND type = 'REVIEWER'") or die(mysqli_error(conn()));
+$faculty_query = conn()->query("SELECT * FROM users WHERE id = '$faculty_id' AND type = 'REVIEWER'") or die(mysqli_error(conn()->get_conn()));
 if ($faculty_row = mysqli_fetch_assoc($faculty_query)) {
     $faculty_fname = ucfirst(strtolower($faculty_row['fname']));
     $faculty_lname = ucfirst(strtolower($faculty_row['lname']));
@@ -133,7 +133,7 @@ admin_html_head("Assign Subjects", [
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query = mysqli_query(conn(), "
+                                    $query = conn()->query("
                                 SELECT 
                                     subjects.id AS sub_id, 
                                     subjects.code, 
@@ -151,7 +151,7 @@ admin_html_head("Assign Subjects", [
                                         FROM faculty_subjects 
                                         WHERE faculty_id = '$faculty_id'
                                     )
-                            ") or die(mysqli_error(conn()));
+                            ") or die(mysqli_error(conn()->get_conn()));
                                     while ($row = mysqli_fetch_assoc($query)) {
                                     ?>
                                         <tr>
@@ -189,7 +189,7 @@ admin_html_head("Assign Subjects", [
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query = mysqli_query(conn(), "
+                                    $query = conn()->query("
                                 SELECT 
                                     faculty_subjects.subjects_id AS sid, 
                                     subjects.code, 
@@ -203,7 +203,7 @@ admin_html_head("Assign Subjects", [
                                     year_level ON subjects.year_level_id = year_level.id
                                 WHERE 
                                     faculty_subjects.faculty_id = '$faculty_id'
-                            ") or die(mysqli_error(conn()));
+                            ") or die(mysqli_error(conn()->get_conn()));
                                     while ($row = mysqli_fetch_assoc($query)) {
                                     ?>
                                         <tr>

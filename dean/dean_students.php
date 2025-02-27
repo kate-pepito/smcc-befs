@@ -1,9 +1,9 @@
 <?php 
 
 authenticated_page("dean");
-$sub_id = mysqli_real_escape_string(conn(), $_REQUEST['sub_id']);
+$sub_id = conn()->sanitize($_REQUEST['sub_id']);
 
-$subject_query = mysqli_query(conn(), "SELECT description FROM subjects WHERE id = '$sub_id'") or die(mysqli_error(conn()));
+$subject_query = conn()->query("SELECT description FROM subjects WHERE id = '$sub_id'") or die(mysqli_error(conn()->get_conn()));
 $subject_description = "Subject Not Found"; // Default value if query fails
 if ($subject_row = mysqli_fetch_assoc($subject_query)) {
     $subject_description = $subject_row['description'];
@@ -18,7 +18,7 @@ admin_html_head("Students", [
 
 <body>
 <?php 
-$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = ucfirst(strtolower($row['fname']));
     $lname = ucfirst(strtolower($row['lname']));
@@ -79,7 +79,7 @@ if ($row = mysqli_fetch_array($query)) {
                     </thead>
                     <tbody>
 <?php
-$query = mysqli_query(conn(), "
+$query = conn()->query("
     SELECT 
         students.lname AS slname,
         students.fname AS sfname,
@@ -96,7 +96,7 @@ $query = mysqli_query(conn(), "
     INNER JOIN section ON students.section_id = section.id
     WHERE student_score.sub_id = '$sub_id' AND student_score.level = 'PREBOARD1'
     ORDER BY students.lname ASC
-") or die(mysqli_error(conn()));
+") or die(mysqli_error(conn()->get_conn()));
 
 $counter = 1;
 while ($row = mysqli_fetch_array($query)) {
@@ -156,7 +156,7 @@ while ($row = mysqli_fetch_array($query)) {
                     </thead>
                     <tbody>
 <?php
-$query = mysqli_query(conn(), "
+$query = conn()->query("
     SELECT 
         students.lname AS slname,
         students.fname AS sfname,
@@ -173,7 +173,7 @@ $query = mysqli_query(conn(), "
     INNER JOIN section ON students.section_id = section.id
     WHERE student_score.sub_id = '$sub_id' AND student_score.level = 'PREBOARD2'
     ORDER BY students.lname ASC
-") or die(mysqli_error(conn()));
+") or die(mysqli_error(conn()->get_conn()));
 
 $counter = 1;
 while ($row = mysqli_fetch_array($query)) {

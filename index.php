@@ -8,7 +8,7 @@ require_once __DIR__ . '/functions.php';
     require_once "error_page.php";
     exit;
 }
-
+try {
 // Load environment variables inside .env file
 load_dotenv(".env");
 
@@ -16,7 +16,10 @@ load_dotenv(".env");
 redirect_to_no_php_path();
 
 // try to load database connection first for early connection errors
-conn()->close();
+{
+    conn();
+}
+
 
 // check if user is logged in
 if (user_id() === null || account_type() === null) {
@@ -32,3 +35,7 @@ if (user_id() === null || account_type() === null) {
 // if logged in, render the page
 render(get_file_uri_path());
 
+} catch (\Throwable $e) {
+    header("Content-Type: application/json");
+    die(json_encode(["error" => $e->getMessage(), "line" => $e->getLine(), "in" => $e->getFile()]));
+}

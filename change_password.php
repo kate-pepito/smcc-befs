@@ -14,10 +14,10 @@ if (isset($_POST['change_password'])) {
     $password = password_hash($password, PASSWORD_DEFAULT);
     $query = "UPDATE users SET password = '$password' WHERE id = '" . user_id() . "'";
 
-    if (mysqli_query(conn(), $query)) {
+    if (conn()->query($query)) {
       // Fetch the user type based on the user_id
       $user_type_query = "SELECT type FROM users WHERE id = '" . user_id() . "'";
-      $result = mysqli_query(conn(), $user_type_query);
+      $result = conn()->query($user_type_query);
 
       if ($result && mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);

@@ -4,10 +4,10 @@ authenticated_page("dean");
 
 
 // Fetch the current school year
-$current_sy_query = mysqli_query(conn(), "SELECT id FROM school_year WHERE status = 'Current Set' LIMIT 1");
+$current_sy_query = conn()->query("SELECT id FROM school_year WHERE status = 'Current Set' LIMIT 1");
 $current_school_year = mysqli_fetch_assoc($current_sy_query)['id'] ?? null;
 
-$school_year = mysqli_real_escape_string(conn(), $_GET['school_year'] ?? $current_school_year); // Get the selected school year, if any
+$school_year = conn()->sanitize($_GET['school_year'] ?? $current_school_year); // Get the selected school year, if any
 
 // Base query to get students assigned to the courses of the dean
 $sql = "
@@ -53,7 +53,7 @@ admin_html_head("Active Students", [
 
 <body>
   <?php
-  $query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . $user_id . "'") or die(mysqli_error(conn()));
+  $query = conn()->query("SELECT * FROM users WHERE id = '" . $user_id . "'") or die(mysqli_error(conn()->get_conn()));
   if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -97,7 +97,7 @@ admin_html_head("Active Students", [
                 <option value="" <?= empty($school_year) ? 'selected' : ''; ?>>All</option>
                 <?php
                 // Fetch all available school years
-                $sy_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY description ASC");
+                $sy_query = conn()->query("SELECT id, description FROM school_year ORDER BY description ASC");
                 while ($sy_row = mysqli_fetch_array($sy_query)) {
                   $selected = $school_year == $sy_row['id'] ? 'selected' : '';
                   echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";

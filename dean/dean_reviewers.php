@@ -3,7 +3,7 @@
 authenticated_page("dean");
 
 // Get the selected school year from the form submission
-$selected_school_year = mysqli_real_escape_string(conn(), isset($_GET['school_year']) ? $_GET['school_year'] : '');
+$selected_school_year = conn()->sanitize(isset($_GET['school_year']) ? $_GET['school_year'] : '');
 
 // Build the query to fetch reviewers based on the dean's course
 $sql = "
@@ -41,7 +41,7 @@ if (!empty($selected_school_year)) {
 $sql .= " ORDER BY users.lname ASC";
 
 // Execute the query
-$result = mysqli_query(conn(), $sql) or die("Query Error: " . mysqli_error(conn()));
+$result = conn()->query($sql) or die("Query Error: " . mysqli_error(conn()->get_conn()));
 
 // Initialize counter
 $counter = 1;
@@ -54,7 +54,7 @@ admin_html_head("Reviewers", [
 
 <body>
   <?php 
-    $query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+    $query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
     if ($row = mysqli_fetch_array($query)) {
         $fname = ucfirst(strtolower($row['fname']));
         $lname = ucfirst(strtolower($row['lname']));
@@ -85,7 +85,7 @@ admin_html_head("Reviewers", [
                 <option value="" selected>All</option>
                 <?php
                   // Fetch all available school years
-                  $sy_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY description ASC");
+                  $sy_query = conn()->query("SELECT id, description FROM school_year ORDER BY description ASC");
                   while ($sy_row = mysqli_fetch_array($sy_query)) {
                     $selected = isset($_GET['school_year']) && $_GET['school_year'] == $sy_row['id'] ? 'selected' : '';
                     echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";

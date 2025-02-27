@@ -2,7 +2,7 @@
 
 authenticated_page("dean");
 
-$current_school_year_query = mysqli_query(conn(), "SELECT id, description FROM school_year WHERE status = 'Current Set' LIMIT 1") or die(mysqli_error(conn()));
+$current_school_year_query = conn()->query("SELECT id, description FROM school_year WHERE status = 'Current Set' LIMIT 1") or die(mysqli_error(conn()->get_conn()));
 if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
     $current_school_year_id = $current_school_year_row['id'];
     $current_school_year_description = $current_school_year_row['description'];
@@ -21,7 +21,7 @@ admin_html_head("Dashboard", [
 <body>
     <?php
 
-    $query = mysqli_query(conn(), "select * from users where id = '" . user_id() . "'") or die(mysqli_error(conn()));
+    $query = conn()->query("select * from users where id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
     if ($row = mysqli_fetch_array($query)) {
         $fname = $row['fname'];
         $lname = $row['lname'];
@@ -73,11 +73,11 @@ admin_html_head("Dashboard", [
 
                                         <?php
                                         // Fetch the dean's course
-                                        $course_query = mysqli_query(conn(), "
+                                        $course_query = conn()->query("
                         SELECT description FROM course 
                         JOIN dean_course ON course.id = dean_course.course_id 
                         WHERE dean_course.user_id = '" . user_id() . "'
-                    ") or die(mysqli_error(conn()));
+                    ") or die(mysqli_error(conn()->get_conn()));
 
                                         if ($course_row = mysqli_fetch_array($course_query)) {
                                             $deans_course = $course_row['description'];
@@ -86,13 +86,13 @@ admin_html_head("Dashboard", [
                                         }
 
                                         // Query to count the pending students based on the dean's course
-                                        $query = mysqli_query(conn(), "
+                                        $query = conn()->query("
                         SELECT COUNT(students.id) AS student_count_for_approval 
                         FROM students 
                         JOIN course ON students.course_id = course.id 
                         WHERE students.status = 'For Approval' 
                         AND course.description = '$deans_course'
-                    ") or die(mysqli_error(conn()));
+                    ") or die(mysqli_error(conn()->get_conn()));
 
                                         if ($row = mysqli_fetch_array($query)) {
                                             $student_count_for_approval = $row['student_count_for_approval'];
@@ -124,11 +124,11 @@ admin_html_head("Dashboard", [
 
                                         <?php
                                         // Fetch the dean's course
-                                        $course_query = mysqli_query(conn(), "
+                                        $course_query = conn()->query("
                         SELECT description FROM course 
                         JOIN dean_course ON course.id = dean_course.course_id 
                         WHERE dean_course.user_id = '" . user_id() . "'
-                    ") or die(mysqli_error(conn()));
+                    ") or die(mysqli_error(conn()->get_conn()));
 
                                         if ($course_row = mysqli_fetch_array($course_query)) {
                                             $deans_course = $course_row['description'];
@@ -137,13 +137,13 @@ admin_html_head("Dashboard", [
                                         }
 
                                         // Query to count the active students based on the dean's course
-                                        $query = mysqli_query(conn(), "
+                                        $query = conn()->query("
                         SELECT COUNT(students.id) AS student_count_active 
                         FROM students 
                         JOIN course ON students.course_id = course.id 
                         WHERE students.status = 'Active' 
                         AND course.description = '$deans_course'
-                    ") or die(mysqli_error(conn()));
+                    ") or die(mysqli_error(conn()->get_conn()));
 
                                         if ($row = mysqli_fetch_array($query)) {
                                             $student_count_active = $row['student_count_active'];
@@ -175,13 +175,13 @@ admin_html_head("Dashboard", [
 
                                         <?php
                                         // Query to count the inactive students based on the dean's course
-                                        $query = mysqli_query(conn(), "
+                                        $query = conn()->query("
                         SELECT COUNT(students.id) AS student_count_inactive 
                         FROM students 
                         JOIN course ON students.course_id = course.id 
                         WHERE students.status = 'Inactive' 
                         AND course.description = '$deans_course'
-                    ") or die(mysqli_error(conn()));
+                    ") or die(mysqli_error(conn()->get_conn()));
 
                                         if ($row = mysqli_fetch_array($query)) {
                                             $student_count_inactive = $row['student_count_inactive'];
@@ -208,7 +208,7 @@ admin_html_head("Dashboard", [
                 $school_year_id = isset($_GET['school_year_id']) ? $_GET['school_year_id'] : $current_school_year_id; // Default to current school year if not provided
 
                 // Query to calculate the total average per subject for students under the dean's course, filtered by school year
-                $query = mysqli_query(conn(), "
+                $query = conn()->query("
     SELECT 
         subjects.description AS subject_name,
         AVG(student_score.average) AS avg_score,
@@ -230,7 +230,7 @@ admin_html_head("Dashboard", [
         subjects.id
     ORDER BY 
         avg_score DESC
-") or die(mysqli_error(conn()));
+") or die(mysqli_error(conn()->get_conn()));
 
                 // Prepare arrays for chart data
                 $subject_names = [];
@@ -255,7 +255,7 @@ admin_html_head("Dashboard", [
                                 <label for="school_year_id">School Year:</label>
                                 <select name="school_year_id" id="school_year_id">
                                     <?php
-                                    $school_year_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY id ASC");
+                                    $school_year_query = conn()->query("SELECT id, description FROM school_year ORDER BY id ASC");
                                     while ($row = mysqli_fetch_array($school_year_query)) {
                                         $selected = ($row['id'] == $school_year_id) ? 'selected' : '';
                                         echo "<option value='{$row['id']}' $selected>{$row['description']}</option>";
@@ -362,7 +362,7 @@ admin_html_head("Dashboard", [
                                     $dean_course = isset($_GET['dean_course']) ? $_GET['dean_course'] : '';
 
                                     // Modify the query to only show students linked to the dean_course table for the given user_id
-                                    $query = mysqli_query(conn(), "
+                                    $query = conn()->query("
                 SELECT
                     year_level.description AS yr_desc,
                     section.description AS sec_desc,
@@ -389,7 +389,7 @@ admin_html_head("Dashboard", [
                 AND students.course_id IN (SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "')
                 ORDER BY sum_average DESC
                 LIMIT 10
-                ") or die(mysqli_error(conn()));
+                ") or die(mysqli_error(conn()->get_conn()));
 
                                     while ($row = mysqli_fetch_array($query)) {
                                         $stud_id = $row['stud_id'];

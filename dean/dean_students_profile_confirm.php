@@ -2,7 +2,8 @@
 
 authenticated_page("dean");
 
-$stud_id = mysqli_real_escape_string($conn, $_REQUEST['stud_id']);
+
+$stud_id = conn()->sanitize($_REQUEST['stud_id']);
 
 admin_html_head("Students Approval", [
   [ "type" => "style", "href" => "assets/css/style.css" ],
@@ -13,7 +14,7 @@ admin_html_head("Students Approval", [
 <body>
 <?php 
 
-  $query=mysqli_query($conn,"select * from users where id = 'user_id()'")or die(mysqli_error($conn));
+  $query=conn()->query("select * from users where id = 'user_id()'")or die(mysqli_error(conn()->get_conn()));
     if($row=mysqli_fetch_array($query))
     {
       $fname=$row['fname'];
@@ -70,7 +71,7 @@ admin_html_head("Students Approval", [
   </br>
   <?php
 // Ensure the student data is fetched from the database correctly
-$query = mysqli_query($conn, "SELECT students.lrn_num AS lrn_num, students.fname AS fname, students.lname AS lname, students.gender AS gender, students.username AS username, course.description AS course, section.description AS section, year_level.description AS year_level FROM students JOIN course ON students.course_id = course.id JOIN section ON students.section_id = section.id JOIN year_level ON students.year_level_id = year_level.id WHERE students.id = '$stud_id'") or die(mysqli_error($conn));
+$query = conn()->query( "SELECT students.lrn_num AS lrn_num, students.fname AS fname, students.lname AS lname, students.gender AS gender, students.username AS username, course.description AS course, section.description AS section, year_level.description AS year_level FROM students JOIN course ON students.course_id = course.id JOIN section ON students.section_id = section.id JOIN year_level ON students.year_level_id = year_level.id WHERE students.id = '$stud_id'") or die(mysqli_error(conn()->get_conn()));
 
 // Check if the query fetched data
 if ($row = mysqli_fetch_array($query)) {

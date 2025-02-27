@@ -4,7 +4,7 @@ authenticated_page("student");
 
 $stud_id = user_id();
 
-$query = mysqli_query(conn(), "select * from students where id = '$stud_id'") or die(mysqli_error(conn()));
+$query = conn()->query("select * from students where id = '$stud_id'") or die(mysqli_error(conn()->get_conn()));
 
 while ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
@@ -198,7 +198,7 @@ student_html_head('Home', [
 
                 <?php
                 
-                $query = mysqli_query(conn(), "select * from students") or die(mysqli_error(conn()));
+                $query = conn()->query("select * from students") or die(mysqli_error(conn()->get_conn()));
                 while ($row = mysqli_fetch_array($query)) {
                     $fname = $row['fname'];
                     $about = $row['about'];

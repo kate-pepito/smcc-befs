@@ -3,16 +3,16 @@
 authenticated_page("student");
 
 $stud_id = user_id();
-$sub_id = mysqli_real_escape_string(conn(), $_REQUEST['sub_id']);
+$sub_id = conn()->sanitize($_REQUEST['sub_id']);
 
-$query=mysqli_query(conn(),"select * from subjects where id = '$sub_id'")or die(mysqli_error(conn()));
+$query=conn()->query("select * from subjects where id = '$sub_id'")or die(mysqli_error(conn()->get_conn()));
   if($row=mysqli_fetch_array($query))
   {
     $subs_id=$row['id'];
     $sub_description=$row['description'];
   }
 
-$query=mysqli_query(conn(),"select * from students where id = '$stud_id'")or die(mysqli_error(conn()));
+$query=conn()->query("select * from students where id = '$stud_id'")or die(mysqli_error(conn()->get_conn()));
   if($row=mysqli_fetch_array($query))
   {
     $level=$row['level'];
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-$query=mysqli_query(conn(),"select * from subjects_timer where subjects_id = '$sub_id'")or die(mysqli_error(conn()));
+$query=conn()->query("select * from subjects_timer where subjects_id = '$sub_id'")or die(mysqli_error(conn()->get_conn()));
 if($row=mysqli_fetch_array($query))
 {
   $timer=$row['timer'];

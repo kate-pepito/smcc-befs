@@ -2,7 +2,7 @@
 
 $user_id = user_id();
 
-$query = mysqli_query(conn(), "select
+$query = conn()->query("select
 students.profile_image as profile_image,
 students.lrn_num as lrn_num,
 students.fname as fname,
@@ -25,7 +25,7 @@ students.year_level_id = year_level.id and
 students.course_id = course.id and
 students.section_id = section.id and
 students.id = '" . $user_id . "'
-") or die(mysqli_error(conn()));
+") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
   $lrn_num = $row['lrn_num'];
   $fname = $row['fname'];
@@ -45,22 +45,22 @@ if ($row = mysqli_fetch_array($query)) {
     $profile_image = base_url() . "/assets/img/profile-img2.jpg";
   }
 } else {
-  echo "Error: " . $query . "<br>" . mysqli_error(conn());
+  echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
 }
 
-$query = mysqli_query(conn(), "select count(subjects_id) as sub_count
+$query = conn()->query("select count(subjects_id) as sub_count
 from 
 students_subjects
 where 
 students_id = '" . $user_id . "'
-") or die(mysqli_error(conn()));
+") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
   $sub_count = $row['sub_count'];
 } else {
-  echo "Error: " . $query . "<br>" . mysqli_error(conn());
+  echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
 }
 
-$query = mysqli_query(conn(), "select * from students where id = '" . $user_id . "'") or die(mysqli_error(conn()));
+$query = conn()->query("select * from students where id = '" . $user_id . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
   $fname = $row['fname'];
   $lname = $row['lname'];
@@ -198,7 +198,7 @@ admin_html_head("Subjects", [
                 <tbody>
                   <?php
                   
-                  $query = mysqli_query(conn(), "
+                  $query = conn()->query("
                     SELECT 
     subjects.code AS code,
     subjects.description AS description,
@@ -227,7 +227,7 @@ WHERE
     AND students_subjects.level = 'PREBOARD1'
 GROUP BY 
     subjects.code, subjects.description;
-                ") or die(mysqli_error(conn()));
+                ") or die(mysqli_error(conn()->get_conn()));
 
                   while ($row = mysqli_fetch_array($query)) {
                     $code = $row['code'];
@@ -315,7 +315,7 @@ GROUP BY
                 <tbody>
                   <?php
                   
-                  $query = mysqli_query(conn(), "
+                  $query = conn()->query("
                    SELECT 
     subjects.code AS code,
     subjects.description AS description,
@@ -345,7 +345,7 @@ WHERE
 GROUP BY 
     subjects.code, subjects.description;
 
-                ") or die(mysqli_error(conn()));
+                ") or die(mysqli_error(conn()->get_conn()));
 
                   while ($row = mysqli_fetch_array($query)) {
                     $code = $row['code'];

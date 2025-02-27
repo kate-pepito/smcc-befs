@@ -4,8 +4,8 @@ authenticated_page("admin");
 
 // Handle course registration
 if (isset($_POST['add_course'])) {
-    $code_no = mysqli_real_escape_string(conn(), $_POST['code_no']);
-    $description = mysqli_real_escape_string(conn(), $_POST['description']);
+    $code_no = conn()->sanitize($_POST['code_no']);
+    $description = conn()->sanitize($_POST['description']);
 
     date_default_timezone_set("Asia/Manila");
     $dt = date("Y-m-d") . " " . date("h:i:sa");
@@ -13,10 +13,10 @@ if (isset($_POST['add_course'])) {
     $query = "INSERT INTO course (description, date_entry, status, code_no) 
               VALUES ('$description', '$dt', 'Active', '$code_no')";
 
-    if (mysqli_query(conn(), $query)) {
+    if (conn()->query($query)) {
         echo "<script type='text/javascript'>alert('Course Successfully Saved!'); document.location='admin_course';</script>";
     } else {
-        echo "Error: " . $query . "<br>" . mysqli_error(conn());
+        echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
     }
 }
 
@@ -30,7 +30,7 @@ admin_html_head("Course", [
 
 <?php 
 // User info fetching
-$query = mysqli_query(conn(),"SELECT * FROM users WHERE id = '" . user_id() . "'")or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -85,10 +85,10 @@ if ($row = mysqli_fetch_array($query)) {
                             </thead>
                             <tbody>
                             <?php
-                                $query = mysqli_query(conn(), "SELECT course.id as i, course.code_no as cn, course.description as c_desc, 
+                                $query = conn()->query("SELECT course.id as i, course.code_no as cn, course.description as c_desc, 
                                                               course.date_entry as de, course.status as s 
                                                               FROM course 
-                                                              WHERE course.status = 'Active'") or die(mysqli_error(conn()));
+                                                              WHERE course.status = 'Active'") or die(mysqli_error(conn()->get_conn()));
                                 while ($row = mysqli_fetch_array($query)) {
                                     $id = $row['i'];
                                     $code_no = $row['cn'];

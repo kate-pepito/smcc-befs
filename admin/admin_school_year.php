@@ -4,21 +4,21 @@ authenticated_page("admin");
 
 
 if (isset($_POST['add_school_year'])) {
-    $description = mysqli_real_escape_string(conn(), $_POST['description']);
+    $description = conn()->sanitize($_POST['description']);
     date_default_timezone_set("Asia/Manila");
     $dt = date("Y-m-d") . " " . date("h:i:sa");
 
     $query = "INSERT INTO school_year (description, status, user_id, date_created) 
-              VALUES ('$description', 'Not Set', '" . user_id() . "', '$dt')" or die(mysqli_error(conn()));
-    if (mysqli_query(conn(), $query)) {
+              VALUES ('$description', 'Not Set', '" . user_id() . "', '$dt')" or die(mysqli_error(conn()->get_conn()));
+    if (conn()->query($query)) {
         echo "<script type='text/javascript'>alert('Year Successfully Saved!');
               document.location='admin_school_year'</script>";
     } else {
-        echo "Error: " . $query . "<br>" . mysqli_error(conn());
+        echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
     }
 }
 
-$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -40,7 +40,7 @@ admin_html_head("School Year", [
 
     <!-- ======= Sidebar ======= -->
     <?php
-    $query = mysqli_query(conn(), "SELECT * FROM school_year WHERE status = 'Current Set' AND user_id = '". user_id() . "'") or die(mysqli_error(conn()));
+    $query = conn()->query("SELECT * FROM school_year WHERE status = 'Current Set' AND user_id = '". user_id() . "'") or die(mysqli_error(conn()->get_conn()));
     if ($row = mysqli_fetch_array($query)) {
         require_once get_admin_sidebar();
     }
@@ -81,7 +81,7 @@ admin_html_head("School Year", [
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query = mysqli_query(conn(), "SELECT * FROM school_year") or die(mysqli_error(conn()));
+                                    $query = conn()->query("SELECT * FROM school_year") or die(mysqli_error(conn()->get_conn()));
                                     while ($row = mysqli_fetch_array($query)) {
                                         $id = $row['id'];
                                         $description = $row['description'];

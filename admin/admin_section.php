@@ -4,18 +4,18 @@ authenticated_page("admin");
 
 // Handle Add Section
 if (isset($_POST['add_section'])) {
-    $description = mysqli_real_escape_string(conn(), $_POST['description']);
+    $description = conn()->sanitize($_POST['description']);
 
     date_default_timezone_set("Asia/Manila");
     $dt = date("Y-m-d H:i:s");
 
     // Check for duplicate section
-    $check_duplicate = mysqli_query(conn(), "SELECT * FROM section WHERE description = '$description'");
+    $check_duplicate = conn()->query("SELECT * FROM section WHERE description = '$description'");
     if (mysqli_num_rows($check_duplicate) > 0) {
         echo '<script>alert("Section already exists!");window.location="admin_section";</script>';
     } else {
         // Insert new section
-        $query = mysqli_query(conn(), "INSERT INTO section (description, date_entry, status) VALUES ('$description', '$dt', 'Active')") or die(mysqli_error(conn()));
+        $query = conn()->query("INSERT INTO section (description, date_entry, status) VALUES ('$description', '$dt', 'Active')") or die(mysqli_error(conn()->get_conn()));
 
         if ($query) {
             echo '<script>alert("Section added successfully!");window.location="admin_section";</script>';
@@ -26,7 +26,7 @@ if (isset($_POST['add_section'])) {
 }
 
 // Fetch user info
-$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -37,7 +37,7 @@ if ($row = mysqli_fetch_array($query)) {
 }
 
 // Fetch sections
-$sections = mysqli_query(conn(), "SELECT * FROM section WHERE status = 'Active'") or die(mysqli_error(conn()));
+$sections = conn()->query("SELECT * FROM section WHERE status = 'Active'") or die(mysqli_error(conn()->get_conn()));
 
 
 admin_html_head("Section", [

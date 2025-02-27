@@ -2,9 +2,9 @@
 
 authenticated_page("dean");
 
-$s_id = mysqli_real_escape_string(conn(), $_REQUEST['s_id']);
-$s_code = mysqli_real_escape_string(conn(), $_REQUEST['s_code']);
-$s_desc = mysqli_real_escape_string(conn(), $_REQUEST['s_desc']);
+$s_id = conn()->sanitize($_REQUEST['s_id']);
+$s_code = conn()->sanitize($_REQUEST['s_code']);
+$s_desc = conn()->sanitize($_REQUEST['s_desc']);
 
 admin_html_head("Add Subjects", [
   [ "type" => "style", "href" => "assets/css/style.css" ],
@@ -15,7 +15,7 @@ admin_html_head("Add Subjects", [
 <body>
 <?php 
 
-  $query=mysqli_query(conn(),"select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()));
+  $query=conn()->query("select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
     if($row=mysqli_fetch_array($query))
     {
       $fname=$row['fname'];

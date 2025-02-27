@@ -4,7 +4,7 @@ authenticated_page("dean");
 
 
 // Get the current school year
-$current_school_year_query = mysqli_query(conn(), "SELECT id, description FROM school_year WHERE status = 'Current Set' LIMIT 1") or die(mysqli_error(conn()));
+$current_school_year_query = conn()->query("SELECT id, description FROM school_year WHERE status = 'Current Set' LIMIT 1") or die(mysqli_error(conn()->get_conn()));
 if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
     $current_school_year_id = $current_school_year_row['id'];
     $current_school_year_description = $current_school_year_row['description'];
@@ -14,7 +14,7 @@ if ($current_school_year_row = mysqli_fetch_array($current_school_year_query)) {
 }
 
 
-$query = mysqli_query(conn(), "select * from users where id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("select * from users where id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];

@@ -1,14 +1,14 @@
 <?php
 
 authenticated_page("reviewer");
-$query = mysqli_query(conn(), "select * from faculty_course_school_year where user_id = '". user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("select * from faculty_course_school_year where user_id = '". user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $course_id = $row['course_id'];
 } else {
-    echo "Error: " . $query . "<br>" . mysqli_error(conn());
+    echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
 }
 
-$query = mysqli_query(conn(), "select * from users where id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("select * from users where id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -67,11 +67,11 @@ admin_html_head("Dashboard", [
                                 </div>
                                 <?php
                                 // Count active students
-                                $active_query = mysqli_query(conn(), "
+                                $active_query = conn()->query("
                         SELECT COUNT(*) AS student_count_active 
                         FROM students 
                         WHERE status = 'Active' AND course_id = '$course_id'
-                    ") or die(mysqli_error(conn()));
+                    ") or die(mysqli_error(conn()->get_conn()));
 
                                 $student_count_active = 0;
                                 if ($active_row = mysqli_fetch_array($active_query)) {
@@ -98,11 +98,11 @@ admin_html_head("Dashboard", [
                                 </div>
                                 <?php
                                 // Count inactive students
-                                $inactive_query = mysqli_query(conn(), "
+                                $inactive_query = conn()->query("
                         SELECT COUNT(*) AS student_count_inactive 
                         FROM students 
                         WHERE status = 'Inactive' AND course_id = '$course_id'
-                    ") or die(mysqli_error(conn()));
+                    ") or die(mysqli_error(conn()->get_conn()));
 
                                 $student_count_inactive = 0;
                                 if ($inactive_row = mysqli_fetch_array($inactive_query)) {
@@ -152,7 +152,7 @@ admin_html_head("Dashboard", [
             </thead>
             <?php
 
-            $query = mysqli_query(conn(), "
+            $query = conn()->query("
             SELECT
                 year_level.description AS yr_desc,
                 section.description AS sec_desc,
@@ -175,7 +175,7 @@ admin_html_head("Dashboard", [
             JOIN year_level ON students.year_level_id = year_level.id
             JOIN section ON students.section_id = section.id
             ORDER BY sum_average DESC;
-            ") or die(mysqli_error(conn()));
+            ") or die(mysqli_error(conn()->get_conn()));
             while ($row = mysqli_fetch_array($query)) {
                 $stud_id = $row['stud_id'];
                 $lrn_num = $row['lrn_num'];

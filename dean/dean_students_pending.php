@@ -12,12 +12,12 @@ admin_html_head("Pending Students", [
 <body>
 <?php 
   // Fetch the Dean's details along with their course ID and profile image
-  $query = mysqli_query(conn(), "
+  $query = conn()->query("
       SELECT u.fname, u.lname, u.type, u.profile_image, dc.course_id 
       FROM users u 
       JOIN dean_course dc ON u.id = dc.user_id 
       WHERE u.id = '" . user_id() . "'
-  ") or die(mysqli_error(conn()));
+  ") or die(mysqli_error(conn()->get_conn()));
 
   if ($row = mysqli_fetch_array($query)) {
       $fname = ucfirst(strtolower($row['fname']));
@@ -30,7 +30,7 @@ admin_html_head("Pending Students", [
   }
 
   // Fetch the course description using the course_id
-  $course_query = mysqli_query(conn(), "SELECT description FROM course WHERE id = '$course_id'") or die(mysqli_error(conn()));
+  $course_query = conn()->query("SELECT description FROM course WHERE id = '$course_id'") or die(mysqli_error(conn()->get_conn()));
   $course_row = mysqli_fetch_array($course_query);
   $deans_course = $course_row ? $course_row['description'] : "Unknown";
 ?>
@@ -78,7 +78,7 @@ admin_html_head("Pending Students", [
                 <tbody>
                 <?php
                     // Query to fetch only students in the same course as the Dean
-                    $query = mysqli_query(conn(), "
+                    $query = conn()->query("
                         SELECT course.description AS course, 
                                students.id AS stud_id, 
                                students.lname AS lname, 
@@ -88,7 +88,7 @@ admin_html_head("Pending Students", [
                         JOIN students ON students.course_id = course.id 
                         WHERE students.status = 'For Approval' 
                         AND course.description = '$deans_course'
-                    ") or die(mysqli_error(conn()));
+                    ") or die(mysqli_error(conn()->get_conn()));
                     
                     while($row = mysqli_fetch_array($query)) {
                         $stud_id = $row['stud_id'];

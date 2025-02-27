@@ -2,20 +2,20 @@
 
 
 // Fetch the current school year
-$query = mysqli_query(conn(), "SELECT * FROM school_year WHERE status = 'Current Set'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM school_year WHERE status = 'Current Set'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $school_year_id = $row['id'];
 }
 
 if (isset($_POST['add_student'])) {
-    $lrn_num = mysqli_real_escape_string(conn(), $_POST['lrn_num']);
-    $fname = mysqli_real_escape_string(conn(), $_POST['fname']);
-    $lname = mysqli_real_escape_string(conn(), $_POST['lname']);
-    $gender = mysqli_real_escape_string(conn(), $_POST['gender']);
-    $course = mysqli_real_escape_string(conn(), $_POST['course']);
-    $year_level = mysqli_real_escape_string(conn(), $_POST['year_level']);
-    $section = mysqli_real_escape_string(conn(), $_POST['section']);
-    $username = mysqli_real_escape_string(conn(), $_POST['username']);
+    $lrn_num = conn()->sanitize($_POST['lrn_num']);
+    $fname = conn()->sanitize($_POST['fname']);
+    $lname = conn()->sanitize($_POST['lname']);
+    $gender = conn()->sanitize($_POST['gender']);
+    $course = conn()->sanitize($_POST['course']);
+    $year_level = conn()->sanitize($_POST['year_level']);
+    $section = conn()->sanitize($_POST['section']);
+    $username = conn()->sanitize($_POST['username']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
@@ -27,12 +27,12 @@ if (isset($_POST['add_student'])) {
         // Insert student data including the current school year ID
         $query = "INSERT INTO students (lrn_num, fname, lname, gender, course_id, year_level_id, section_id, username, password, date_registered, status, logged_in, level, school_year_id) 
                   VALUES ('$lrn_num', '$fname', '$lname', '$gender', '$course', '$year_level', '$section', '$username', '$password', '$dt', 'For Approval', 'NO', 'PREBOARD1', '$school_year_id')" 
-                  or die(mysqli_error(conn()));
-        if (mysqli_query(conn(), $query)) {
+                  or die(mysqli_error(conn()->get_conn()));
+        if (conn()->query($query)) {
             echo "<script type='text/javascript'>alert('Student Successfully Registered!');
             document.location='" . base_url() . "'</script>";
         } else {
-            echo "Error: " . $query . "<br>" . mysqli_error(conn());
+            echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
         }
     } else {
         echo "<script type='text/javascript'>alert('Password did not match!');
@@ -104,7 +104,7 @@ admin_html_head("Register", [
                       <label for="yourEmail" class="form-label">Course</label>
                       <select name="course" class="form-select" aria-label="Default select example">
                         <?php
-                          $query=mysqli_query(conn(),"select * from course where status = 'Active' ORDER BY description asc")or die(mysqli_error(conn()));
+                          $query = conn()->query("select * from course where status = 'Active' ORDER BY description asc") or die(mysqli_error(conn()->get_conn()));
                           while($row=mysqli_fetch_array($query)) {
                               $id=$row['id'];
                               $description=$row['description'];
@@ -120,7 +120,7 @@ admin_html_head("Register", [
                       <select name="year_level" class="form-select" id="yourYearLevel" required>
                         <option value="" selected disabled>Select Year Level</option>
                         <?php
-                          $query = mysqli_query(conn(), "SELECT * FROM year_level WHERE status = 'Active' ORDER BY description ASC") or die(mysqli_error(conn()));
+                          $query = conn()->query("SELECT * FROM year_level WHERE status = 'Active' ORDER BY description ASC") or die(mysqli_error(conn()->get_conn()));
                           while ($row = mysqli_fetch_array($query)) {
                             $y_id = $row['id'];
                             $y_desc = $row['description'];
@@ -136,7 +136,7 @@ admin_html_head("Register", [
                       <select name="section" class="form-select" id="yourSection" required>
                         <option value="" selected disabled>Select Section</option>
                         <?php
-                          $query = mysqli_query(conn(), "SELECT * FROM section WHERE status = 'Active' ORDER BY description ASC") or die(mysqli_error(conn()));
+                          $query = conn()->query("SELECT * FROM section WHERE status = 'Active' ORDER BY description ASC") or die(mysqli_error(conn()->get_conn()));
                           while ($row = mysqli_fetch_array($query)) {
                             $y_id = $row['id'];
                             $y_desc = $row['description'];

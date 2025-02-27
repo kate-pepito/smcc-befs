@@ -3,8 +3,8 @@
 
 authenticated_page("dean");
 
-$c_id = mysqli_real_escape_string(conn(), $_REQUEST['c_id']);
-$stud_id = mysqli_real_escape_string(conn(), $_REQUEST['stud_id']);
+$c_id = conn()->sanitize($_REQUEST['c_id']);
+$stud_id = conn()->sanitize($_REQUEST['stud_id']);
 
 admin_html_head("Student Assign Subject", [
   [ "type" => "style", "href" => "assets/vendor/remixicon/remixicon.css" ],
@@ -17,7 +17,7 @@ admin_html_head("Student Assign Subject", [
 <body>
 <?php 
 
-  $query=mysqli_query(conn(),"select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()));
+  $query=conn()->query("select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
     if($row=mysqli_fetch_array($query))
     {
       $fname=$row['fname'];
@@ -72,7 +72,7 @@ admin_html_head("Student Assign Subject", [
                 <tbody>
                 <?php
                     
-                    $query=mysqli_query(conn(),"
+                    $query=conn()->query("
                     SELECT 
                   subjects.id AS sub_id, 
                   subjects.code AS code, 
@@ -90,7 +90,7 @@ admin_html_head("Student Assign Subject", [
                       FROM students_subjects 
                       WHERE students_id = '$stud_id'
                         );
-                    ")or die(mysqli_error(conn()));
+                    ")or die(mysqli_error(conn()->get_conn()));
                     while($row=mysqli_fetch_array($query))
                     {
                         $sub_id=$row['sub_id'];
@@ -140,7 +140,7 @@ admin_html_head("Student Assign Subject", [
                 <tbody>
                 <?php
                     
-                    $query=mysqli_query(conn(),"SELECT 
+                    $query=conn()->query("SELECT 
                   students_subjects.subjects_id AS sid, 
                   students_subjects.id AS sub_id, 
                   year_level.description AS y_desc, 
@@ -153,7 +153,7 @@ admin_html_head("Student Assign Subject", [
               JOIN 
                   year_level ON subjects.year_level_id = year_level.id
               WHERE 
-                  students_subjects.students_id = '$stud_id' AND students_subjects.level = 'PREBOARD1'")or die(mysqli_error(conn()));
+                  students_subjects.students_id = '$stud_id' AND students_subjects.level = 'PREBOARD1'")or die(mysqli_error(conn()->get_conn()));
                     while($row=mysqli_fetch_array($query))
                     {
                       $sub_id=$row['sub_id'];

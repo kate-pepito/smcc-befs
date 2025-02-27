@@ -14,10 +14,10 @@ if (!user_id() || !$course_id || !$sub_id || !$faculty_id || !$school_year) {
 }
 
 // Escape input to prevent SQL injection
-$course_id = mysqli_real_escape_string(conn(), $course_id);
-$sub_id = mysqli_real_escape_string(conn(), $sub_id);
-$faculty_id = mysqli_real_escape_string(conn(), $faculty_id);
-$school_year = mysqli_real_escape_string(conn(), $school_year);
+$course_id = conn()->sanitize($course_id);
+$sub_id = conn()->sanitize($sub_id);
+$faculty_id = conn()->sanitize($faculty_id);
+$school_year = conn()->sanitize($school_year);
 
 // Check if the subject is already assigned to the faculty
 $check_query = "
@@ -25,10 +25,10 @@ $check_query = "
     FROM faculty_subjects 
     WHERE faculty_id = '$faculty_id' AND subjects_id = '$sub_id'
 ";
-$check_result = mysqli_query(conn(), $check_query);
+$check_result = conn()->query($check_query);
 
 if (!$check_result) {
-    die("Error: Failed to check subject assignment. " . mysqli_error(conn()));
+    die("Error: Failed to check subject assignment. " . mysqli_error(conn()->get_conn()));
 }
 
 if (mysqli_num_rows($check_result) > 0) {
@@ -40,12 +40,12 @@ $assign_query = "
     INSERT INTO faculty_subjects (faculty_id, subjects_id, course_id, school_year_id, assigned_date)
     VALUES ('$faculty_id', '$sub_id', '$course_id', '$school_year', NOW())
 ";
-$assign_result = mysqli_query(conn(), $assign_query);
+$assign_result = conn()->query($assign_query);
 
 if ($assign_result) {
     // Redirect with all required parameters
     $redirect_url = "dean_reviewer_assign_subjects?faculty_id=$faculty_id&school_year=$school_year&course_id=$course_id";
     echo "<script>window.location.href='" . $redirect_url . "';</script>";    
 } else {
-    die("Error: Could not assign the subject. " . mysqli_error(conn()));
+    die("Error: Could not assign the subject. " . mysqli_error(conn()->get_conn()));
 }

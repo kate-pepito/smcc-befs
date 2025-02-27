@@ -2,10 +2,10 @@
 
 authenticated_page("dean");
 
-$stud_id=mysqli_real_escape_string(conn(), $_REQUEST['stud_id']);
+$stud_id=conn()->sanitize($_REQUEST['stud_id']);
 
-$query="update students set level = 'PREBOARD2' where id = '$stud_id'" or die(mysqli_error(conn()));	  
-if (mysqli_query(conn(), $query)) 
+$query="update students set level = 'PREBOARD2' where id = '$stud_id'" or die(mysqli_error(conn()->get_conn()));	  
+if (conn()->query($query)) 
 {
 			echo "<script type='text/javascript'>window.alert('Updated');
 </script>";

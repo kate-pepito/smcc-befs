@@ -4,10 +4,10 @@ authenticated_page("admin");
 
 
 if (isset($_POST['add_dean'])) {
-    $fname = mysqli_real_escape_string(conn(), $_POST['fname']);
-    $lname = mysqli_real_escape_string(conn(), $_POST['lname']);
-    $course = mysqli_real_escape_string(conn(), $_POST['course']);
-    $username = mysqli_real_escape_string(conn(), $_POST['username']);
+    $fname = conn()->sanitize($_POST['fname']);
+    $lname = conn()->sanitize($_POST['lname']);
+    $course = conn()->sanitize($_POST['course']);
+    $username = conn()->sanitize($_POST['username']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
@@ -20,36 +20,36 @@ if (isset($_POST['add_dean'])) {
         // Insert user data into the 'users' table
         $query = "INSERT INTO users (username, password, type, status, fname, lname, date_created, logged_in) 
                   VALUES ('$username', '$password', 'DEAN', 'Active', '$fname', '$lname', '$dt', 'NO')";
-        if (mysqli_query(conn(), $query)) {
+        if (conn()->query($query)) {
             // Get the newly inserted user ID
             $query = "SELECT * FROM users WHERE fname = '$fname' AND lname = '$lname'";
-            $result = mysqli_query(conn(), $query);
+            $result = conn()->query($query);
             if ($row = mysqli_fetch_array($result)) {
                 $f_id = $row['id'];
 
                 // Get the current school year
                 $query = "SELECT * FROM school_year WHERE status = 'Current Set'";
-                $result = mysqli_query(conn(), $query);
+                $result = conn()->query($query);
                 if ($row = mysqli_fetch_array($result)) {
                     $school_year_id = $row['id'];
 
                     // Insert the faculty course and school year relation
                     $query = "INSERT INTO dean_course (user_id, course_id) 
                               VALUES ('$f_id', '$course')";
-                    if (mysqli_query(conn(), $query)) {
+                    if (conn()->query($query)) {
                         echo "<script type='text/javascript'>alert('Dean Successfully Saved!'); 
                         document.location='admin_dean'</script>";
                     } else {
-                        echo "Error: " . $query . "<br>" . mysqli_error(conn());
+                        echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
                     }
                 } else {
-                    echo "Error: Could not find current school year.<br>" . mysqli_error(conn());
+                    echo "Error: Could not find current school year.<br>" . mysqli_error(conn()->get_conn());
                 }
             } else {
-                echo "Error: Faculty not found after insertion.<br>" . mysqli_error(conn());
+                echo "Error: Faculty not found after insertion.<br>" . mysqli_error(conn()->get_conn());
             }
         } else {
-            echo "Error: " . $query . "<br>" . mysqli_error(conn());
+            echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
         }
     } else {
         // Passwords do not match
@@ -58,7 +58,7 @@ if (isset($_POST['add_dean'])) {
     }
 }
 
-$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = $row['fname'];
     $lname = $row['lname'];
@@ -126,7 +126,7 @@ admin_html_head("Reviewer", [
                                         <div class="col-sm-10">
                                             <select name="course" class="form-select">
                                                 <?php
-                                                $query = mysqli_query(conn(), "SELECT * FROM course WHERE status = 'Active' ORDER BY description ASC");
+                                                $query = conn()->query("SELECT * FROM course WHERE status = 'Active' ORDER BY description ASC");
                                                 while ($row = mysqli_fetch_array($query)) {
                                                     $id = $row['id'];
                                                     $description = $row['description'];
@@ -187,7 +187,7 @@ admin_html_head("Reviewer", [
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query = mysqli_query(conn(), "SELECT DISTINCT 
+                                    $query = conn()->query("SELECT DISTINCT 
                         users.id AS id, 
                         users.lname AS lname, 
                         users.fname AS fname, 

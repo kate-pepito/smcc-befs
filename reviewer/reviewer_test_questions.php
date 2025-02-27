@@ -2,15 +2,15 @@
 
 authenticated_page("reviewer");
 
-$s_id = mysqli_real_escape_string(conn(), $_REQUEST['s_id']);
+$s_id = conn()->sanitize($_REQUEST['s_id']);
 
-$query=mysqli_query(conn(),"select * from subjects where id = '$s_id'")or die(mysqli_error(conn()));
+$query=conn()->query("select * from subjects where id = '$s_id'")or die(mysqli_error(conn()->get_conn()));
 if($row=mysqli_fetch_array($query))
 {
 $sub_desc = $row['description'];
 }
 
-$query=mysqli_query(conn(),"select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()));
+$query=conn()->query("select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
 if($row=mysqli_fetch_array($query)) {
   $fname=$row['fname'];
   $lname=$row['lname'];
@@ -204,7 +204,7 @@ admin_html_head("Manage Test Questions", [
                     </form>
                     <?php
   // Count the number of questions for Pre-Board 1
-  $count_query = mysqli_query(conn(), "SELECT COUNT(*) AS total_questions FROM question_answer WHERE subject_id = '$s_id' AND faculty_id = '" . user_id() . "' AND level='PREBOARD1'") or die(mysqli_error(conn()));
+  $count_query = conn()->query("SELECT COUNT(*) AS total_questions FROM question_answer WHERE subject_id = '$s_id' AND faculty_id = '" . user_id() . "' AND level='PREBOARD1'") or die(mysqli_error(conn()->get_conn()));
   $count_row = mysqli_fetch_assoc($count_query);
   $total_questions = $count_row['total_questions'];
 ?>
@@ -224,7 +224,7 @@ admin_html_head("Manage Test Questions", [
                       <tbody>
                         <?php
                           
-                          $query = mysqli_query(conn(), "SELECT * FROM question_answer WHERE subject_id = '$s_id' AND faculty_id = '" . user_id() . "' AND level='PREBOARD1'") or die(mysqli_error(conn()));
+                          $query = conn()->query("SELECT * FROM question_answer WHERE subject_id = '$s_id' AND faculty_id = '" . user_id() . "' AND level='PREBOARD1'") or die(mysqli_error(conn()->get_conn()));
                           
                           $no = 1; // Initialize row counter
                           while ($row = mysqli_fetch_array($query)) {
@@ -364,7 +364,7 @@ admin_html_head("Manage Test Questions", [
                     </form>
                     <?php
                       // Count the number of questions for Pre-Board 1
-                      $count_query = mysqli_query(conn(), "SELECT COUNT(*) AS total_questions FROM question_answer WHERE subject_id = '$s_id' AND faculty_id = '" . user_id() . "' AND level='PREBOARD2'") or die(mysqli_error(conn()));
+                      $count_query = conn()->query("SELECT COUNT(*) AS total_questions FROM question_answer WHERE subject_id = '$s_id' AND faculty_id = '" . user_id() . "' AND level='PREBOARD2'") or die(mysqli_error(conn()->get_conn()));
                       $count_row = mysqli_fetch_assoc($count_query);
                       $total_questions = $count_row['total_questions'];
                     ?>
@@ -384,7 +384,7 @@ admin_html_head("Manage Test Questions", [
                       <tbody>
                         <?php
                           
-                          $query = mysqli_query(conn(), "SELECT * FROM question_answer WHERE subject_id = '$s_id' AND faculty_id = '" . user_id() . "' AND level = 'PREBOARD2'") or die(mysqli_error(conn()));
+                          $query = conn()->query("SELECT * FROM question_answer WHERE subject_id = '$s_id' AND faculty_id = '" . user_id() . "' AND level = 'PREBOARD2'") or die(mysqli_error(conn()->get_conn()));
                           
                           $no = 1; // Initialize row counter
                           while ($row = mysqli_fetch_array($query)) {

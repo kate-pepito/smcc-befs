@@ -2,7 +2,7 @@
 
 authenticated_page("dean");
 
-$school_year = mysqli_real_escape_string(conn(), $_GET['school_year'] ?? ''); // Get the selected school year, if any
+$school_year = conn()->sanitize($_GET['school_year'] ?? ''); // Get the selected school year, if any
 
 // Base query to get students assigned to the courses of the dean
 $sql = "
@@ -49,7 +49,7 @@ admin_html_head("Inactive Students", [
 <body>
   <?php 
     // Fetch the user information as you did for active students
-    $query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . $user_id . "'") or die(mysqli_error(conn()));
+    $query = conn()->query("SELECT * FROM users WHERE id = '" . $user_id . "'") or die(mysqli_error(conn()->get_conn()));
     if($row = mysqli_fetch_array($query)) {
         $fname = $row['fname'];
         $lname = $row['lname'];

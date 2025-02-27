@@ -16,14 +16,14 @@ $result = [
 
 $q = "SELECT id, username, password from users";
 
-$query = mysqli_query(conn(), $q);
+$query = conn()->query($q);
 
 if (mysqli_num_rows($query) > 0) {
     while ($row = mysqli_fetch_assoc($query)) {
         if (strpos($row['password'], "$") !== 0) {
             $id = $row['id'];
             $newPassword = password_hash($row['password'], PASSWORD_DEFAULT);
-            if (mysqli_query(conn(), "UPDATE users SET password = '$newPassword' WHERE id = $id")) {
+            if (conn()->query("UPDATE users SET password = '$newPassword' WHERE id = $id")) {
                 $result["users"][] = [
                     "id" => $id,
                     "username" => $row['username'],
@@ -38,14 +38,14 @@ if (mysqli_num_rows($query) > 0) {
 
 $q = "SELECT id, username, password from students";
 
-$query = mysqli_query(conn(), $q);
+$query = conn()->query($q);
 
 if (mysqli_num_rows($query) > 0) {
     while ($row = mysqli_fetch_assoc($query)) {
         if (strpos($row['password'], "$") !== 0) {
             $id = $row['id'];
             $newPassword = password_hash($row['password'], PASSWORD_DEFAULT);
-            if (mysqli_query(conn(), "UPDATE students SET password = '$newPassword' WHERE id = $id")) {
+            if (conn()->query("UPDATE students SET password = '$newPassword' WHERE id = $id")) {
                 $result["students"][] = [
                     "id" => $id,
                     "username" => $row['username'],

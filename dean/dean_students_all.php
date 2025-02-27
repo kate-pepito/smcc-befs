@@ -4,14 +4,14 @@ authenticated_page("dean");
 
 
 // Fetch the current school year
-$current_sy_query = mysqli_query(conn(), "SELECT id FROM school_year WHERE status = 'Current Set' LIMIT 1");
+$current_sy_query = conn()->query("SELECT id FROM school_year WHERE status = 'Current Set' LIMIT 1");
 $current_school_year = mysqli_fetch_assoc($current_sy_query)['id'] ?? null;
 
 // Get the selected school year, or use the current school year as the default
-$school_year = mysqli_real_escape_string(conn(), $_GET['school_year'] ?? $current_school_year);
+$school_year = conn()->sanitize($_GET['school_year'] ?? $current_school_year);
 
 // Fetch the dean's course from the dean_course table (assuming the relationship is via user_id)
-$query = mysqli_query(conn(), "SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "'");
+$query = conn()->query("SELECT course_id FROM dean_course WHERE user_id = '" . user_id() . "'");
 $dean_course = mysqli_fetch_assoc($query)['course_id']; // Get the course_id associated with the dean
 
 admin_html_head("List of Students", [
@@ -24,7 +24,7 @@ admin_html_head("List of Students", [
 <body>
 <?php 
   // Fetch user details
-  $query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'");
+  $query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'");
   if ($row = mysqli_fetch_array($query)) {
       $fname = $row['fname'];
       $lname = $row['lname'];
@@ -61,7 +61,7 @@ admin_html_head("List of Students", [
         <select class="form-select" style="width: 200px;" name="school_year" id="school_year_filter" onchange="this.form.submit()">
             <option value="" <?= empty($school_year) ? 'selected' : ''; ?>>All</option>
             <?php
-            $sy_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY description ASC");
+            $sy_query = conn()->query("SELECT id, description FROM school_year ORDER BY description ASC");
             while ($sy_row = mysqli_fetch_array($sy_query)) {
                 $selected = $school_year == $sy_row['id'] ? 'selected' : '';
                 echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";
@@ -129,14 +129,14 @@ if (empty($_GET['school_year']) && $current_school_year) {
   $school_year_id = $current_school_year;
   $sql .= " AND students.school_year_id = '$school_year_id'";
 } elseif (!empty($_GET['school_year'])) {
-  $school_year_id = mysqli_real_escape_string(conn(), $_GET['school_year']);
+  $school_year_id = conn()->sanitize($_GET['school_year']);
   $sql .= " AND students.school_year_id = '$school_year_id'";
 }
 
 
           $sql .= " ORDER BY students.lname ASC"; // Order by last name
 
-          $query = mysqli_query(conn(), $sql) or die(mysqli_error(conn()));
+          $query = conn()->query($sql) or die(mysqli_error(conn()->get_conn()));
           $counter = 1;
 
           while ($row = mysqli_fetch_array($query)) {

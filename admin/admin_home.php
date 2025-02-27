@@ -11,7 +11,7 @@ admin_html_head("Dashboard", [
 <body>
 <?php 
 
-  $query=mysqli_query(conn(),"select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()));
+  $query=conn()->query("select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
     if($row=mysqli_fetch_array($query))
     {
       $fname=$row['fname'];
@@ -28,7 +28,7 @@ admin_html_head("Dashboard", [
   <!-- End Header -->
   <!-- ======= Sidebar ======= -->
   <?php
-  $query=mysqli_query(conn(),"select * from school_year where status = 'Current Set' and user_id = '". user_id() . "'")or die(mysqli_error(conn()));
+  $query=conn()->query("select * from school_year where status = 'Current Set' and user_id = '". user_id() . "'")or die(mysqli_error(conn()->get_conn()));
   if($row=mysqli_fetch_array($query))
   {
     require_once get_admin_sidebar();
@@ -61,7 +61,7 @@ admin_html_head("Dashboard", [
           </div>
           <?php 
           // Fetch the number of active users where the type is 'FACULTY'
-          $query = mysqli_query(conn(), "SELECT COUNT(id) AS reviewer_count FROM users WHERE status = 'Active' AND type = 'REVIEWER'") or die(mysqli_error(conn()));
+          $query = conn()->query("SELECT COUNT(id) AS reviewer_count FROM users WHERE status = 'Active' AND type = 'REVIEWER'") or die(mysqli_error(conn()->get_conn()));
           $reviewer_count = 0; // Default value in case of no data
           if ($row = mysqli_fetch_array($query)) {
               $reviewer_count = $row['reviewer_count'];
@@ -86,7 +86,7 @@ admin_html_head("Dashboard", [
           </div>
           <?php 
           // Fetch the number of active users where the type is 'DEAN'
-          $query = mysqli_query(conn(), "SELECT COUNT(id) AS dean_count FROM users WHERE status = 'Active' AND type = 'DEAN'") or die(mysqli_error(conn()));
+          $query = conn()->query("SELECT COUNT(id) AS dean_count FROM users WHERE status = 'Active' AND type = 'DEAN'") or die(mysqli_error(conn()->get_conn()));
           $dean_count = 0; // Default value in case of no data
           if ($row = mysqli_fetch_array($query)) {
               $dean_count = $row['dean_count'];

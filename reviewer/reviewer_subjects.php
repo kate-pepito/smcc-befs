@@ -4,14 +4,14 @@ authenticated_page("reviewer");
 
 
 // Fetch the "Current Set" school year
-$current_school_year_query = mysqli_query(conn(), "SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error(conn()));
+$current_school_year_query = conn()->query("SELECT id, description FROM school_year WHERE status = 'Current Set'") or die(mysqli_error(conn()->get_conn()));
 $current_school_year = mysqli_fetch_assoc($current_school_year_query);
 $current_school_year_id = $current_school_year['id'] ?? null;
 
 // Determine selected school year (default to "Current Set")
-$selected_school_year = mysqli_real_escape_string(conn(), $_GET['school_year'] ?? $current_school_year_id);
+$selected_school_year = conn()->sanitize($_GET['school_year'] ?? $current_school_year_id);
 
-$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $fname = ucfirst(strtolower($row['fname']));
     $lname = ucfirst(strtolower($row['lname']));
@@ -54,7 +54,7 @@ admin_html_head("Subjects", [
               <option value="" selected>All</option>
               <?php
                // Fetch all available school years
-          $sy_query = mysqli_query(conn(), "SELECT id, description FROM school_year ORDER BY description ASC");
+          $sy_query = conn()->query("SELECT id, description FROM school_year ORDER BY description ASC");
           while ($sy_row = mysqli_fetch_assoc($sy_query)) {
             $selected = ($sy_row['id'] == $selected_school_year) ? 'selected' : '';
             echo "<option value='{$sy_row['id']}' $selected>{$sy_row['description']}</option>";
@@ -91,7 +91,7 @@ admin_html_head("Subjects", [
                 <?php
                // Build the query with the school year filter
               $school_year_filter = $selected_school_year ? "AND subjects.school_year_id = '$selected_school_year'" : '';
-                $query = mysqli_query(conn(), "
+                $query = conn()->query("
                 SELECT DISTINCT
                     subjects.id AS s_id, 
                     subjects.code AS s_code, 
@@ -116,7 +116,7 @@ admin_html_head("Subjects", [
                     subjects.status = 'Active' AND
                     faculty_subjects.faculty_id = '" . user_id() . "'
                     $school_year_filter
-              ") or die(mysqli_error(conn()));              
+              ") or die(mysqli_error(conn()->get_conn()));              
                 
                 while ($row = mysqli_fetch_array($query)) {
                     $s_id = $row['s_id'];

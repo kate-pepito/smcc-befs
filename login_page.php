@@ -13,11 +13,13 @@ $stud_id = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize and retrieve inputs
-    $username = mysqli_real_escape_string(conn(), $_POST['username']);
+    $username = $_POST['username'];
+    $username = conn()->sanitize($username);
     $mypassword = $_POST['password'];
-
+    
     // Query the users table
-    $query = mysqli_query(conn(), "SELECT * FROM users WHERE username = '$username'") or die(mysqli_error(conn()));
+    $q = "SELECT * FROM users WHERE username = '$username'";
+    $query = conn()->query($q) or die(mysqli_error(conn()->get_conn()));
 
     // Check if user exists
     if (mysqli_num_rows($query) > 0) {
@@ -33,9 +35,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verify password and status
         if (password_verify($mypassword, $password_hashed) && $status == 'Active') {
             // Update logged_in status
-            mysqli_query(conn(), "UPDATE users SET logged_in = 'YES' WHERE id = '$id'") or die(mysqli_error(conn()));
+            conn()->query("UPDATE users SET logged_in = 'YES' WHERE id = '$id'") or die(mysqli_error(conn()->get_conn()));
             $_SESSION["user_id"] = $id;
             $_SESSION["account_type"] = strtolower($type);
+            
             switch ($type){
                 case 'ADMIN':
                     echo "<script>alert('Welcome, Admin!'); document.location='admin/admin_home';</script>";
@@ -53,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If not a user, check students table
     else {
         $sql = "SELECT * FROM students WHERE username = '$username'";
-        $result = mysqli_query(conn(), $sql);
+        $result = conn()->query($sql);
 
         if (mysqli_num_rows($result) == 1) {
             $row = mysqli_fetch_assoc($result);
@@ -63,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if (password_verify($mypassword, $password_hashed) && $status == 'Active') {
                 // Update logged_in status
-                mysqli_query(conn(), "UPDATE students SET logged_in = 'YES' WHERE id = '$stud_id'") or die(mysqli_error(conn()));
+                conn()->query("UPDATE students SET logged_in = 'YES' WHERE id = '$stud_id'") or die(mysqli_error(conn()->get_conn()));
                 $_SESSION["user_id"] = $stud_id;
                 $_SESSION["account_type"] = "student";
                 echo "<script>alert('Welcome, Student!'); document.location='smcc-students';</script>";

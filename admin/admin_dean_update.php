@@ -2,10 +2,10 @@
 
 authenticated_page("admin");
 
-$f_id = mysqli_real_escape_string(conn(), $_REQUEST['f_id']);
+$f_id = conn()->sanitize($_REQUEST['f_id']);
 
 // Fetch faculty details to populate the form
-$query = mysqli_query(conn(), "SELECT * FROM users WHERE id = '$f_id'") or die(mysqli_error(conn()));
+$query = conn()->query("SELECT * FROM users WHERE id = '$f_id'") or die(mysqli_error(conn()->get_conn()));
 if ($row = mysqli_fetch_array($query)) {
     $f_fname = $row['fname'];
     $f_lname = $row['lname'];
@@ -13,12 +13,12 @@ if ($row = mysqli_fetch_array($query)) {
 
 // Check if form is submitted to update the faculty
 if (isset($_POST['update_dean'])) {
-    $f_fname = mysqli_real_escape_string(conn(), $_POST['fname']);
-    $f_lname = mysqli_real_escape_string(conn(), $_POST['lname']);
+    $f_fname = conn()->sanitize($_POST['fname']);
+    $f_lname = conn()->sanitize($_POST['lname']);
 
     // Update faculty details in the database
     $update_query = "UPDATE users SET fname = '$f_fname', lname = '$f_lname' WHERE id = '$f_id'";
-    if (mysqli_query(conn(), $update_query)) {
+    if (conn()->query($update_query)) {
         echo "<script type='text/javascript'>
                 alert('Dean Successfully Updated!');
                 window.location.href = 'admin_dean';
@@ -40,7 +40,7 @@ admin_html_head("Update Dean", [
 <body>
 
 <?php 
-$query=mysqli_query(conn(),"SELECT * FROM users WHERE id = '" . user_id() . "'")or die(mysqli_error(conn()));
+$query=conn()->query("SELECT * FROM users WHERE id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
 if($row=mysqli_fetch_array($query)) {
     $fname = ucfirst(strtolower($row['fname']));
     $lname = ucfirst(strtolower($row['lname']));

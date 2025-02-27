@@ -1,7 +1,7 @@
 <?php
 
 // Fetch the student's profile and related details from the database
-$query = mysqli_query(conn(), "
+$query = conn()->query("
     SELECT
         students.profile_image AS profile_image,
         students.lrn_num AS lrn_num,
@@ -23,7 +23,7 @@ $query = mysqli_query(conn(), "
     INNER JOIN section ON students.section_id = section.id
     WHERE 
         students.id = '" . user_id() . "'
-") or die("Error fetching data: " . mysqli_error(conn()));
+") or die("Error fetching data: " . mysqli_error(conn()->get_conn()));
 
 // Check if the query returned any result
 if ($row = mysqli_fetch_array($query)) {
@@ -53,12 +53,12 @@ if ($row = mysqli_fetch_array($query)) {
     exit;
 }
 
-$query=mysqli_query(conn(),"SELECT count(subjects_id) as sub_count
+$query=conn()->query("SELECT count(subjects_id) as sub_count
 FROM 
 students_subjects
 WHERE 
 students_id = '" . user_id() . "' and level = '$level'
-")or die(mysqli_error(conn()));
+")or die(mysqli_error(conn()->get_conn()));
 
 if($row=mysqli_fetch_array($query))
 {
@@ -66,10 +66,10 @@ if($row=mysqli_fetch_array($query))
 }
 else
 {
-  echo "Error: " . $query . "<br>" . mysqli_error(conn());
+  echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
 }
 
-$query=mysqli_query(conn(),"select * from students where id = '" . user_id() . "'")or die(mysqli_error(conn()));
+$query=conn()->query("select * from students where id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
 if($row=mysqli_fetch_array($query))
 {
   $fname=$row['fname'];
@@ -370,9 +370,9 @@ admin_html_head("Profile", [
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Average Score</div>
                     <?php 
-                        // $query = mysqli_query(conn(), "SELECT SUM(average)/COUNT(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "'") or die(mysqli_error());
+                        // $query = conn()->query("SELECT SUM(average)/COUNT(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "'") or die(mysqli_error());
                         if($level === 'PREBOARD1'){
-                              $query = mysqli_query(conn(), "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "' and level ='$level'") or die(mysqli_error(conn()));
+                              $query = conn()->query("SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "' and level ='$level'") or die(mysqli_error(conn()->get_conn()));
                               if ($row = mysqli_fetch_array($query)) {
                                   $sum_average = $row['sum_average'];
                                   if ($sum_average == "") {
@@ -391,7 +391,7 @@ admin_html_head("Profile", [
                       <?php
                         }
                         else{
-                          $query = mysqli_query(conn(), "SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "' and level ='$level'") or die(mysqli_error(conn()));
+                          $query = conn()->query("SELECT SUM(average) AS sum_average FROM student_score WHERE stud_id = '" . user_id() . "' and level ='$level'") or die(mysqli_error(conn()->get_conn()));
                               if ($row = mysqli_fetch_array($query)) {
                                   $sum_average = $row['sum_average'];
                                   if ($sum_average == "") {
