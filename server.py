@@ -24,4 +24,4 @@ app.include_router(v1.router, prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host=settings.FASTAPI_SERVER_HOST, port=settings.FASTAPI_SERVER_PORT, reload=True)
+    uvicorn.run("server:app", host=settings.FASTAPI_SERVER_HOST, port=int(settings.FASTAPI_SERVER_PORT), reload=True)

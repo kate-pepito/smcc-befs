@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import Any, List, Literal, Optional
+from typing import Any, List, Literal, Optional, Union
 from pydantic import BaseModel
-from sympy import Union
 
 class TrainCreateSessionRequest(BaseModel):
     username: str
