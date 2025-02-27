@@ -18,11 +18,15 @@ class ProcessTimeMiddleware(BaseHTTPMiddleware):
 
 class APIKeyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        api_key = request.headers.get("X-API-Key")
-        if api_key != settings.API_KEY:
-            return JSONResponse({"detail": "Invalid API Key"}, status_code=403)
+        # api_key = request.get("api_key")
+        uripath: str = request.get("path")
+        if uripath.startswith("/api"):
+            api_key = request.query_params.get("api_key")
+            if api_key != settings.API_KEY:
+                return JSONResponse({"detail": "Invalid API Key"}, status_code=403)
         response = await call_next(request)
         return response
+
 
     
 async def check_api_key(websocket: WebSocket, api_key: str):

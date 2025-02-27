@@ -17,6 +17,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(middleware.ProcessTimeMiddleware)
+
 app.add_middleware(middleware.APIKeyMiddleware)
 
 # Include API routes
