@@ -5,9 +5,14 @@ from pydantic import BaseModel
 class TrainCreateSessionRequest(BaseModel):
     username: str
     session_key: str
+    algo: Literal["Logistic Regression", "XGBoost Classifier"]
 
 class TrainCreateSessionResponse(BaseModel):
     session_token: str
+
+class TrainDestroySessionResponse(BaseModel):
+    success: bool
+    detail: str
 
 class MLModelMetadata(BaseModel):
     algo: Literal["Logistic Regression", "XGBoost Classifier"]
@@ -28,23 +33,23 @@ class TrainingStatesResponse(BaseModel):
     session_id: str
     username: str
     progress: float
-    ended_at: Optional[datetime]
+    ended_at: Optional[datetime] = None
     algo: Literal["Logistic Regression", "XGBoost Classifier"]
-    training_start_time: Optional[float]
-    training_end_time: Optional[float]
-    last_training_time: Optional[float]
-    dataset: Optional[DatasetMetadata]
-    column_names: Optional[List[str]]
+    training_start_time: Optional[float] = None
+    training_end_time: Optional[float] = None
+    last_training_time: Optional[float] = None
+    dataset: Optional[DatasetMetadata] = None
+    column_names: Optional[List[str]] = None
     features: List[str]
     target: List[str]
-    valid_parameters: List[str]
+    valid_hyperparameters: List[str]
     hyperparameters: dict
     test_size: float
     random_state: int
     scaler: dict
-    model: Optional[MLModelMetadata]
-    metrics: Optional[Any]
-    error: Optional[str]
+    model: Optional[MLModelMetadata] = None
+    metrics: Optional[Any] = None
+    error: Optional[str] = None
 
 class CommandRequest(BaseModel):
     action: str
