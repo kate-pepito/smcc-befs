@@ -148,7 +148,7 @@ admin_html_head("Forecast Training", [
     </div>
     <!-- End Page Title -->
 
-    <?php if (!isset($_SESSION['train_username']) || !isset($_SESSION['train_session_key']) || !isset($_SESSION['train_algo']) || !isset($_GET['train_token'])): ?>
+    <?php if (!(!isset($_SESSION['train_username']) || !isset($_SESSION['train_session_key']) || !isset($_SESSION['train_algo']) || !isset($_GET['train_token']))): ?>
         <div class="row">
             <div class="col-md-6">
                 <div class="card info-card">
@@ -204,31 +204,31 @@ admin_html_head("Forecast Training", [
         </div>
     <?php else: ?>
         <?php
-            $response = http_request_get(
-                base_api_uri() .
-                "/api/v1/validate/session" .
-                "?api_key=" . api_key() .
-                "&username=" . $_SESSION['train_username'] .
-                "&session_key=" . $_SESSION['train_session_key'] .
-                "&token=" . $_GET['train_token']
-            );
-            if (!($response["valid"] ?? false)) {
-            ?>
-                <script>
-                    alert("Invalid Session.");
-                    window.location.href = `<?= base_url() ?>/admin/admin_train`;
-                </script>
-                </body>
-                </html>
-            <?php
-                exit;
-            }
+            // $response = http_request_get(
+            //     base_api_uri() .
+            //     "/api/v1/validate/session" .
+            //     "?api_key=" . api_key() .
+            //     "&username=" . $_SESSION['train_username'] .
+            //     "&session_key=" . $_SESSION['train_session_key'] .
+            //     "&token=" . $_GET['train_token']
+            // );
+            // if (!($response["valid"] ?? false)) {
+            // ?>
+            //     <script>
+            //         alert("Invalid Session.");
+            //         window.location.href = `<?= base_url() ?>/admin/admin_train`;
+            //     </script>
+            //     </body>
+            //     </html>
+            // <?php
+            //     exit;
+            // }
         ?>
         <input type="hidden" name="username" id="trainingSessionUsername" value="<?= $_SESSION['train_username'] ?>" />
         <input type="hidden" name="session_key" id="trainingSessionId" value="<?= $_SESSION['train_session_key'] ?>" />
         <input type="hidden" name="token" id="trainingToken" value="<?= $_GET['train_token'] ?>" />
         <div class="row">
-            <div class="col-md">
+            <div class="col-md-6">
                 <div class="card info-card">
                     <div class="card-body">
                         <h5 class="card-title">Train using <?= $_SESSION['train_algo'] ?? "" ?></h5>
@@ -237,35 +237,42 @@ admin_html_head("Forecast Training", [
                                 <label for="trainingDataset">Dataset:</label>
                                 <input type="file" name="dataset" id="trainingDataset" />
                             </div>
-                            <div class="d-flex align-items-center justify-content-between gap-3 mt-4">
+                            <div class="d-flex align-items-center justify-content-between gap-3 mt-4 flex-wrap">
                                 <div class="d-flex flex-column flex-grow-1">
                                     <label for="trainingFeatures">Features:</label>
                                     <select data-placeholder="Select Features" name="features" id="trainingFeatures" multiple class="chosen-select">
-                                        <option>Design</option>
-                                        <option>HTML5</option>
-                                        <option>CSS3</option>
-                                        <option>jQuery</option>
-                                        <option>BS4</option>
-                                        <option>Bootstrap</option>
-                                        <option>WordPress</option>
-                                        <option>FrontEnd</option>
+                                        
                                     </select>
                                 </div>
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column" style="min-width: 100px;">
                                     <label for="trainingTarget">Target:</label>
                                     <select data-placeholder="Select Target" name="target" id="trainingTarget" class="chosen-select">
-                                        <option>Design</option>
-                                        <option>HTML5</option>
-                                        <option>CSS3</option>
-                                        <option>jQuery</option>
-                                        <option>BS4</option>
-                                        <option>Bootstrap</option>
-                                        <option>WordPress</option>
-                                        <option>FrontEnd</option>
+                                        
                                     </select>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center justify-content-between gap-3 mt-4">
+                                <div class="d-flex flex-column">
+                                    <label for="trainingTestSize">Test Size:</label>
+                                    <input type="number" class="form-control" name="test_size" value="0.2" id="trainingTestSize" />
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <label for="trainingRandomState">Random State:</label>
+                                    <input type="number" class="form-control" name="random_state" value="42" id="trainingRandomState" />
+                                </div>
+                            </div>
+                            <div class="container mt-4">
+                                <label for="trainingHyperparametersContainer">Hyperparameters:</label>
+                                <div class="row" id="trainingHyperparametersContainer">
+                                    
+                                </div>
+                            </div>
+                            <div class="w-100 mt-4">
+                                <div class="mx-auto">
+                                    <button type="button" class="btn btn-primary" id="trainingTrainButton" disabled>
+                                        Train
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -276,8 +283,22 @@ admin_html_head("Forecast Training", [
                 <div class="card info-card">
                     <div class="card-body">
                         <h5 class="card-title">Training Results:</h5>
-                        <div id="trainingContainer">
-                            
+                        <div class="w-100">
+                            <div id="trainingContainer" class="d-block" style="min-height: 250px;">
+
+                            </div>
+                            <div class="w-100 mt-4 d-flex justify-content-evenly">
+                                <div style="width: fit-content;">
+                                    <button type="button" class="btn btn-primary" id="trainingSaveModelButton" disabled>
+                                        Save Model
+                                    </button>
+                                </div>
+                                <div style="width: fit-content;">
+                                    <button type="button" class="btn btn-primary" id="trainingDownloadModelButton" disabled>
+                                        Download Model
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

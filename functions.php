@@ -77,6 +77,9 @@ function get_latest_training_session(string $username)
 
 function is_current_unauthenticated_page()
 {
+    $api_path = __DIR__ . DIRECTORY_SEPARATOR . "api";
+    $api_pages = glob($api_path . DIRECTORY_SEPARATOR . "*.php");
+    $api_pages = array_map(fn($page) => "/api/" . pathinfo(basename($page), PATHINFO_FILENAME), array_diff($api_pages, ['.', '..']));
     $unauthenticated_pages = [
         # add or change uri path if needed
         "/",
@@ -84,6 +87,7 @@ function is_current_unauthenticated_page()
         "/_hash_passwords",
         "/ftp",
         "/ftp_api",
+        ...$api_pages
     ];
     $bsp = strlen(get_base_uri_path()) === 0 ? null : get_base_uri_path();
     $trimed_uri = $bsp === null ? get_uri_path() : substr(get_uri_path(), strlen($bsp));
@@ -175,6 +179,11 @@ class DB {
     {
         $this->query_result = $this->conn->query($sql);
         return $this->query_result;
+    }
+
+    public function prepare(string $sql)
+    {
+        return $this->conn->prepare($sql);
     }
 
     public function num_rows()

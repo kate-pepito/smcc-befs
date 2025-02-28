@@ -16,12 +16,12 @@ SET time_zone = "+08:00";
 
 CREATE TABLE `course` (
   `id` int(11) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `description` varchar(219) DEFAULT NULL,
   `year_level_id` int(11) DEFAULT NULL,
-  `school_year` varchar(255) DEFAULT NULL,
+  `school_year` varchar(219) DEFAULT NULL,
   `date_entry` datetime DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL,
-  `code_no` varchar(255) DEFAULT NULL
+  `status` varchar(219) DEFAULT NULL,
+  `code_no` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -116,15 +116,15 @@ INSERT INTO `faculty_subjects` (`id`, `faculty_id`, `subjects_id`, `course_id`, 
 
 CREATE TABLE `question_answer` (
   `id` int(11) NOT NULL,
-  `question` varchar(255) DEFAULT NULL,
-  `answer` varchar(255) DEFAULT NULL,
+  `question` varchar(219) DEFAULT NULL,
+  `answer` varchar(219) DEFAULT NULL,
   `subject_id` int(11) DEFAULT NULL,
   `faculty_id` int(11) DEFAULT NULL,
-  `option1` varchar(255) DEFAULT NULL,
-  `option2` varchar(255) DEFAULT NULL,
-  `option3` varchar(255) DEFAULT NULL,
-  `option4` varchar(255) DEFAULT NULL,
-  `level` varchar(255) DEFAULT NULL
+  `option1` varchar(219) DEFAULT NULL,
+  `option2` varchar(219) DEFAULT NULL,
+  `option3` varchar(219) DEFAULT NULL,
+  `option4` varchar(219) DEFAULT NULL,
+  `level` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -212,8 +212,8 @@ INSERT INTO `question_answer` (`id`, `question`, `answer`, `subject_id`, `facult
 
 CREATE TABLE `school_year` (
   `id` int(11) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL,
+  `description` varchar(219) DEFAULT NULL,
+  `status` varchar(219) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `date_created` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
@@ -237,9 +237,9 @@ INSERT INTO `school_year` (`id`, `description`, `status`, `user_id`, `date_creat
 CREATE TABLE `section` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `description` varchar(219) DEFAULT NULL,
   `date_entry` datetime DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL
+  `status` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -259,23 +259,23 @@ INSERT INTO `section` (`id`, `user_id`, `description`, `date_entry`, `status`) V
 
 CREATE TABLE `students` (
   `id` int(11) NOT NULL,
-  `about` varchar(255) DEFAULT NULL,
-  `lrn_num` varchar(255) DEFAULT NULL,
-  `fname` varchar(255) DEFAULT NULL,
-  `lname` varchar(255) DEFAULT NULL,
+  `about` varchar(219) DEFAULT NULL,
+  `lrn_num` varchar(219) DEFAULT NULL,
+  `fname` varchar(219) DEFAULT NULL,
+  `lname` varchar(219) DEFAULT NULL,
   `gender` varchar(10) DEFAULT NULL,
-  `username` varchar(255) DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL,
-  `complete_address` varchar(255) DEFAULT NULL,
+  `username` varchar(219) DEFAULT NULL,
+  `password` varchar(219) DEFAULT NULL,
+  `complete_address` varchar(219) DEFAULT NULL,
   `year_level_id` int(11) DEFAULT NULL,
   `course_id` int(11) DEFAULT NULL,
   `section_id` int(11) DEFAULT NULL,
   `school_year_id` int(11) DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL,
+  `status` varchar(219) DEFAULT NULL,
   `date_registered` datetime DEFAULT NULL,
-  `logged_in` varchar(255) DEFAULT NULL,
-  `profile_image` varchar(255) DEFAULT NULL,
-  `level` varchar(255) DEFAULT NULL
+  `logged_in` varchar(219) DEFAULT NULL,
+  `profile_image` varchar(219) DEFAULT NULL,
+  `level` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -312,8 +312,8 @@ CREATE TABLE `students_subjects` (
   `id` int(11) NOT NULL,
   `students_id` varchar(11) DEFAULT NULL,
   `subjects_id` int(11) DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL,
-  `level` varchar(255) DEFAULT NULL
+  `status` varchar(219) DEFAULT NULL,
+  `level` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -435,7 +435,6 @@ INSERT INTO `students_subjects` (`id`, `students_id`, `subjects_id`, `status`, `
 (250, '26', 10, 'NOT TAKEN', 'PREBOARD2'),
 (251, '28', 10, 'NOT TAKEN', 'PREBOARD1'),
 (252, '28', 10, 'NOT TAKEN', 'PREBOARD2'),
-(255, '30', 1, 'TAKEN', 'PREBOARD1'),
 (256, '30', 1, 'NOT TAKEN', 'PREBOARD2'),
 (259, '26', 12, 'NOT TAKEN', 'PREBOARD1'),
 (260, '26', 12, 'NOT TAKEN', 'PREBOARD2'),
@@ -452,15 +451,15 @@ INSERT INTO `students_subjects` (`id`, `students_id`, `subjects_id`, `status`, `
 
 CREATE TABLE `student_score` (
   `id` int(11) NOT NULL,
-  `score` varchar(255) DEFAULT NULL,
-  `total_items` varchar(255) DEFAULT NULL,
+  `score` varchar(219) DEFAULT NULL,
+  `total_items` varchar(219) DEFAULT NULL,
   `stud_id` int(11) DEFAULT NULL,
-  `average` varchar(255) DEFAULT NULL,
+  `average` varchar(219) DEFAULT NULL,
   `remarks` text DEFAULT NULL,
   `remarks2` text DEFAULT NULL,
   `sub_id` int(11) DEFAULT NULL,
   `date_accomplished` datetime DEFAULT NULL,
-  `level` varchar(255) DEFAULT NULL
+  `level` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -518,13 +517,13 @@ INSERT INTO `student_score` (`id`, `score`, `total_items`, `stud_id`, `average`,
 
 CREATE TABLE `subjects` (
   `id` int(11) NOT NULL,
-  `code` varchar(255) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `code` varchar(219) DEFAULT NULL,
+  `description` varchar(219) DEFAULT NULL,
   `year_level_id` int(11) DEFAULT NULL,
   `course_id` int(11) DEFAULT NULL,
   `school_year_id` int(11) DEFAULT NULL,
   `date_entry` datetime DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL
+  `status` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -552,7 +551,7 @@ INSERT INTO `subjects` (`id`, `code`, `description`, `year_level_id`, `course_id
 CREATE TABLE `subjects_timer` (
   `id` int(11) NOT NULL,
   `subjects_id` int(11) NOT NULL,
-  `timer` varchar(255) DEFAULT NULL
+  `timer` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -581,7 +580,7 @@ INSERT INTO `subjects_timer` (`id`, `subjects_id`, `timer`) VALUES
 CREATE TABLE `subject_percent` (
   `id` int(11) NOT NULL,
   `sub_id` int(11) DEFAULT NULL,
-  `percent` varchar(255) DEFAULT NULL
+  `percent` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -609,15 +608,15 @@ INSERT INTO `subject_percent` (`id`, `sub_id`, `percent`) VALUES
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `username` varchar(255) DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL,
-  `type` varchar(255) DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL,
-  `fname` varchar(255) DEFAULT NULL,
-  `lname` varchar(255) DEFAULT NULL,
-  `profile_image` varchar(255) DEFAULT NULL,
+  `username` varchar(219) DEFAULT NULL,
+  `password` varchar(219) DEFAULT NULL,
+  `type` varchar(219) DEFAULT NULL,
+  `status` varchar(219) DEFAULT NULL,
+  `fname` varchar(219) DEFAULT NULL,
+  `lname` varchar(219) DEFAULT NULL,
+  `profile_image` varchar(219) DEFAULT NULL,
   `date_created` datetime DEFAULT NULL,
-  `logged_in` varchar(255) DEFAULT NULL
+  `logged_in` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -627,7 +626,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `username`, `password`, `type`, `status`, `fname`, `lname`, `profile_image`, `date_created`, `logged_in`) VALUES
 (1, 'admin', 'admin', 'ADMIN', 'Active', 'EDP', 'Personnel', '../uploads/6777bf0a41cad.jpg', '2024-11-21 09:07:16', 'NO'),
 (2, 'JissrelAcabo', 'Acabo12', 'REVIEWER', 'Active', 'Jissrell', 'Acabo', '../uploads/67774a2ec09bd.jpg', '2024-12-03 02:32:48', 'YES'),
-(3, 'JunVillarmia', 'Jun123', 'DEAN', 'Active', 'Jun', 'Villarmia', '../uploads/67774a0e51255.png', '2024-12-15 06:16:25', 'YES'),
+(3, 'JunVillarmia', 'Jun123', 'DEAN', 'Active', 'Jun', 'Villarmia', '../uploads/67774a0e51219.png', '2024-12-15 06:16:25', 'YES'),
 (4, 'kk', 'kk', 'DEAN', 'Inactive', 'korek', 'a', NULL, '2024-12-15 06:28:41', 'NO'),
 (5, 'DaisaGupit', 'Daisa123', 'DEAN', 'Active', 'Daisa', 'Gupit', '../uploads/676fae3bab708.png', '2024-12-21 02:27:45', 'YES'),
 (6, 'A', 'A', 'DEAN', 'Active', 'A', 'B', NULL, '2024-12-23 10:52:32', 'NO'),
@@ -645,10 +644,10 @@ INSERT INTO `users` (`id`, `username`, `password`, `type`, `status`, `fname`, `l
 
 CREATE TABLE `year_level` (
   `id` int(11) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `description` varchar(219) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `date_entry` datetime DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL
+  `status` varchar(219) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 --
@@ -658,9 +657,48 @@ CREATE TABLE `year_level` (
 INSERT INTO `year_level` (`id`, `description`, `user_id`, `date_entry`, `status`) VALUES
 (1, '4th year', 1, '2024-12-03 02:30:11', 'Active');
 
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inference_model`
+--
+
+CREATE TABLE `inference_model` (
+  `id` int(11) NOT NULL,
+  `algo` varchar(64) DEFAULT NULL,
+  `size` int(11) DEFAULT NULL,
+  `filename` varchar(100) DEFAULT NULL,
+  `file_extension` varchar(15) DEFAULT NULL,
+  `filepath` varchar(200) NOT NULL,
+  `fullpath` varchar(219) NOT NULL,
+  `accuracy` float(7,6) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `selected_model`
+--
+
+CREATE TABLE `selected_model` (
+  `id` int(11) NOT NULL,
+  `school_year_id` int(11) NOT NULL UNIQUE,
+  `inference_model_id` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `inference_model`
+--
+ALTER TABLE `inference_model`
+  ADD PRIMARY KEY (`id`) USING BTREE;
 
 --
 -- Indexes for table `course`
@@ -674,7 +712,7 @@ ALTER TABLE `course`
 ALTER TABLE `faculty_subjects`
   ADD PRIMARY KEY (`id`),
   ADD KEY `faculty_id` (`faculty_id`),
-  ADD KEY `subject_id` (`subjects_id`),
+  ADD KEY `subjects_id` (`subjects_id`),
   ADD KEY `course_id` (`course_id`),
   ADD KEY `school_year_id` (`school_year_id`);
 
@@ -745,8 +783,21 @@ ALTER TABLE `year_level`
   ADD PRIMARY KEY (`id`) USING BTREE;
 
 --
+-- Indexes for table `selected_model`
+--
+ALTER TABLE `selected_model`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inference_model_id` (`inference_model_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `inference_model`
+--
+ALTER TABLE `inference_model`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `course`
@@ -831,6 +882,13 @@ ALTER TABLE `year_level`
 --
 
 --
+-- Constraints for table `selected_model`
+--
+ALTER TABLE `selected_model`
+  ADD CONSTRAINT `selected_model_ibfk_1` FOREIGN KEY (`school_year_id`) REFERENCES `school_year` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `selected_model_ibfk_2` FOREIGN KEY (`inference_model_id`) REFERENCES `inference_model` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
 -- Constraints for table `faculty_subjects`
 --
 ALTER TABLE `faculty_subjects`
@@ -838,6 +896,7 @@ ALTER TABLE `faculty_subjects`
   ADD CONSTRAINT `faculty_subjects_ibfk_2` FOREIGN KEY (`subjects_id`) REFERENCES `subjects` (`id`),
   ADD CONSTRAINT `faculty_subjects_ibfk_3` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`),
   ADD CONSTRAINT `faculty_subjects_ibfk_4` FOREIGN KEY (`school_year_id`) REFERENCES `school_year` (`id`);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
