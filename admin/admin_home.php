@@ -2,6 +2,19 @@
 
 authenticated_page("admin");
 
+
+$query=conn()->query("select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
+if($row=mysqli_fetch_array($query))
+{
+  $fname=$row['fname'];
+  $lname=$row['lname'];
+  $type=$row['type'];
+  $fname = ucfirst(strtolower($fname));
+  $lname = ucfirst(strtolower($lname));
+  $type = ucfirst(strtolower($type));
+}
+
+
 admin_html_head("Dashboard", [
   [ "type" => "style", "href" => "assets/vendor/remixicon/remixicon.css" ],
   [ "type" => "style", "href" => "assets/css/style.css" ],
@@ -9,20 +22,6 @@ admin_html_head("Dashboard", [
 
 ?>
 <body>
-<?php 
-
-  $query=conn()->query("select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
-    if($row=mysqli_fetch_array($query))
-    {
-      $fname=$row['fname'];
-      $lname=$row['lname'];
-      $type=$row['type'];
-      $fname = ucfirst(strtolower($fname));
-      $lname = ucfirst(strtolower($lname));
-      $type = ucfirst(strtolower($type));
-    }
-
-?>
   <!-- ======= Header ======= -->
   <?php require_once get_admin_header(); ?>
   <!-- End Header -->
@@ -34,7 +33,6 @@ admin_html_head("Dashboard", [
     require_once get_admin_sidebar();
   }
   ?>
-  <div>OK</div>
   <!-- End Sidebar-->
 
   <main id="main" class="main">

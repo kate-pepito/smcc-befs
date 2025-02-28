@@ -7,6 +7,74 @@ function get_base_uri_path()
     return $_ENV['BEFS_BASE_URI'] ?? "/smcc-befs";
 }
 
+function base_api_uri()
+{
+    return $_ENV['BEFS_API_BASE_URL'] ?? 'http://localhost:5000';
+}
+
+function api_key()
+{
+    return $_ENV['BEFS_API_KEY'] ?? '';
+}
+
+function http_request_get(string $url)
+{
+    $ch = curl_init();
+
+    // Set the URL and options
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Return response as a string
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Accept: application/json",
+    ]);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+    try {
+        $data = json_decode($response, true);
+        return $data;
+    } catch (\Exception $e) {
+        return $response;
+    }
+}
+
+function make_training_session(string $username)
+{
+    $fdir = __DIR__ . DIRECTORY_SEPARATOR . "training_sessions.json";
+    $jsonTxt = file_get_contents($fdir);
+    $json = json_decode($jsonTxt, true);
+    if (!isset($json[$username])) {
+        $json[$username] = [];
+    }
+    $rtk = bin2hex(random_bytes(16));
+    $json[$username][] = $rtk;
+    file_put_contents($fdir, $json);
+}
+
+function get_all_training_sessions(string $username)
+{
+    $fdir = __DIR__ . DIRECTORY_SEPARATOR . "training_sessions.json";
+    $jsonTxt = file_get_contents($fdir);
+    $json = json_decode($jsonTxt, true);
+    return $json[$username] ?? [];
+}
+
+function get_training_session(string $username, int $index)
+{
+    $fdir = __DIR__ . DIRECTORY_SEPARATOR . "training_sessions.json";
+    $jsonTxt = file_get_contents($fdir);
+    $json = json_decode($jsonTxt, true);
+    return isset($json[$username]) ? ($json[$username][$index] ?? null) : null;
+}
+
+function get_latest_training_session(string $username)
+{
+    $fdir = __DIR__ . DIRECTORY_SEPARATOR . "training_sessions.json";
+    $jsonTxt = file_get_contents($fdir);
+    $json = json_decode($jsonTxt, true);
+    return count($json) > 0 ? end($json) : null;
+}
+
 function is_current_unauthenticated_page()
 {
     $unauthenticated_pages = [
@@ -259,6 +327,16 @@ function get_file_extension(string $filename)
         : "";
 }
 
+function generateUUIDv4() {
+    $data = random_bytes(16);
+
+    // Set the version (4) and variant bits
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // Version 4
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // Variant
+
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
+
 function get_admin_header()
 {
     return implode(DIRECTORY_SEPARATOR, [__DIR__, "header.php"]);
@@ -440,7 +518,7 @@ function default_html_head(string $title_page = "Login", array $imports = [])
     <script src="<?= strpos($import_item['src'] ?? "", "http") === 0 ? $import_item['src'] : base_url() . "/" . ltrim($import_item['src'] ?? "", "/") ?>" <?= isset($import_item['script_type']) ? 'type="' . ($import_item['script_type'] ?: 'text/javascript') . '"' : '' ?>></script>
     <?php       break;
                 case 'custom': ?>
-    <?php $import_item['content'] ?? "" ?>
+    <?php isset($import_item['content']) ? (is_callable($import_item['content']) ? call_user_func($import_item['content']) : $import_item['content']) : $import_item['content'] ?>  
     <?php       break;
             endswitch;
         endforeach;
@@ -459,7 +537,8 @@ function default_html_body_end(array $imports = [])
 <script src="<?= strpos($import_item['src'] ?? "", "http") === 0 ? $import_item['src'] : base_url() . "/" . ltrim($import_item['src'] ?? "", "/") ?>" <?= isset($import_item['script_type']) ? 'type="' . ($import_item['script_type'] ?: 'text/javascript') . '"' : '' ?>></script>
 <?php       break;
             case 'custom': ?>
-<?php isset($import_item['content']) ? (is_callable($import_item['content']) ? call_user_func($import_item['content']) : $import_item['content']) : $import_item['content'] ?>    <?php       break;
+<?php isset($import_item['content']) ? (is_callable($import_item['content']) ? call_user_func($import_item['content']) : $import_item['content']) : $import_item['content'] ?>
+<?php       break;
         endswitch;
     endforeach;
 }
