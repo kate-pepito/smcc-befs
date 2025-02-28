@@ -43,13 +43,15 @@ class MLModelMetadata(BaseModel):
     filename: str
     file_extension: str
     filepath: str
-    create_at: datetime
+    accuracy: float
+    created_at: datetime
 
 class FileModelData(BaseModel):
     inference: Tuple[str, str, Literal["application/octet-stream"]]
 
 class FileModelResponse(BaseModel):
     success: bool
+    error: Optional[str]
     filepath: Optional[str]
 
 class DatasetMetadata(BaseModel):

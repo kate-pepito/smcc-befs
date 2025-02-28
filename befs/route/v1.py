@@ -2,7 +2,7 @@ from datetime import datetime
 import secrets
 from typing import Dict
 from fastapi import APIRouter,  Request, WebSocket, WebSocketDisconnect
-from befs.http_request import create_train_session_api, get_train_session, get_train_sessions, invalidate_train_session, validate_train_session
+from befs.http_request import create_train_session_api, get_train_session, get_train_sessions, invalidate_train_session, invalidate_train_session_token, validate_train_session
 
 from befs.route import middleware
 from befs.route.responses import InvalidateSessionRequest, SessionValidateRequest, SessionValidateResponse, TrainCreateSessionPost, TrainCreateSessionRequest, TrainCreateSessionResponse, TrainDestroySessionResponse, TrainSessionsResponse, TrainingStatesResponse
@@ -56,7 +56,7 @@ async def get_training_sessions(request: Request):
             started = str(training_classes[str(tck)].state.started_at)
             data.append([username, session_key, algo, started])
         else:
-            await invalidate_train_session(InvalidateSessionRequest(token=tck))
+            await invalidate_train_session_token(InvalidateSessionRequest(token=tck))
     data.sort(key=lambda x: datetime.fromisoformat(x[3]))
     return TrainSessionsResponse(data=data)
 
@@ -66,7 +66,7 @@ async def destroy_training_session(data: TrainCreateSessionRequest, request: Req
         resp = await get_train_session(data)
         session_token = resp.session_token if resp is not None else None
         if session_token is not None:
-            await invalidate_train_session(InvalidateSessionRequest(token=session_token))
+            await invalidate_train_session_token(InvalidateSessionRequest(token=session_token))
             training_classes: Dict[str, LogisticRegressionTrainer] = request.app.training_classes
             if str(session_token) in training_classes.keys():
                 del training_classes[str(session_token)]

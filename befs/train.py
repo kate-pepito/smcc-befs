@@ -163,7 +163,7 @@ class BaseMLTrainer:
                 filename = secrets.token_hex(12)
                 file_ext = ".onnx"
                 filepath = "/inference/"
-                self.state.model = MLModelMetadata(filename=filename, file_extension=file_ext, filepath=filepath, algo=self.algo, created_at=datetime.now(timezone.utc), size=len(serialized_model))
+                self.state.model = MLModelMetadata(filename=filename, file_extension=file_ext, filepath=filepath, algo=self.algo, created_at=datetime.now(timezone.utc), size=len(serialized_model), accuracy=self.state.metrics["accuracy"])
             else:
                 initial_type = [("input", FloatTensorType([None, len(self.features)]))]
                 onx = convert_sklearn(self.model, initial_types=initial_type)
@@ -172,7 +172,7 @@ class BaseMLTrainer:
                 filename = secrets.token_hex(12)
                 file_ext = ".onnx"
                 filepath = "/inference/"
-                self.state.model = MLModelMetadata(filename=filename, file_extension=file_ext, filepath=filepath, algo=self.algo, created_at=datetime.now(timezone.utc), size=len(serialized_model))
+                self.state.model = MLModelMetadata(filename=filename, file_extension=file_ext, filepath=filepath, algo=self.algo, created_at=datetime.now(timezone.utc), size=len(serialized_model), accuracy=self.state.metrics["accuracy"])
             await self.update_state()
             
     async def send_model(self):
