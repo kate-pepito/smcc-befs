@@ -8,6 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from befs.config import settings
 from befs.train import BaseMLTrainer
 
+
 class ProcessTimeMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         start_time = time.time()
@@ -38,3 +39,4 @@ async def check_api_key(websocket: WebSocket, api_key: str):
 def get_trainer_class(websocket: WebSocket, session_token: str) -> Optional[BaseMLTrainer]:
     trainer_classes: Dict[str, BaseMLTrainer] = websocket.app.training_classes
     return trainer_classes[session_token] if session_token in trainer_classes.keys() else None
+

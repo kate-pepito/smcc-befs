@@ -14,6 +14,17 @@ class TrainDestroySessionResponse(BaseModel):
     success: bool
     detail: str
 
+class SessionValidateRequest(BaseModel):
+    username: str
+    session_key: str
+    token: str
+
+class SessionValidateResponse(BaseModel):
+    valid: bool
+
+class TrainSessionsResponse(BaseModel):
+    data: List[List[str]]
+
 class MLModelMetadata(BaseModel):
     algo: Literal["Logistic Regression", "XGBoost Classifier"]
     size: float
