@@ -10,5 +10,5 @@ fastapi[standard]
 onnxruntime
 websockets
 uvicorn
-redis
+httpx
 python-dotenv

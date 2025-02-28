@@ -1,11 +1,17 @@
 from datetime import datetime
-from typing import Any, List, Literal, Optional, Union
+from typing import Any, List, Literal, Optional, Tuple, Union
 from pydantic import BaseModel
 
 class TrainCreateSessionRequest(BaseModel):
     username: str
     session_key: str
     algo: Optional[Literal["Logistic Regression", "XGBoost Classifier"]] = None
+
+class TrainCreateSessionPost(BaseModel):
+    username: str
+    session_key: str
+    algo: Optional[Literal["Logistic Regression", "XGBoost Classifier"]] = None
+    token: str
 
 class TrainCreateSessionResponse(BaseModel):
     session_token: str
@@ -19,8 +25,14 @@ class SessionValidateRequest(BaseModel):
     session_key: str
     token: str
 
+class InvalidateSessionRequest(BaseModel):
+    token: str
+
 class SessionValidateResponse(BaseModel):
     valid: bool
+
+class TrainSessionsGet(BaseModel):
+    data: List[str]
 
 class TrainSessionsResponse(BaseModel):
     data: List[List[str]]
@@ -28,7 +40,17 @@ class TrainSessionsResponse(BaseModel):
 class MLModelMetadata(BaseModel):
     algo: Literal["Logistic Regression", "XGBoost Classifier"]
     size: float
+    filename: str
+    file_extension: str
+    filepath: str
     create_at: datetime
+
+class FileModelData(BaseModel):
+    inference: Tuple[str, str, Literal["application/octet-stream"]]
+
+class FileModelResponse(BaseModel):
+    success: bool
+    filepath: Optional[str]
 
 class DatasetMetadata(BaseModel):
     filename: str

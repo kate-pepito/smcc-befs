@@ -1,22 +1,21 @@
 from datetime import datetime
 import secrets
 from typing import Dict
-from fastapi import APIRouter, Depends, Request, WebSocket, WebSocketDisconnect
-from redis import Redis
+from fastapi import APIRouter,  Request, WebSocket, WebSocketDisconnect
+from befs.http_request import create_train_session_api, get_train_session, get_train_sessions, invalidate_train_session, validate_train_session
 
-from befs.redis import get_redis
 from befs.route import middleware
-from befs.route.responses import SessionValidateRequest, SessionValidateResponse, TrainCreateSessionRequest, TrainCreateSessionResponse, TrainDestroySessionResponse, TrainSessionsResponse, TrainingStatesResponse
+from befs.route.responses import InvalidateSessionRequest, SessionValidateRequest, SessionValidateResponse, TrainCreateSessionPost, TrainCreateSessionRequest, TrainCreateSessionResponse, TrainDestroySessionResponse, TrainSessionsResponse, TrainingStatesResponse
 from befs.train import BaseMLTrainer, LogisticRegressionTrainer, XGBClassifierTrainer
 
 router = APIRouter()
 router.prefix = "/v1"
 
 @router.post("/train/create", response_model=TrainCreateSessionResponse)
-async def create_training_session(data: TrainCreateSessionRequest, request: Request, redis: Redis = Depends(get_redis)):
-    session_token = await redis.get(f"training_session:{data.username}::{data.session_key}")
-    if session_token is not None:
-        return TrainCreateSessionResponse(session_token=str(session_token))
+async def create_training_session(data: TrainCreateSessionRequest, request: Request):
+    resp = await get_train_session(data)
+    if resp is not None and resp.session_token is not None:
+        return TrainCreateSessionResponse(session_token=str(resp.session_token))
     session_token = secrets.token_hex(16)
     # Initialize training state
     training_classes: Dict[str, BaseMLTrainer] = request.app.training_classes
@@ -24,51 +23,50 @@ async def create_training_session(data: TrainCreateSessionRequest, request: Requ
     training_classes[str(session_token)] = TrainerClass(
         session_id=data.session_key,
         username=data.username,
-        token=str(session_token),
-        redis=redis,
+        token=str(session_token)
     )
-    train_key = f"training_session:{data.username}::{data.session_key}"
-    await redis.set(train_key, str(session_token))
+    await create_train_session_api(TrainCreateSessionPost(**data.model_dump(), token=str(session_token)))
     return TrainCreateSessionResponse(session_token=str(session_token))
 
 @router.get("/validate/session", response_model=SessionValidateResponse)
-async def validate_session(request: Request, redis: Redis = Depends(get_redis)):
+async def validate_session(request: Request):
     params = request.query_params.items()
     param_dict = {p[0]:p[1] for p in params}
     data = SessionValidateRequest(**param_dict)
-    session_token = await redis.get(f"training_session:{data.username}::{data.session_key}")
-    if session_token is None:
+    resp = await validate_train_session(data)
+    if not resp or not resp.valid:
         return SessionValidateResponse(valid=False)
     training_classes: Dict[str, BaseMLTrainer] = request.app.training_classes
-    is_valid = session_token == data.token and session_token in training_classes.keys()
+    is_valid = data.token in training_classes.keys()
+    if not is_valid:
+        await invalidate_train_session(data)
     return SessionValidateResponse(valid=is_valid)
 
 @router.get("/train/sessions", response_model=TrainSessionsResponse)
-async def get_training_sessions(request: Request, redis: Redis = Depends(get_redis)):
-    keys = await redis.keys()
-    tsl = len("training_session:")
+async def get_training_sessions(request: Request):
+    resp = await get_train_sessions()
+    keys = resp.data if resp is not None else []
     training_classes: Dict[str, BaseMLTrainer] = request.app.training_classes
     data = []
-    for k in keys:
-        tck = await redis.get(k)
+    for tck in keys:
         if tck in training_classes.keys():
-            e1 = str(k).find('::')
-            s2 = int(str(k).find('::')+2)
+            username = training_classes[str(tck)].username
+            session_key = training_classes[str(tck)].session_id
             algo = training_classes[str(tck)].algo
             started = str(training_classes[str(tck)].state.started_at)
-            data.append([k[tsl:e1], k[s2:], algo, started])
+            data.append([username, session_key, algo, started])
         else:
-            await redis.delete(k)
+            await invalidate_train_session(InvalidateSessionRequest(token=tck))
     data.sort(key=lambda x: datetime.fromisoformat(x[3]))
     return TrainSessionsResponse(data=data)
 
 @router.post("/train/destroy", response_model=TrainDestroySessionResponse)
-async def destroy_training_session(data: TrainCreateSessionRequest, request: Request, redis: Redis = Depends(get_redis)):
+async def destroy_training_session(data: TrainCreateSessionRequest, request: Request):
     try:
-        session_token = await redis.get(f"training_session:{data.username}::{data.session_key}")
+        resp = await get_train_session(data)
+        session_token = resp.session_token if resp is not None else None
         if session_token is not None:
-            train_key = f"training_session:{data.username}::{data.session_key}"
-            await redis.delete(train_key)
+            await invalidate_train_session(InvalidateSessionRequest(token=session_token))
             training_classes: Dict[str, LogisticRegressionTrainer] = request.app.training_classes
             if str(session_token) in training_classes.keys():
                 del training_classes[str(session_token)]

@@ -3,11 +3,12 @@ import asyncio
 from datetime import datetime, timezone
 import io
 import json
+import secrets
 import time
 from typing import Any, List, Literal, Union
 import pandas as pd
 from fastapi import WebSocket
-from redis import Redis
+from befs.http_request import invalidate_train_session_token, update_training_state, upload_model_to_database
 from sklearn.pipeline import Pipeline
 from befs.route.responses import CommandRequest, DatasetMetadata, MLModelMetadata, SaveMLModelResponse, TrainingStatesResponse
 from sklearn.linear_model import LogisticRegression
@@ -22,7 +23,7 @@ from skl2onnx.common.shape_calculator import (
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 
 class BaseMLTrainer:
-    def __init__(self, session_id: str, username: str, token: str, redis: Redis, valid_hyperparameters: List[str], algo: Literal["Logistic Regression", "XGBoost Classifier"]):
+    def __init__(self, session_id: str, username: str, token: str, valid_hyperparameters: List[str], algo: Literal["Logistic Regression", "XGBoost Classifier"]):
         self.valid_hyperparameters = valid_hyperparameters
         self.algo = algo
         self.session_id = session_id
@@ -31,7 +32,6 @@ class BaseMLTrainer:
         self.model = None
         self.saved_model = None
         self.websocket = None
-        self.redis = redis
         self.dataset = None
         self.features = []
         self.target = []
@@ -39,6 +39,7 @@ class BaseMLTrainer:
         self.test_size = 0.2
         self.random_state = 42
         self.scaler_class = {}
+        self.save_model_full_path = ""
         self.state = TrainingStatesResponse(
             connection="connected",
             status="idle",
@@ -63,8 +64,7 @@ class BaseMLTrainer:
         self.state["connection"] = "connected"
 
     async def update_state(self):
-        redis_key = f"session:{self.username}_{self.session_id}"
-        await self.redis.hset(redis_key, mapping=self.state.model_dump())
+        await update_training_state(self.token, mapping=self.state.model_dump())
         self.send_updates()
 
     async def send_updates(self):
@@ -160,32 +160,31 @@ class BaseMLTrainer:
             if hasattr(self, "_save_model") and callable(self._save_model):
                 serialized_model = self._save_model()
                 self.saved_model = serialized_model
-                self.state.model = MLModelMetadata(algo=self.algo, created_at=datetime(timezone.utc), size=len(serialized_model))
+                filename = secrets.token_hex(12)
+                file_ext = ".onnx"
+                filepath = "/inference/"
+                self.state.model = MLModelMetadata(filename=filename, file_extension=file_ext, filepath=filepath, algo=self.algo, created_at=datetime.now(timezone.utc), size=len(serialized_model))
             else:
                 initial_type = [("input", FloatTensorType([None, len(self.features)]))]
                 onx = convert_sklearn(self.model, initial_types=initial_type)
                 serialized_model = onx.SerializeToString()
                 self.saved_model = serialized_model
-                self.state.model = MLModelMetadata(algo=self.algo, created_at=datetime(timezone.utc), size=len(serialized_model))
+                filename = secrets.token_hex(12)
+                file_ext = ".onnx"
+                filepath = "/inference/"
+                self.state.model = MLModelMetadata(filename=filename, file_extension=file_ext, filepath=filepath, algo=self.algo, created_at=datetime.now(timezone.utc), size=len(serialized_model))
             await self.update_state()
             
     async def send_model(self):
-        CHUNK_SIZE = 8 * 1024   # 8KB per chunk
         if self.saved_model is not None and self.state.model is not None:
-            await self.websocket.send_json(SaveMLModelResponse(state="save_start"))
-            model_to_upload = self.saved_model  # ONNX serialized model
-            total_size = len(model_to_upload)
-            num_chunks = (total_size // CHUNK_SIZE) + (1 if total_size % CHUNK_SIZE else 0)
-            j = 0
-
-            for i in range(0, total_size, CHUNK_SIZE):
-                chunk = model_to_upload[i : i + CHUNK_SIZE]
-                await self.websocket.send_bytes(chunk)
-                j += 1
-                await asyncio.sleep(0.01)
-            if j == num_chunks:
-                await self.websocket.send_json(SaveMLModelResponse(state="save_end"))
-            else:
+            try:
+                resp = await upload_model_to_database(self.saved_model, self.state.model)
+                if resp is not None and resp.success:
+                    self.save_model_full_path = resp.filepath
+                    await self.websocket.send_json(SaveMLModelResponse(state="save_end"))
+                else:
+                    raise Exception("Error")
+            except Exception:
                 await self.websocket.send_json(SaveMLModelResponse(state="save_failed"))
     
     async def run_command(self, command: CommandRequest):
@@ -227,6 +226,7 @@ class BaseMLTrainer:
             hyperparameters = None if command.data == "" or command.data is None or not command.data else command.data
             await self.set_hyperparameters(**hyperparameters)
         elif command.action == "save_model":
+            await self.train()
             await self.save_model()
         elif command.action == "download_model":
             await self.send_model()
@@ -248,10 +248,17 @@ class BaseMLTrainer:
         self.state.connection = "disconnected"
         await self.update_state()
         self.websocket = None
+    
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        await invalidate_train_session_token(self.token)
+
+    def __del__(self):
+        loop = asyncio.get_event_loop()
+        loop.create_task(invalidate_train_session_token(str(self.token)))
 
 class LogisticRegressionTrainer(BaseMLTrainer):
-    def __init__(self, session_id: str, username: str, token: str, redis: Redis):
-        super().__init__(session_id, username, token, redis, valid_hyperparameters = [
+    def __init__(self, session_id: str, username: str, token: str):
+        super().__init__(session_id, username, token, valid_hyperparameters = [
             "penalty", "dual", "tol", "C", "fit_intercept", "intercept_scaling",
             "class_weight", "random_state", "solver", "max_iter", "multi_class",
             "verbose", "warm_start", "n_jobs", "l1_ratio"
@@ -281,8 +288,8 @@ class LogisticRegressionTrainer(BaseMLTrainer):
         return xgb_onnx.SerializeToString()
 
 class XGBClassifierTrainer(BaseMLTrainer):
-    def __init__(self, session_id: str, username: str, token: str, redis: Redis):
-        super().__init__(session_id, username, token, redis, valid_hyperparameters = [
+    def __init__(self, session_id: str, username: str, token: str):
+        super().__init__(session_id, username, token, valid_hyperparameters = [
            "n_estimators", "max_depth", "learning_rate", "verbosity", "objective",
             "booster", "tree_method", "gamma", "min_child_weight", "max_delta_step",
             "subsample", "colsample_bytree", "colsample_bylevel", "colsample_bynode",
