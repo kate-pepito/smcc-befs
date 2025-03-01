@@ -148,7 +148,7 @@ admin_html_head("Forecast Training", [
     </div>
     <!-- End Page Title -->
 
-    <?php if (!(!isset($_SESSION['train_username']) || !isset($_SESSION['train_session_key']) || !isset($_SESSION['train_algo']) || !isset($_GET['train_token']))): ?>
+    <?php if (!isset($_SESSION['train_username']) || !isset($_SESSION['train_session_key']) || !isset($_SESSION['train_algo']) || !isset($_GET['train_token'])): ?>
         <div class="row">
             <div class="col-md-6">
                 <div class="card info-card">
@@ -204,25 +204,25 @@ admin_html_head("Forecast Training", [
         </div>
     <?php else: ?>
         <?php
-            // $response = http_request_get(
-            //     base_api_uri() .
-            //     "/api/v1/validate/session" .
-            //     "?api_key=" . api_key() .
-            //     "&username=" . $_SESSION['train_username'] .
-            //     "&session_key=" . $_SESSION['train_session_key'] .
-            //     "&token=" . $_GET['train_token']
-            // );
-            // if (!($response["valid"] ?? false)) {
-            // ?>
-            //     <script>
-            //         alert("Invalid Session.");
-            //         window.location.href = `<?= base_url() ?>/admin/admin_train`;
-            //     </script>
-            //     </body>
-            //     </html>
-            // <?php
-            //     exit;
-            // }
+            $response = http_request_get(
+                base_api_uri() .
+                "/api/v1/validate/session" .
+                "?api_key=" . api_key() .
+                "&username=" . $_SESSION['train_username'] .
+                "&session_key=" . $_SESSION['train_session_key'] .
+                "&token=" . $_GET['train_token']
+            );
+            if (!($response["valid"] ?? false)) {
+            ?>
+                <script>
+                    alert("Invalid Session.");
+                    window.location.href = `<?= base_url() ?>/admin/admin_train`;
+                </script>
+                </body>
+                </html>
+            <?php
+                exit;
+            }
         ?>
         <input type="hidden" name="username" id="trainingSessionUsername" value="<?= $_SESSION['train_username'] ?>" />
         <input type="hidden" name="session_key" id="trainingSessionId" value="<?= $_SESSION['train_session_key'] ?>" />
