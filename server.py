@@ -38,6 +38,10 @@ app.add_middleware(middleware.APIKeyMiddleware)
 # Include API routes
 app.include_router(v1.router, prefix="/api")
 
+@app.get("/favicon.ico")
+async def disable_favicon():
+    return {"detail": "No favicon"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host=settings.FASTAPI_SERVER_HOST, port=int(settings.FASTAPI_SERVER_PORT), reload=True)
