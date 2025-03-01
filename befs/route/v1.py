@@ -12,56 +12,78 @@ router = APIRouter()
 router.prefix = "/v1"
 
 @router.post("/train/create", response_model=TrainCreateSessionResponse)
-async def create_training_session(data: TrainCreateSessionRequest, request: Request):
-    resp = await get_train_session(data)
-    if resp is not None and resp.session_token is not None:
-        return TrainCreateSessionResponse(session_token=str(resp.session_token))
-    session_token = secrets.token_hex(16)
-    # Initialize training state
-    training_classes: Dict[str, BaseMLTrainer] = request.app.training_classes
-    TrainerClass = LogisticRegressionTrainer if data.algo == "Logistic Regression" else XGBClassifierTrainer
-    training_classes[str(session_token)] = TrainerClass(
-        session_id=data.session_key,
-        username=data.username,
-        token=str(session_token)
-    )
-    await create_train_session_api(TrainCreateSessionPost(**data.model_dump(), token=str(session_token)))
-    return TrainCreateSessionResponse(session_token=str(session_token))
+async def create_training_session(data: SessionValidateRequest, request: Request):
+    session_token = None
+    try:
+        resp = await validate_train_session(data)
+        if resp.valid:
+            session_token = data.token
+        else:
+            session_token = str(secrets.token_hex(16))
+            # Initialize training state
+            training_classes: Dict[str, BaseMLTrainer] = request.app.training_classes
+            TrainerClass = LogisticRegressionTrainer if data.algo == "Logistic Regression" else XGBClassifierTrainer
+            training_classes[str(session_token)] = TrainerClass(
+                session_id=data.session_key,
+                username=data.username,
+                token=str(session_token)
+            )
+            create_body = TrainCreateSessionPost(**data.model_dump(exclude='token'), token=str(session_token))
+            await create_train_session_api(create_body)
+    except Exception as e:
+        print(e)
+        session_token = None
+    finally:
+        return TrainCreateSessionResponse(session_token=str(session_token) if session_token is not None else None)
 
 @router.get("/validate/session", response_model=SessionValidateResponse)
 async def validate_session(request: Request):
-    params = request.query_params.items()
-    param_dict = {p[0]:p[1] for p in params}
-    data = SessionValidateRequest(**param_dict)
-    resp = await validate_train_session(data)
-    if not resp or not resp.valid:
-        return SessionValidateResponse(valid=False)
-    training_classes: Dict[str, BaseMLTrainer] = request.app.training_classes
-    is_valid = data.token in training_classes.keys()
-    if not is_valid:
-        await invalidate_train_session(data)
-    return SessionValidateResponse(valid=is_valid)
+    is_valid = False
+    try:
+        params = request.query_params.items()
+        param_dict = {p[0]:p[1] for p in params}
+        data = SessionValidateRequest(**param_dict)
+        resp = await validate_train_session(data)
+        if not resp or not resp.valid:
+            raise Exception("[expected exception] Session Invalid")
+        training_classes: Dict[str, BaseMLTrainer] = request.app.training_classes
+        is_valid = data.token in training_classes.keys()
+        if not is_valid:
+            await invalidate_train_session(data)
+    except Exception as e:
+        print(e)
+        is_valid = False
+    finally:
+        return SessionValidateResponse(valid=is_valid)
 
 @router.get("/train/sessions", response_model=TrainSessionsResponse)
 async def get_training_sessions(request: Request):
-    resp = await get_train_sessions()
-    keys = resp.data if resp is not None else []
-    training_classes: Dict[str, BaseMLTrainer] = request.app.training_classes
-    data = []
-    for tck in keys:
-        if tck in training_classes.keys():
-            username = training_classes[str(tck)].username
-            session_key = training_classes[str(tck)].session_id
-            algo = training_classes[str(tck)].algo
-            started = str(training_classes[str(tck)].state.started_at)
-            data.append([username, session_key, algo, started])
-        else:
-            await invalidate_train_session_token(InvalidateSessionRequest(token=tck))
-    data.sort(key=lambda x: datetime.fromisoformat(x[3]))
-    return TrainSessionsResponse(data=data)
+    try:
+        resp = await get_train_sessions()
+        keys = resp.data if resp is not None else []
+        training_classes: Dict[str, BaseMLTrainer] = request.app.training_classes
+        data = []
+        for tck in keys:
+            if tck in training_classes.keys():
+                username = training_classes[str(tck)].username
+                session_key = training_classes[str(tck)].session_id
+                algo = training_classes[str(tck)].algo
+                started = str(training_classes[str(tck)].state.started_at)
+                token = training_classes[str(tck)].token
+                data.append([username, session_key, algo, started, token])
+            else:
+                await invalidate_train_session_token(InvalidateSessionRequest(token=tck))
+        data.sort(key=lambda x: datetime.fromisoformat(x[3]))
+    except Exception as e:
+        print(e)
+        data = []
+    finally:
+        return TrainSessionsResponse(data=data)
 
 @router.post("/train/destroy", response_model=TrainDestroySessionResponse)
 async def destroy_training_session(data: TrainCreateSessionRequest, request: Request):
+    detail = ""
+    success = False
     try:
         resp = await get_train_session(data)
         session_token = resp.session_token if resp is not None else None
@@ -70,26 +92,41 @@ async def destroy_training_session(data: TrainCreateSessionRequest, request: Req
             training_classes: Dict[str, LogisticRegressionTrainer] = request.app.training_classes
             if str(session_token) in training_classes.keys():
                 del training_classes[str(session_token)]
-                return TrainDestroySessionResponse(success=True, detail=f"{str(session_token)} session deleted")
+                detail = f"{str(session_token)} session deleted"
+                success = True
             else:
                 raise Exception("No Training Session Found")
         else:
             raise Exception("No Training Session Found")
     except Exception as e:
-        return TrainDestroySessionResponse(success=False, detail=str(e))
+        print(e)
+        detail = str(e)
+        success = False
+    finally:
+        return TrainDestroySessionResponse(success=success, detail=detail)
 
 @router.websocket("/train")
-async def websocket_endpoint(websocket: WebSocket):
-    api_key = websocket.query_params.get("api_key")
-    session_token = websocket.query_params.get("token")
-    if not await middleware.check_api_key(websocket, api_key):
-        return
+async def websocket_endpoint(websocket: WebSocket, api_key: str, token: str):
+    try:
+        # api_key = websocket.query_params.get("api_key")
+        # session_token = websocket.query_params.get("token")
+        session_token = token
+        valid_api_key = await middleware.check_api_key(websocket, api_key)
+        if not valid_api_key:
+            return
 
-    trainer = middleware.get_trainer_class(websocket, session_token)
-    if trainer is None:
-        await websocket.send_json(TrainingStatesResponse(connection="disconnected", state="error", progress=0.0, error="Training Session not yet initiated"))
-        await websocket.close()
-    await websocket.accept()
+        trainer = middleware.get_trainer_class(websocket, session_token)
+        if trainer is None:
+            resp = TrainingStatesResponse(connection="disconnected", state="error", progress=0.0, error="Training Session not yet initiated").model_dump_json()
+            await websocket.send_text(resp)
+            await websocket.close()
+        await websocket.accept()
+    except WebSocketDisconnect as e:
+        print(f"WebSocket disconnected: {str(e)}")
+        return
+    except Exception as e:
+        print(f"Error Websocket Connection: {str(e)}")
+
     try:
         trainer.connect(websocket)
         await trainer.websocket_loop()

@@ -30,11 +30,12 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
 
 
     
-async def check_api_key(websocket: WebSocket, api_key: str):
+async def check_api_key(websocket: WebSocket, api_key: str) -> bool:
     api_key = websocket.query_params.get("api_key")
     if api_key != settings.API_KEY:
         await websocket.close()
         return False
+    return True
 
 def get_trainer_class(websocket: WebSocket, session_token: str) -> Optional[BaseMLTrainer]:
     trainer_classes: Dict[str, BaseMLTrainer] = websocket.app.training_classes

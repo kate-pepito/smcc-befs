@@ -1,14 +1,14 @@
 
 import asyncio
 from datetime import datetime, timezone
-import io
 import json
 import secrets
 import time
 from typing import Any, List, Literal, Union
+from fastapi.websockets import WebSocketState
 import pandas as pd
 from fastapi import WebSocket
-from befs.http_request import invalidate_train_session_token, update_training_state, upload_model_to_database
+from befs.http_request import get_dataset_contents, invalidate_train_session_token, update_training_state, upload_model_to_database
 from sklearn.pipeline import Pipeline
 from befs.route.responses import CommandRequest, DatasetMetadata, MLModelMetadata, SaveMLModelResponse, TrainingStatesResponse
 from sklearn.linear_model import LogisticRegression
@@ -61,17 +61,23 @@ class BaseMLTrainer:
     
     def connect(self, websocket: WebSocket):
         self.websocket = websocket
-        self.state["connection"] = "connected"
+        self.state.connection = "connected"
 
     async def update_state(self):
-        await update_training_state(self.token, mapping=self.state.model_dump())
-        self.send_updates()
+        await update_training_state(self.token, self.state)
+        await self.send_updates()
 
     async def send_updates(self):
-        if self.websocket and self.websocket.application_state == 1:
-            await self.websocket.send_json(self.state.model_dump())
+        if self.websocket and self.websocket.client_state == WebSocketState.CONNECTED:
+            state = self.state.model_dump_json()
+            try:
+                state = json.loads(state)
+            except Exception as e:
+                print("it had error", str(e))
 
-    async def set_dataset(self, filename: str, size: str, dataset: Union[list, pd.DataFrame]):
+            await self.websocket.send_json(state)
+
+    async def set_dataset(self, dataset: Union[list, pd.DataFrame], metadata: DatasetMetadata):
         try:
             if type(dataset) is list:
                 if isinstance(dataset, pd.DataFrame):
@@ -87,7 +93,7 @@ class BaseMLTrainer:
             else:
                 raise Exception("Invalid Dataset!")
             self.state.column_names = list(self.dataset.columns)
-            self.state.dataset = DatasetMetadata(filename=filename,size=size,columns=len(self.dataset.columns),rows=self.dataset.shape[0])
+            self.state.dataset = DatasetMetadata(**metadata, columns=len(self.dataset.columns), rows=self.dataset.shape[0])
         except Exception as e:
             self.state.status = "error"
             self.state.error = str(e)
@@ -130,6 +136,7 @@ class BaseMLTrainer:
             self.state.status = "training"
             self.state.training_start_time = time.time()
             self.state.training_end_time = None
+            self.state.progress = 30
             await self.update_state()
 
             try:
@@ -138,18 +145,25 @@ class BaseMLTrainer:
 
                 # Train-test split
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.test_size, random_state=self.random_state)
+                self.state.progress = 50
+                await self.update_state()
 
                 self._train(X_train, y_train, X_test, y_test)
+
+                self.state.progress = 90
+                await self.update_state()
 
                 # Training complete
                 self.state.status = "completed"
                 self.state.training_end_time = time.time()
                 self.state.last_training_time = self.state.training_end_time - self.state.training_start_time
+                self.state.progress = 100
                 await self.update_state()
 
             except Exception as e:
                 self.state.status = "error"
                 self.state.error = str(e)
+                self.state.progress = 0
                 await self.update_state()
             finally:
                 return True
@@ -181,35 +195,22 @@ class BaseMLTrainer:
                 resp = await upload_model_to_database(self.saved_model, self.state.model)
                 if resp is not None and resp.success:
                     self.save_model_full_path = resp.filepath
-                    await self.websocket.send_json(SaveMLModelResponse(state="save_end"))
+                    resp = SaveMLModelResponse(state="save_end").model_dump()
+                    await self.websocket.send_json(resp)
                 else:
                     raise Exception("Error")
             except Exception:
-                await self.websocket.send_json(SaveMLModelResponse(state="save_failed"))
+                resp = SaveMLModelResponse(state="save_failed").model_dump()
+                await self.websocket.send_json(resp)
     
     async def run_command(self, command: CommandRequest):
         if command.action == "get_updates":
             await self.send_updates()
-        elif command.action == "upload_dataset_start":
-            self._dataset_chunk = []
-            self._dataset_filename = command.data.filename
-            self._dataset_size = command.data.size
-        elif command.action == "upload_dataset":
-            if hasattr(self, "_dataset_chunk") and isinstance(self._dataset_chunk, list):
-                self._dataset_chunk.append(command.data)
-        elif command.action == "upload_dataset_end":
-            if hasattr(self, "_dataset_chunk") and isinstance(self._dataset_chunk, list):
-                dataset_str = "".join(self._dataset_chunk)
-                dfilename = self._dataset_filename
-                dsize = self._dataset_size
-                del self._dataset_filename
-                del self._dataset_size
-                del self._dataset_chunk
-                if dataset_str.startswith("[") and dataset_str.endswith("]"):
-                    dataset = json.dumps(dataset_str)
-                else:
-                    dataset = pd.read_csv(io.StringIO(dataset_str))
-                self.set_dataset(dfilename, dsize, dataset)
+        elif command.action == "set_dataset":
+            datasetmetadata = DatasetMetadata(**command.data)
+            dataset = await get_dataset_contents(datasetmetadata)
+           
+            self.set_dataset(dataset, datasetmetadata)
         elif command.action == "set_features":
             features = command.data
             await self.set_features(*features)
@@ -228,18 +229,19 @@ class BaseMLTrainer:
         elif command.action == "save_model":
             await self.train()
             await self.save_model()
-        elif command.action == "download_model":
+        elif command.action == "upload_model":
             await self.send_model()
         else:
             await self.send_updates()
 
     async def websocket_loop(self):
         if self.websocket:
+            await self.update_state()
             while True:
                 try:
                     message = await self.websocket.receive_json()
-                    self.run_command(CommandRequest(**message))
-                    asyncio.sleep(0.01)
+                    await self.run_command(CommandRequest(**message))
+                    await asyncio.sleep(0.01)
                 except Exception as e:
                     print(f"Error: {e}")
                     break  # Break loop on error or disconnect

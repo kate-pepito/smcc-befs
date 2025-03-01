@@ -1,9 +1,31 @@
 import io
+import json
 
 import httpx
+import pandas as pd
+from typing import Union
+
+from pydantic import BaseModel
 
 from befs.config import settings
-from befs.route.responses import FileModelData, FileModelResponse, InvalidateSessionRequest, MLModelMetadata, SessionValidateRequest, SessionValidateResponse, TrainCreateSessionPost, TrainCreateSessionRequest, TrainCreateSessionResponse, TrainDestroySessionResponse, TrainSessionsGet, TrainingStatesResponse
+from befs.route.responses import CreateSessionTrainResponse, DatasetMetadata, FileModelData, FileModelResponse, InvalidateSessionRequest, MLModelMetadata, SessionValidateRequest, SessionValidateResponse, TrainCreateSessionPost, TrainCreateSessionRequest, TrainCreateSessionResponse, TrainDestroySessionResponse, TrainSessionsGet, TrainingStatesResponse, UpdateStateResponse
+
+class ApiUrls:
+    get_train_session = f"{settings.MAIN_BASE_URL}/api/get_train_session"
+    create_train_session_api = f"{settings.MAIN_BASE_URL}/api/create_train_session"
+    validate_train_session = f"{settings.MAIN_BASE_URL}/api/validate_session"
+    invalidate_train_session = f"{settings.MAIN_BASE_URL}/api/invalidate_session"
+    invalidate_train_session_token = f"{settings.MAIN_BASE_URL}/api/invalidate_session_token"
+    get_train_sessions = f"{settings.MAIN_BASE_URL}/api/get_all_sessions"
+    upload_model_to_database = f"{settings.MAIN_BASE_URL}/api/model_upload"
+    def update_training_state(self, token: str):
+        return f"{settings.MAIN_BASE_URL}/api/train_update?token={token}"
+    
+    def __str__(self):
+        attrs = {k: v for k, v in self.__class__.__dict__.items() if not callable(v) and not k.startswith("__")}
+        return "\n".join(f"{key}: {value}" for key, value in attrs.items())
+
+apiUrls = ApiUrls()
 
 
 async def http_get(url: str, params: dict = None):
@@ -12,28 +34,43 @@ async def http_get(url: str, params: dict = None):
         response = await client.get(url, params=params, headers=headers)
         return response.json()
 
-async def http_post(url: str, data: dict = None):
+async def http_get_raw(url: str, params: dict = None):
+    headers = {"Accept": "application/json"}
     async with httpx.AsyncClient(verify=False) as client:
-        response = await client.post(url, data=data)
+        response = await client.get(url, params=params, headers=headers)
+        return response.text
+
+async def http_post_json(url: str, data: BaseModel):
+    async with httpx.AsyncClient(verify=False) as client:
+        data = data.model_dump_json()
+        data = json.loads(data)
+        response = await client.post(url, json=data)
         return response.json()
 
 async def get_train_session(data: TrainCreateSessionRequest) -> TrainCreateSessionResponse:
-    return await http_get(f"{settings.MAIN_BASE_URL}/api/get_train_session", data.model_dump())
+    respDict = await http_get(apiUrls.get_train_session, data.model_dump())
+    return TrainCreateSessionResponse(**respDict)
 
-async def create_train_session_api(data: TrainCreateSessionPost):
-    return await http_post(f"{settings.MAIN_BASE_URL}/api/create_train_session", data.model_dump())
+async def create_train_session_api(data: TrainCreateSessionPost) -> CreateSessionTrainResponse:
+    respDict = await http_post_json(apiUrls.create_train_session_api, data)
+    return CreateSessionTrainResponse(**respDict)
+
 
 async def validate_train_session(data: SessionValidateRequest) -> SessionValidateResponse:
-    return await http_get(f"{settings.MAIN_BASE_URL}/api/validate_session", data.model_dump())
+    respDict = await http_get(apiUrls.validate_train_session, data.model_dump())
+    return SessionValidateResponse(**respDict)
 
 async def invalidate_train_session(data: SessionValidateRequest) -> TrainDestroySessionResponse:
-    return await http_post(f"{settings.MAIN_BASE_URL}/api/invalidate_session", data.model_dump())
+    respDict = await http_post_json(apiUrls.invalidate_train_session, data)
+    return TrainDestroySessionResponse(**respDict)
 
 async def invalidate_train_session_token(data: InvalidateSessionRequest) -> TrainDestroySessionResponse:
-    return await http_post(f"{settings.MAIN_BASE_URL}/api/invalidate_session_token", data.model_dump())
+    respDict = await http_post_json(apiUrls.invalidate_train_session_token, data)
+    return TrainDestroySessionResponse(**respDict)
 
 async def get_train_sessions() -> TrainSessionsGet:
-    return await http_get(f"{settings.MAIN_BASE_URL}/api/get_all_sessions")
+    respDict = await http_get(apiUrls.get_train_sessions)
+    return TrainSessionsGet(**respDict)  
 
 async def upload_model_to_database(onnx_model: bytes, metadata: MLModelMetadata) -> FileModelResponse:
     file_data = io.BytesIO(onnx_model)  # Wrap bytes in a file-like object
@@ -41,9 +78,18 @@ async def upload_model_to_database(onnx_model: bytes, metadata: MLModelMetadata)
     files = FileModelData(inference=(f"{metadata.filename}{metadata.file_extension}", file_data, "application/octet-stream"))
     
     async with httpx.AsyncClient() as client:
-        response = await client.post(f"{settings.MAIN_BASE_URL}/api/model_upload", data=metadata.model_dump(), files=files.model_dump())
-        return response.json()
-    return FileModelResponse(success=False)
+        metadata = metadata.model_dump_json()
+        metadata = json.loads(metadata)
+        response = await client.post(apiUrls.upload_model_to_database, data=metadata, files=files.model_dump())
+        respDict = response.json()
+        return FileModelResponse(**respDict)
+    return FileModelResponse(success=False, error="Failed to upload model")
 
-async def update_training_state(token: str, state: TrainingStatesResponse):
-    return await http_post(f"{settings.MAIN_BASE_URL}/api/train_update?token={token}", data=state.model_dump())
+async def update_training_state(token: str, state: TrainingStatesResponse) -> UpdateStateResponse:
+    respDict = await http_post_json(apiUrls.update_training_state(token), state)
+    print("RESP: ", respDict)
+    return UpdateStateResponse(**respDict)
+
+async def get_dataset_contents(metadata: DatasetMetadata) -> Union[list, pd.DataFrame]:
+    respDict = await http_get_raw(f"{settings.MAIN_BASE_URL}{metadata.filepath}")
+    return json.loads(respDict) if respDict.startswith("[") and respDict.endswith("]") else pd.read_csv(io.StringIO(respDict))
