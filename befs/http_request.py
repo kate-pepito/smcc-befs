@@ -8,7 +8,7 @@ from typing import Union
 from pydantic import BaseModel
 
 from befs.config import settings
-from befs.route.responses import CreateSessionTrainResponse, DatasetMetadata, FileModelData, FileModelResponse, InvalidateSessionRequest, MLModelMetadata, SessionValidateRequest, SessionValidateResponse, TrainCreateSessionPost, TrainCreateSessionRequest, TrainCreateSessionResponse, TrainDestroySessionResponse, TrainSessionsGet, TrainingStatesResponse, UpdateStateResponse
+from befs.route.responses import CreateSessionTrainResponse, DatasetMetadata, DatasetRemoveFile, FileModelData, FileModelResponse, InvalidateSessionRequest, MLModelMetadata, SessionValidateRequest, SessionValidateResponse, TrainCreateSessionPost, TrainCreateSessionRequest, TrainCreateSessionResponse, TrainDestroySessionResponse, TrainSessionsGet, TrainingStatesResponse, UpdateStateResponse
 
 class ApiUrls:
     get_train_session = f"{settings.MAIN_BASE_URL}/api/get_train_session"
@@ -18,6 +18,7 @@ class ApiUrls:
     invalidate_train_session_token = f"{settings.MAIN_BASE_URL}/api/invalidate_session_token"
     get_train_sessions = f"{settings.MAIN_BASE_URL}/api/get_all_sessions"
     upload_model_to_database = f"{settings.MAIN_BASE_URL}/api/model_upload"
+    remove_dataset= f"{settings.MAIN_BASE_URL}/api/remove_dataset"
     def update_training_state(self, token: str):
         return f"{settings.MAIN_BASE_URL}/api/train_update?token={token}"
     
@@ -87,9 +88,12 @@ async def upload_model_to_database(onnx_model: bytes, metadata: MLModelMetadata)
 
 async def update_training_state(token: str, state: TrainingStatesResponse) -> UpdateStateResponse:
     respDict = await http_post_json(apiUrls.update_training_state(token), state)
-    print("RESP: ", respDict)
     return UpdateStateResponse(**respDict)
 
 async def get_dataset_contents(metadata: DatasetMetadata) -> Union[list, pd.DataFrame]:
     respDict = await http_get_raw(f"{settings.MAIN_BASE_URL}{metadata.filepath}")
     return json.loads(respDict) if respDict.startswith("[") and respDict.endswith("]") else pd.read_csv(io.StringIO(respDict))
+
+async def remove_dataset_file(filename: str):
+    await http_post_json(apiUrls.remove_dataset, DatasetRemoveFile(dataset=filename))
+    

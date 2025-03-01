@@ -63,10 +63,13 @@ class FileModelResponse(BaseModel):
 
 class DatasetMetadata(BaseModel):
     filename: str
-    size: str
+    size: Union[str, int, float]
     filepath: str
     rows: Optional[int] = None
     columns: Optional[int] = None
+
+class DatasetRemoveFile(BaseModel):
+    dataset: str
 
 class TrainingStatesResponse(BaseModel):
     connection: Literal["connected", "disconnected"]

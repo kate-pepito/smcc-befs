@@ -8,7 +8,7 @@ from typing import Any, List, Literal, Union
 from fastapi.websockets import WebSocketState
 import pandas as pd
 from fastapi import WebSocket
-from befs.http_request import get_dataset_contents, invalidate_train_session_token, update_training_state, upload_model_to_database
+from befs.http_request import get_dataset_contents, invalidate_train_session_token, remove_dataset_file, update_training_state, upload_model_to_database
 from sklearn.pipeline import Pipeline
 from befs.route.responses import CommandRequest, DatasetMetadata, MLModelMetadata, SaveMLModelResponse, TrainingStatesResponse
 from sklearn.linear_model import LogisticRegression
@@ -73,30 +73,44 @@ class BaseMLTrainer:
             try:
                 state = json.loads(state)
             except Exception as e:
-                print("it had error", str(e))
+                print("send_updates:", str(e))
 
             await self.websocket.send_json(state)
 
     async def set_dataset(self, dataset: Union[list, pd.DataFrame], metadata: DatasetMetadata):
         try:
-            if type(dataset) is list:
+            if dataset is None or metadata is None:
+                self.dataset = None
+                self.state.dataset = None
+                self.state.column_names = []
+                self.features = []
+                self.target = []
+                self.state.features = []
+                self.state.target = []
+                raise Exception("[expected exception]: removed dataset")
+            else:
                 if isinstance(dataset, pd.DataFrame):
                     self.dataset = dataset
-                elif len(dataset) > 0 and isinstance(dataset[0], dict):
+                elif isinstance(dataset, (list, tuple)) and len(dataset) > 0 and isinstance(dataset[0], dict):
                     self.dataset = pd.DataFrame(dataset)
-                elif len(dataset) > 0:
+                elif isinstance(dataset, (list, tuple)) and len(dataset) > 0:
                     column_names = [f"column_{i+1}" for i in range(len(dataset[0]))] if dataset and isinstance(dataset[0], (list, tuple)) else ["value"]
                     dataset = {col: [row[i] for row in dataset] for i, col in enumerate(column_names)} if dataset and isinstance(dataset[0], (list, tuple)) else {"value": dataset}
                     self.dataset = pd.DataFrame(dataset)
                 else:
                     raise Exception("Invalid Dataset!")
-            else:
-                raise Exception("Invalid Dataset!")
-            self.state.column_names = list(self.dataset.columns)
-            self.state.dataset = DatasetMetadata(**metadata, columns=len(self.dataset.columns), rows=self.dataset.shape[0])
+                self.state.column_names = list(self.dataset.columns)
+                old_dataset = self.state.dataset
+                self.state.dataset = DatasetMetadata(**metadata.model_dump(exclude=['columns', 'rows']), columns=len(self.dataset.columns), rows=int(self.dataset.shape[0]))
+                if old_dataset is not None:
+                    filename = old_dataset.filename
+                    await remove_dataset_file(filename)
+                
         except Exception as e:
             self.state.status = "error"
-            self.state.error = str(e)
+            self.state.error = f"set_dataset: {str(e)}"
+            await self.update_state()
+            self.state.status = "idle"
         finally:
             await self.update_state()
 
@@ -148,7 +162,7 @@ class BaseMLTrainer:
                 self.state.progress = 50
                 await self.update_state()
 
-                self._train(X_train, y_train, X_test, y_test)
+                await self._train(X_train, y_train, X_test, y_test)
 
                 self.state.progress = 90
                 await self.update_state()
@@ -165,6 +179,8 @@ class BaseMLTrainer:
                 self.state.error = str(e)
                 self.state.progress = 0
                 await self.update_state()
+                self.state.status = "idle"
+                await self.update_state()
             finally:
                 return True
         return False
@@ -172,12 +188,12 @@ class BaseMLTrainer:
     async def save_model(self):
         if self.state.status == "completed":
             if hasattr(self, "_save_model") and callable(self._save_model):
-                serialized_model = self._save_model()
+                serialized_model = await self._save_model()
                 self.saved_model = serialized_model
                 filename = secrets.token_hex(12)
                 file_ext = ".onnx"
                 filepath = "/inference/"
-                self.state.model = MLModelMetadata(filename=filename, file_extension=file_ext, filepath=filepath, algo=self.algo, created_at=datetime.now(timezone.utc), size=len(serialized_model), accuracy=self.state.metrics["accuracy"])
+                self.state.model = MLModelMetadata(filename=filename, file_extension=file_ext, filepath=filepath, algo=self.algo, created_at=datetime.now(timezone.utc), size=len(serialized_model), accuracy=float(self.state.metrics["accuracy"]))
             else:
                 initial_type = [("input", FloatTensorType([None, len(self.features)]))]
                 onx = convert_sklearn(self.model, initial_types=initial_type)
@@ -207,10 +223,12 @@ class BaseMLTrainer:
         if command.action == "get_updates":
             await self.send_updates()
         elif command.action == "set_dataset":
-            datasetmetadata = DatasetMetadata(**command.data)
-            dataset = await get_dataset_contents(datasetmetadata)
-           
-            self.set_dataset(dataset, datasetmetadata)
+            if command.data is not None:
+                datasetmetadata = DatasetMetadata(**command.data)
+                dataset = await get_dataset_contents(datasetmetadata)
+                await self.set_dataset(dataset, datasetmetadata)
+            else:
+                await self.set_dataset(None, None)
         elif command.action == "set_features":
             features = command.data
             await self.set_features(*features)
@@ -268,15 +286,21 @@ class LogisticRegressionTrainer(BaseMLTrainer):
     
     async def _train(self, X_train, y_train, X_test, y_test):
         self.scaler_class = StandardScaler()
+        self.state.progress = 60
+        await self.update_state()
         self.model: Pipeline = Pipeline([("scaler", self.scaler_class), ("logreg", LogisticRegression(**self.hyperparameters))])
-        self.model.fit(X_train, y_train)
+        self.model.fit(X_train, y_train.ravel())
+        self.state.progress = 70
+        await self.update_state()
         self.state.metrics = {
-            "accuracy": self.model.score(X_test, y_test)
+            "accuracy": self.model.score(X_test, y_test.ravel())
         }
         self.state.scaler =  {
             "mean": self.scaler_class.mean_.tolist(),
             "scale": self.scaler_class.scale_.tolist()
         }
+        self.state.progress = 80
+        await self.update_state()
     
     async def _save_model(self) -> Any:
         xgb_onnx = convert_sklearn(
@@ -302,15 +326,21 @@ class XGBClassifierTrainer(BaseMLTrainer):
 
     async def _train(self, X_train, y_train, X_test, y_test):
         self.scaler_class = StandardScaler()
+        self.state.progress = 60
+        await self.update_state()
         self.model: Pipeline = Pipeline([("scaler", self.scaler_class), ("xgb", XGBClassifier(**self.hyperparameters))])
-        self.model.fit(X_train, y_train)
+        self.model.fit(X_train, y_train.ravel())
+        self.state.progress = 70
+        await self.update_state()
         self.state.metrics = {
-            "accuracy": self.model.score(X_test, y_test)
+            "accuracy": self.model.score(X_test, y_test.ravel())
         }
         self.state.scaler =  {
             "mean": self.scaler_class.mean_.tolist(),
             "scale": self.scaler_class.scale_.tolist()
         }
+        self.state.progress = 80
+        await self.update_state()
 
     async def _save_model(self) -> Any:
         update_registered_converter(
