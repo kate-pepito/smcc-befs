@@ -6,8 +6,10 @@ import secrets
 import time
 from typing import Any, List, Literal, Union
 from fastapi.websockets import WebSocketState
+import numpy as np
 import pandas as pd
 from fastapi import WebSocket
+from sklearn.metrics import auc, classification_report, confusion_matrix, f1_score, precision_recall_curve, precision_score, recall_score, accuracy_score, roc_curve
 from befs.http_request import get_dataset_contents, invalidate_train_session_token, remove_dataset_file, update_training_state, upload_model_to_database
 from sklearn.pipeline import Pipeline
 from befs.route.responses import CommandRequest, DatasetMetadata, MLModelMetadata, SaveMLModelResponse, TrainingStatesResponse
@@ -292,12 +294,30 @@ class LogisticRegressionTrainer(BaseMLTrainer):
         self.model.fit(X_train, y_train.ravel())
         self.state.progress = 70
         await self.update_state()
+        scaler_steps: StandardScaler = self.model.named_steps['scaler']
+        y_pred = self.model.predict(X_test)
+        y_proba = self.model.predict_proba(X_test)[:, 1] if hasattr(self.model, "predict_proba") else np.zeros_like(y_pred)  # For ROC & PR curves
         self.state.metrics = {
-            "accuracy": self.model.score(X_test, y_test.ravel())
+            "accuracy": float(accuracy_score(y_test.ravel(), y_pred)),
+            "precision": float(precision_score(y_test.ravel(), y_pred, average="weighted")),
+            "recall": float(recall_score(y_test.ravel(), y_pred, average="weighted")),
+            "f1_score": float(f1_score(y_test.ravel(), y_pred, average="weighted")),
+            "confusion_matrix": confusion_matrix(y_test.ravel(), y_pred).tolist(),
+            "classification_report": classification_report(y_test.ravel(), y_pred, output_dict=True)
         }
+        if len(np.unique(y_test)) == 2:  # Check if binary classification
+            fpr, tpr, _ = roc_curve(y_test.ravel(), y_proba)
+            self.state.metrics["roc_curve"] = {"fpr": fpr.tolist(), "tpr": tpr.tolist()}
+            self.state.metrics["roc_auc"] = float(auc(fpr, tpr))  # ROC AUC Score
+
+            # Precision-Recall Curve
+            precision, recall, _ = precision_recall_curve(y_test.ravel(), y_proba)
+            self.state.metrics["precision_recall_curve"] = {"precision": precision.tolist(), "recall": recall.tolist()}
+            self.state.metrics["pr_auc"] = float(auc(recall, precision))  # PR AUC Score
+
         self.state.scaler =  {
-            "mean": self.scaler_class.mean_.tolist(),
-            "scale": self.scaler_class.scale_.tolist()
+            "mean": scaler_steps.mean_.tolist(),
+            "scale": scaler_steps.scale_.tolist()
         }
         self.state.progress = 80
         await self.update_state()
@@ -332,12 +352,30 @@ class XGBClassifierTrainer(BaseMLTrainer):
         self.model.fit(X_train, y_train.ravel())
         self.state.progress = 70
         await self.update_state()
+        scaler_steps: StandardScaler = self.model.named_steps['scaler']
+        y_pred = self.model.predict(X_test)
+        y_proba = self.model.predict_proba(X_test)[:, 1] if hasattr(self.model, "predict_proba") else np.zeros_like(y_pred)  # For ROC & PR curves
         self.state.metrics = {
-            "accuracy": self.model.score(X_test, y_test.ravel())
+            "accuracy": float(accuracy_score(y_test.ravel(), y_pred)),
+            "precision": float(precision_score(y_test.ravel(), y_pred, average="weighted")),
+            "recall": float(recall_score(y_test.ravel(), y_pred, average="weighted")),
+            "f1_score": float(f1_score(y_test.ravel(), y_pred, average="weighted")),
+            "confusion_matrix": confusion_matrix(y_test.ravel(), y_pred).tolist(),
+            "classification_report": str(classification_report(y_test.ravel(), y_pred, output_dict=True))
         }
+        if len(np.unique(y_test)) == 2:  # Check if binary classification
+            fpr, tpr, _ = roc_curve(y_test.ravel(), y_proba)
+            self.state.metrics["roc_curve"] = {"fpr": fpr.tolist(), "tpr": tpr.tolist()}
+            self.state.metrics["roc_auc"] = float(auc(fpr, tpr))  # ROC AUC Score
+
+            # Precision-Recall Curve
+            precision, recall, _ = precision_recall_curve(y_test.ravel(), y_proba)
+            self.state.metrics["precision_recall_curve"] = {"precision": precision.tolist(), "recall": recall.tolist()}
+            self.state.metrics["pr_auc"] = float(auc(recall, precision))  # PR AUC Score
+
         self.state.scaler =  {
-            "mean": self.scaler_class.mean_.tolist(),
-            "scale": self.scaler_class.scale_.tolist()
+            "mean": scaler_steps.mean_.tolist(),
+            "scale": scaler_steps.scale_.tolist()
         }
         self.state.progress = 80
         await self.update_state()
