@@ -300,7 +300,6 @@ class BaseMLTrainer:
             while True:
                 try:
                     message = await self.websocket.receive_json()
-                    print("message", message)
                     await self.run_command(CommandRequest(**message))
                     await asyncio.sleep(0.01)
                 except Exception as e:
