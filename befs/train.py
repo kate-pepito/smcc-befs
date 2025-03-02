@@ -4,15 +4,15 @@ from datetime import datetime, timezone
 import json
 import secrets
 import time
-from typing import Any, List, Literal, Union
+from typing import Any, List, Literal, Optional, Union
 from fastapi.websockets import WebSocketState
 import numpy as np
 import pandas as pd
 from fastapi import WebSocket
 from sklearn.metrics import auc, classification_report, confusion_matrix, f1_score, precision_recall_curve, precision_score, recall_score, accuracy_score, roc_curve
-from befs.http_request import get_dataset_contents, invalidate_train_session_token, remove_dataset_file, update_training_state, upload_model_to_database
+from befs.http_request import end_session, get_dataset_contents, invalidate_train_session_token, remove_dataset_file, remove_model_file, update_training_state, upload_model
 from sklearn.pipeline import Pipeline
-from befs.route.responses import CommandRequest, DatasetMetadata, MLModelMetadata, SaveMLModelResponse, TrainingStatesResponse
+from befs.route.responses import CommandRequest, DatasetMetadata, MLModelMetadata, SaveMLModelResponse, TrainCreateSessionRequest, TrainingStatesResponse
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -79,7 +79,7 @@ class BaseMLTrainer:
 
             await self.websocket.send_json(state)
 
-    async def set_dataset(self, dataset: Union[list, pd.DataFrame], metadata: DatasetMetadata):
+    async def set_dataset(self, dataset: Optional[Union[list, pd.DataFrame]] = None, metadata: Optional[DatasetMetadata] = None):
         try:
             if dataset is None or metadata is None:
                 self.dataset = None
@@ -109,6 +109,7 @@ class BaseMLTrainer:
                     await remove_dataset_file(filename)
                 
         except Exception as e:
+            print("exception here?", e)
             self.state.status = "error"
             self.state.error = f"set_dataset: {str(e)}"
             await self.update_state()
@@ -127,8 +128,25 @@ class BaseMLTrainer:
         await self.update_state()
 
     async def set_hyperparameters(self, **hyperparameters):
+        hi = hyperparameters.items()
+        hyperparameter_items = []
+        for k,v in hi:
+            if type(v) is str:
+                try:
+                    if "." in v:
+                        cv = float(v)
+                    else:
+                        cv = int(v)
+                except ValueError:
+                    try:
+                        cv = json.loads(v)
+                    except json.JSONDecodeError:
+                        cv = v
+            else:
+                cv = v
+            hyperparameter_items.append((k,cv))
         my_hyperparameters = {
-            key: value for key, value in hyperparameters.items() if key in self.valid_hyperparameters and value is not None and value != ""
+            key: value for key, value in hyperparameter_items if key in self.valid_hyperparameters and value is not None and value != ""
         }
         self.hyperparameters = my_hyperparameters
         self.state.hyperparameters = self.hyperparameters
@@ -207,20 +225,33 @@ class BaseMLTrainer:
                 self.state.model = MLModelMetadata(filename=filename, file_extension=file_ext, filepath=filepath, algo=self.algo, created_at=datetime.now(timezone.utc), size=len(serialized_model), accuracy=self.state.metrics["accuracy"])
             await self.update_state()
             
-    async def send_model(self):
+    async def send_model(self, customfilepath: Optional[str] = None):
         if self.saved_model is not None and self.state.model is not None:
             try:
-                resp = await upload_model_to_database(self.saved_model, self.state.model)
+                state_model = MLModelMetadata(**self.state.model.model_dump(exclude=['filepath']), filepath=customfilepath) if customfilepath is not None else self.state.model
+                print("uploading model..", state_model)
+                resp = await upload_model(self.saved_model, state_model)
+                print("result:", resp)
                 if resp is not None and resp.success:
                     self.save_model_full_path = resp.filepath
                     resp = SaveMLModelResponse(state="save_end").model_dump()
                     await self.websocket.send_json(resp)
                 else:
                     raise Exception("Error")
-            except Exception:
+            except Exception as e:
+                print("ERROR ON SAVE:", str(e), e.__traceback__.tb_lineno)
                 resp = SaveMLModelResponse(state="save_failed").model_dump()
                 await self.websocket.send_json(resp)
     
+    async def remove_model(self, model_path: Optional[str] = None):
+        if self.saved_model is not None and self.state.model is not None:
+            try:
+                model_path = f"{model_path}{self.state.model.filename}{self.state.model.file_extension}" if model_path is not None else f"{self.state.model.filepath}{self.state.model.filename}{self.state.model.file_extension}"
+                await remove_model_file(model_path)
+            except Exception as e:
+                print("failed remove model:", str(e))
+                await self.update_state()
+
     async def run_command(self, command: CommandRequest):
         if command.action == "get_updates":
             await self.send_updates()
@@ -250,7 +281,16 @@ class BaseMLTrainer:
             await self.train()
             await self.save_model()
         elif command.action == "upload_model":
-            await self.send_model()
+            filepath = command.data["filepath"] if command.data is not None else None
+            await self.send_model(filepath)
+        elif command.action == "remove_model":
+            filepath = command.data["filepath"] if command.data is not None else None
+            await self.remove_model(filepath)
+        elif command.action == "end_session":
+            await self.set_dataset(None, None)
+            self.state.ended_at = datetime.now(timezone.utc)
+            await self.update_state()
+            await end_session(TrainCreateSessionRequest(username=self.username, session_key=self.session_id, algo=self.algo, train_token=self.token))
         else:
             await self.send_updates()
 
@@ -260,6 +300,7 @@ class BaseMLTrainer:
             while True:
                 try:
                     message = await self.websocket.receive_json()
+                    print("message", message)
                     await self.run_command(CommandRequest(**message))
                     await asyncio.sleep(0.01)
                 except Exception as e:
@@ -298,12 +339,12 @@ class LogisticRegressionTrainer(BaseMLTrainer):
         y_pred = self.model.predict(X_test)
         y_proba = self.model.predict_proba(X_test)[:, 1] if hasattr(self.model, "predict_proba") else np.zeros_like(y_pred)  # For ROC & PR curves
         self.state.metrics = {
+            "classification_report": classification_report(y_test.ravel(), y_pred, output_dict=True),
             "accuracy": float(accuracy_score(y_test.ravel(), y_pred)),
             "precision": float(precision_score(y_test.ravel(), y_pred, average="weighted")),
             "recall": float(recall_score(y_test.ravel(), y_pred, average="weighted")),
             "f1_score": float(f1_score(y_test.ravel(), y_pred, average="weighted")),
             "confusion_matrix": confusion_matrix(y_test.ravel(), y_pred).tolist(),
-            "classification_report": classification_report(y_test.ravel(), y_pred, output_dict=True)
         }
         if len(np.unique(y_test)) == 2:  # Check if binary classification
             fpr, tpr, _ = roc_curve(y_test.ravel(), y_proba)
@@ -328,7 +369,7 @@ class LogisticRegressionTrainer(BaseMLTrainer):
             "pipeline_logreg",
             [("input", FloatTensorType([None, len(self.features)]))],
             target_opset={"": 17, "ai.onnx.ml": 3},
-            options={id(self.model.steps[-1][1]): {"zipmap": True}}  # Enable probability scores
+            options={id(self.model): {"zipmap": "columns"}}  # Enable probability scores
         )
 
         return xgb_onnx.SerializeToString()
@@ -356,12 +397,12 @@ class XGBClassifierTrainer(BaseMLTrainer):
         y_pred = self.model.predict(X_test)
         y_proba = self.model.predict_proba(X_test)[:, 1] if hasattr(self.model, "predict_proba") else np.zeros_like(y_pred)  # For ROC & PR curves
         self.state.metrics = {
+            "classification_report": str(classification_report(y_test.ravel(), y_pred, output_dict=True)),
             "accuracy": float(accuracy_score(y_test.ravel(), y_pred)),
             "precision": float(precision_score(y_test.ravel(), y_pred, average="weighted")),
             "recall": float(recall_score(y_test.ravel(), y_pred, average="weighted")),
             "f1_score": float(f1_score(y_test.ravel(), y_pred, average="weighted")),
             "confusion_matrix": confusion_matrix(y_test.ravel(), y_pred).tolist(),
-            "classification_report": str(classification_report(y_test.ravel(), y_pred, output_dict=True))
         }
         if len(np.unique(y_test)) == 2:  # Check if binary classification
             fpr, tpr, _ = roc_curve(y_test.ravel(), y_proba)
@@ -393,6 +434,6 @@ class XGBClassifierTrainer(BaseMLTrainer):
             "pipeline_xgboost",
             [("input", FloatTensorType([None, len(self.features)]))],
             target_opset={"": 17, "ai.onnx.ml": 3},
-            options={id(self.model.steps[-1][1]): {"zipmap": True}}  # Enable probability scores
+            options={id(self.model): {"zipmap": "columns"}}  # Enable probability scores
         )
         return xgb_onnx.SerializeToString()

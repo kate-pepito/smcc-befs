@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, List, Literal, Optional, Tuple, Union
+from typing import Any, List, Literal, Optional, Union
 from pydantic import BaseModel
 
 class TrainCreateSessionRequest(BaseModel):
@@ -53,9 +53,6 @@ class MLModelMetadata(BaseModel):
             datetime: lambda dt: dt.isoformat()
         }
 
-class FileModelData(BaseModel):
-    inference: Tuple[str, str, Literal["application/octet-stream"]]
-
 class FileModelResponse(BaseModel):
     success: bool
     error: Optional[str] = None
@@ -70,6 +67,9 @@ class DatasetMetadata(BaseModel):
 
 class DatasetRemoveFile(BaseModel):
     dataset: str
+
+class ModelRemoveFile(BaseModel):
+    model: str
 
 class TrainingStatesResponse(BaseModel):
     connection: Literal["connected", "disconnected"]
