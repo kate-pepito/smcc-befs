@@ -3,6 +3,7 @@
 header("Content-Type: application/json");
 
 if ($_SERVER['REQUEST_METHOD'] === "GET"):
+    check_api_key($_GET['api_key'] ?? []);
     $username = $_GET['username'] ?? null;
     $session_key = $_GET['session_key'] ?? null;
     $token = $_GET['token'] ?? null;
@@ -11,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET"):
         die(json_encode(["detail" => "Bad Request"]));
     }
     $STATE_BASE_DIR = dirname(__DIR__) . DIRECTORY_SEPARATOR . "training_states";
-    $filepath = $STATE_BASE_DIR . DIRECTORY_SEPARATOR . $token;
+    $filepath = $STATE_BASE_DIR . DIRECTORY_SEPARATOR . "$token.json";
     if (is_file($filepath)) {
         $f = file_get_contents($filepath);
         $sess = json_decode($f, true);

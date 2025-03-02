@@ -17,6 +17,14 @@ function api_key()
     return $_ENV['BEFS_API_KEY'] ?? '';
 }
 
+function check_api_key($api_key)
+{
+    if ($api_key !== api_key()) {
+        http_response_code(401);
+        die(json_encode(['detail' => "Invalid Access"]));
+    }
+}
+
 function http_request_get(string $url)
 {
     $ch = curl_init();

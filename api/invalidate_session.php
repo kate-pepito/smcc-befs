@@ -3,15 +3,18 @@
 header("Content-Type: application/json");
 
 if ($_SERVER['REQUEST_METHOD'] === "POST"):
-    $username = $_POST['username'] ?? null;
-    $session_key = $_POST['session_key'] ?? null;
-    $token = $_POST['token'] ?? null;
+    check_api_key($_GET['api_key'] ?? []);
+    $rawData = file_get_contents("php://input");
+    $data = json_decode($rawData, true);
+    $username = $data['username'] ?? null;
+    $session_key = $data['session_key'] ?? null;
+    $token = $data['token'] ?? null;
     if ($username === null || $session_key === null || $token === null) {
         http_response_code(400);
         die(json_encode(["detail" => "Bad Request"]));
     }
     $STATE_BASE_DIR = dirname(__DIR__) . DIRECTORY_SEPARATOR . "training_states";
-    $filepath = $STATE_BASE_DIR . DIRECTORY_SEPARATOR . $token;
+    $filepath = $STATE_BASE_DIR . DIRECTORY_SEPARATOR . "$token.json";
     if (is_file($filepath)) {
         $f = file_get_contents($filepath);
         $sess = json_decode($f, true);

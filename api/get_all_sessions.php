@@ -3,6 +3,7 @@
 header("Content-Type: application/json");
 
 if ($_SERVER['REQUEST_METHOD'] === "GET"):
+    check_api_key($_GET['api_key'] ?? []);
     $STATE_BASE_DIR = dirname(__DIR__) . DIRECTORY_SEPARATOR . "training_states";
     $allSessions = array_diff(glob($STATE_BASE_DIR . DIRECTORY_SEPARATOR . "*.json"), ['.', '..']);
     $sessions = [];

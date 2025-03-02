@@ -666,6 +666,7 @@ INSERT INTO `year_level` (`id`, `description`, `user_id`, `date_entry`, `status`
 
 CREATE TABLE `inference_model` (
   `id` int(11) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
   `algo` varchar(64) DEFAULT NULL,
   `size` int(11) DEFAULT NULL,
   `filename` varchar(100) DEFAULT NULL,
@@ -673,6 +674,7 @@ CREATE TABLE `inference_model` (
   `filepath` varchar(200) NOT NULL,
   `fullpath` varchar(219) NOT NULL,
   `accuracy` float(7,6) NOT NULL,
+  `scaler` TEXT NOT NULL,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 

@@ -1236,6 +1236,11 @@ h6 {
   width: 100%;
 }
 
+.chosen-container#continueTrainingSessionKey_chosen {
+  width: fit-content !important;
+  max-width: 200px;
+}
+
 .chosen-container-multi {
   border: none; }
   .chosen-container-multi .chosen-choices {

@@ -5,36 +5,39 @@ header('Content-Type: application/json');
 if ($_SERVER['REQUEST_METHOD'] === 'POST'):
     check_api_key($_GET['api_key'] ?? []);
     try {
-        $algo = $_POST['algo'] ?? null;
-        $size = $_POST['size'] ?? null;
-        $filename = $_POST['filename'] ?? null;
-        $file_extension = $_POST['file_extension'] ?? null;
-        $filepath = $_POST['filepath'] ?? null;
-        $created_at = $_POST['created_at'] ?? null;
-        $accuracy = $_POST['accuracy'] ?? null;
-        $files = $_FILES['inference'] ?? null;
+        $files = $_FILES['dataset'] ?? null;
 
-        if ($algo === null || $size === null || $filename === null || $file_extension === null || $created_at === null || $files === null || $accuracy === null) {
+        if ($files === null) {
             throw new Exception("Missing required parameters");
         }
-        
-        // Retrieve metadata
-        $full_filename = "$filename$file_extension";
-        
+    
+        $filename = $files['name'] ?? null;
+        if ($filename === null) {
+            throw new Exception("Missing required filename");
+        }
+
+        $fext = pathinfo($filename, PATHINFO_EXTENSION);
+    
+        if ($fext !== "csv") {
+            throw new Exception("Must be a csv file");
+        }
+    
+        $filepath = "/training_datasets/";
+                
         // File handling
         $upload_dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . trim(str_replace("/", DIRECTORY_SEPARATOR, $filepath), DIRECTORY_SEPARATOR); // Ensure this directory exists
         if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+            $hasMade = mkdir($upload_dir, 0777, true);
         }
-        
+
         $file_tmp_path = $files['tmp_name'];
-        $file_dest_path = $upload_dir . DIRECTORY_SEPARATOR . $full_filename;
+        $file_dest_path = $upload_dir . DIRECTORY_SEPARATOR . $filename;
         
         if (move_uploaded_file($file_tmp_path, $file_dest_path)) {
-            $fullfilepath = "$filepath$full_filename";
+            $fullfilepath = "$filepath$filename";
             echo json_encode(["success" => true, "filepath" => $fullfilepath ]);
         } else {
-            throw new Exception("Failed to save model");
+            throw new Exception("Failed to upload dataset");
         }
     } catch (Exception $e) {
         echo json_encode(["success" => false, "error" => $e->getMessage()]);
