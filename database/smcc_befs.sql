@@ -661,6 +661,38 @@ INSERT INTO `year_level` (`id`, `description`, `user_id`, `date_entry`, `status`
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `revalida_grade`
+--
+
+CREATE TABLE `revalida_grade` (
+  `id` int(11) NOT NULL,
+  `school_year_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `revalida_grade` DECIMAL(5,2) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `board_exam_grade`
+--
+
+CREATE TABLE `board_exam_grade` (
+  `id` int(11) NOT NULL,
+  `school_year_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `board_exam_grade` DECIMAL(5,2) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `inference_model`
 --
 
@@ -792,6 +824,19 @@ ALTER TABLE `selected_model`
   ADD KEY `inference_model_id` (`inference_model_id`);
 
 --
+-- Indexes for table `revalida_grade`
+--
+ALTER TABLE `revalida_grade`
+  ADD PRIMARY KEY (`id`) USING BTREE;
+
+
+--
+-- Indexes for table `board_exam_grade`
+--
+ALTER TABLE `board_exam_grade`
+  ADD PRIMARY KEY (`id`) USING BTREE;
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -886,6 +931,19 @@ ALTER TABLE `selected_model`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `revalida_grade`
+--
+ALTER TABLE `revalida_grade`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `board_exam_grade`
+--
+ALTER TABLE `board_exam_grade`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+
+--
 -- Constraints for dumped tables
 --
 
@@ -897,6 +955,22 @@ ALTER TABLE `selected_model`
   ADD CONSTRAINT `unique_school_year_inference` UNIQUE (`school_year_id`, `inference_model_id`),
   ADD CONSTRAINT `selected_model_ibfk_1` FOREIGN KEY (`school_year_id`) REFERENCES `school_year` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `selected_model_ibfk_2` FOREIGN KEY (`inference_model_id`) REFERENCES `inference_model` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `revalida_grade`
+--
+ALTER TABLE `revalida_grade`
+  ADD CONSTRAINT `unique_school_year_student_revalida` UNIQUE (`school_year_id`, `student_id`),
+  ADD CONSTRAINT `revalida_grade_ibfk_1` FOREIGN KEY (`school_year_id`) REFERENCES `school_year` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `revalida_grade_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `board_exam_grade`
+--
+ALTER TABLE `board_exam_grade`
+  ADD CONSTRAINT `unique_school_year_student_board` UNIQUE (`school_year_id`, `student_id`),
+  ADD CONSTRAINT `board_exam_grade_ibfk_1` FOREIGN KEY (`school_year_id`) REFERENCES `school_year` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `board_exam_grade_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `faculty_subjects`

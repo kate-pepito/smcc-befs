@@ -60,7 +60,12 @@
     <a class="nav-link collapsed" data-bs-target="#forecasting-nav" data-bs-toggle="collapse" href="#">
       <i class="ri-file-copy-2-line"></i><span>Forecasting</span><i class="bi bi-chevron-down ms-auto"></i>
     </a>
-    <ul id="forecasting-nav" class="nav-content collapse <?= is_nav_active("/admin/admin_train", "/admin/admin_models") ? "show" : "" ?>" data-bs-parent="#sidebar-nav">
+    <ul id="forecasting-nav" class="nav-content collapse <?= is_nav_active("/admin/admin_datasets", "/admin/admin_train", "/admin/admin_models") ? "show" : "" ?>" data-bs-parent="#sidebar-nav">
+      <li>
+        <a href="admin_datasets" class="<?= is_nav_active("/admin/admin_datasets") ? "active" : "" ?>">
+          <i class="bi bi-circle"></i><span>Dataset</span>
+        </a>
+      </li>
       <li>
         <a href="admin_train" class="<?= is_nav_active("/admin/admin_train") ? "active" : "" ?>">
           <i class="bi bi-circle"></i><span>Train</span>

@@ -661,3 +661,62 @@ function debug_out(string $message)
 {
     file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . "debug.log", "[DEBUG]: $message" . PHP_EOL, FILE_APPEND);
 }
+
+function getStudentsWithTotalAvgScore($preboard_level, $school_year_id = null) {
+    $mysqli = conn();
+    $query = "
+        SELECT 
+            students.id AS id,
+            students.lrn_num AS lrn_num,
+            CONCAT(students.fname, ' ', students.lname) AS full_name,
+            students.gender AS gender,
+            school_year.description as school_year,
+            CASE 
+                WHEN MIN(students_subjects.status) = 'TAKEN' THEN 'TAKEN' 
+                ELSE 'NOT TAKEN' 
+            END AS s_status,
+            SUM(max_avg_score) AS total_avg_score
+        FROM `students` AS students
+        JOIN `students_subjects` AS students_subjects
+            ON students.id = students_subjects.students_id
+        JOIN `school_year` as school_year
+            ON school_year.id = students.school_year_id
+        LEFT JOIN (
+            SELECT 
+                student_score.stud_id,
+                MAX(student_score.average) AS max_avg_score
+            FROM `student_score`
+            JOIN `students_subjects`
+                ON students_subjects.students_id = student_score.stud_id
+                AND students_subjects.subjects_id = student_score.sub_id
+            JOIN `subjects`
+                ON students_subjects.subjects_id = subjects.id
+            WHERE 
+                student_score.level = ?
+                AND students_subjects.level = ?
+            GROUP BY student_score.stud_id, subjects.code, subjects.description
+        ) AS avg_scores
+        ON students.id = avg_scores.stud_id
+        WHERE students_subjects.level = ? ".
+        ($school_year_id !== null ? "AND school_year.id = ? " : "")
+        ."
+        GROUP BY students.id
+    ";
+
+    $stmt = $mysqli->prepare($query);
+    if ($school_year_id === null) {
+        $stmt->bind_param("sss", $preboard_level, $preboard_level, $preboard_level);
+    } else {
+        $stmt->bind_param("ssss", $preboard_level, $preboard_level, $preboard_level, $school_year_id);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $students = [];
+    while ($row = $result->fetch_assoc()) {
+        $students[] = $row;
+    }
+
+    $stmt->close();
+    return $students;
+}

@@ -108,7 +108,7 @@ while ($q_r=mysqli_fetch_assoc($q_y))
 }
 mysqli_free_result($q_y);
 
-admin_html_head("Dashboard", [
+admin_html_head("Trained Models", [
   [ "type" => "style", "href" => "https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.min.css" ],
   [ "type" => "style", "href" => "assets/vendor/remixicon/remixicon.css" ],
   [ "type" => "style", "href" => "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css", "integrity" => "sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=", "crossorigin" => "anonymous" ],
@@ -134,7 +134,7 @@ admin_html_head("Dashboard", [
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Dashboard</h1>
+      <h1>Trained Models</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item">Forecast Training</li>

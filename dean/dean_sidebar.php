@@ -28,6 +28,16 @@
     </a>
   </li>
   <li class="nav-item">
+    <a class="nav-link collapsed" href="dean_students_revalida">
+      <i class="bi bi-book-half"></i><span>Revalida</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="dean_students_board">
+      <i class="bi bi-bookmark-check"></i><span>Board Exam Result</span>
+    </a>
+  </li>
+  <li class="nav-item">
     <a class="nav-link collapsed" href="dean_forecasting">
         <i class="bi bi-bar-chart"></i> <!-- A bar chart icon represents forecasting and analytics -->
         <span>Forecasting</span>
