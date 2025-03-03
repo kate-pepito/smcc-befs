@@ -9,6 +9,7 @@ from fastapi.websockets import WebSocketState
 import numpy as np
 import pandas as pd
 from fastapi import WebSocket
+from sklearn.calibration import LabelEncoder
 from sklearn.metrics import auc, classification_report, confusion_matrix, f1_score, precision_recall_curve, precision_score, recall_score, accuracy_score, roc_curve
 from befs.http_request import end_session, get_dataset_contents, invalidate_train_session_token, remove_dataset_file, remove_model_file, update_training_state, upload_model
 from sklearn.pipeline import Pipeline
@@ -177,6 +178,11 @@ class BaseMLTrainer:
                 X = self.dataset[self.features].values  # Features
                 y = self.dataset[self.target].values   # Target
 
+                # Check if y contains string labels, then encode
+                if y.dtype == 'object' or y.dtype.name == 'category':
+                    label_encoder = LabelEncoder()
+                    y = label_encoder.fit_transform(y)
+
                 # Train-test split
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.test_size, random_state=self.random_state)
                 self.state.progress = 50
@@ -269,11 +275,11 @@ class BaseMLTrainer:
             target = command.data
             await self.set_target(*target)
         elif command.action == "set_test_size":
-            test_size = None if command.data == "" or command.data is None or not command.data else command.data
+            test_size = None if command.data == "" or command.data is None or not command.data else float(command.data)
             await self.set_test_size(test_size)
         elif command.action == "set_random_state":
-            random_state = None if not isinstance(command.data, dict) else command.data
-            await self.set_random_state(**random_state)
+            random_state = None if command.data == "" or command.data is None or not command.data else int(command.data)
+            await self.set_random_state(random_state)
         elif command.action == "set_hyperparameters":
             hyperparameters = None if command.data == "" or command.data is None or not command.data else command.data
             await self.set_hyperparameters(**hyperparameters)
@@ -330,11 +336,14 @@ class LogisticRegressionTrainer(BaseMLTrainer):
         self.scaler_class = StandardScaler()
         self.state.progress = 60
         await self.update_state()
-        self.model: Pipeline = Pipeline([("scaler", self.scaler_class), ("logreg", LogisticRegression(**self.hyperparameters))])
+        self.model: Pipeline = Pipeline([
+            #("scaler", self.scaler_class),
+            ("logreg", LogisticRegression(**self.hyperparameters))
+        ])
         self.model.fit(X_train, y_train.ravel())
         self.state.progress = 70
         await self.update_state()
-        scaler_steps: StandardScaler = self.model.named_steps['scaler']
+        # scaler_steps: StandardScaler = self.model.named_steps['scaler']
         y_pred = self.model.predict(X_test)
         y_proba = self.model.predict_proba(X_test)[:, 1] if hasattr(self.model, "predict_proba") else np.zeros_like(y_pred)  # For ROC & PR curves
         self.state.metrics = {
@@ -356,8 +365,8 @@ class LogisticRegressionTrainer(BaseMLTrainer):
             self.state.metrics["pr_auc"] = float(auc(recall, precision))  # PR AUC Score
 
         self.state.scaler =  {
-            "mean": scaler_steps.mean_.tolist(),
-            "scale": scaler_steps.scale_.tolist()
+            # "mean": scaler_steps.mean_.tolist(),
+            # "scale": scaler_steps.scale_.tolist()
         }
         self.state.progress = 80
         await self.update_state()
@@ -388,11 +397,14 @@ class XGBClassifierTrainer(BaseMLTrainer):
         self.scaler_class = StandardScaler()
         self.state.progress = 60
         await self.update_state()
-        self.model: Pipeline = Pipeline([("scaler", self.scaler_class), ("xgb", XGBClassifier(**self.hyperparameters))])
+        self.model: Pipeline = Pipeline([
+            # ("scaler", self.scaler_class),
+            ("xgb", XGBClassifier(**self.hyperparameters))
+        ])
         self.model.fit(X_train, y_train.ravel())
         self.state.progress = 70
         await self.update_state()
-        scaler_steps: StandardScaler = self.model.named_steps['scaler']
+        # scaler_steps: StandardScaler = self.model.named_steps['scaler']
         y_pred = self.model.predict(X_test)
         y_proba = self.model.predict_proba(X_test)[:, 1] if hasattr(self.model, "predict_proba") else np.zeros_like(y_pred)  # For ROC & PR curves
         self.state.metrics = {
@@ -414,8 +426,8 @@ class XGBClassifierTrainer(BaseMLTrainer):
             self.state.metrics["pr_auc"] = float(auc(recall, precision))  # PR AUC Score
 
         self.state.scaler =  {
-            "mean": scaler_steps.mean_.tolist(),
-            "scale": scaler_steps.scale_.tolist()
+            # "mean": scaler_steps.mean_.tolist(),
+            # "scale": scaler_steps.scale_.tolist()
         }
         self.state.progress = 80
         await self.update_state()

@@ -11,6 +11,10 @@ cors_origins = [
     "https://localhost",
     "http://127.0.0.1",
     "https://127.0.0.1",
+    "http://localhost:5000",
+    "https://localhost:5000",
+    "http://127.0.0.1:5000",
+    "https://127.0.0.1:5000",
 ]
 
 @asynccontextmanager
@@ -44,4 +48,4 @@ async def disable_favicon():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host=settings.FASTAPI_SERVER_HOST, port=int(settings.FASTAPI_SERVER_PORT), reload=True)
+    uvicorn.run("server:app", host=settings.FASTAPI_SERVER_HOST, port=int(settings.FASTAPI_SERVER_PORT), reload=False)
