@@ -200,10 +200,10 @@ admin_html_head("Student's Revalida", [
                       <td><?php echo $section; ?></td>
                       <td><?php echo $sy; ?></td>
                       <td class="d-flex justify-content-end gap-3">
-                        <span class="fw-bold"><?= $REVALIDA_GRADE ?? "" ?></span>
+                        <span class="fw-bold"><?= $REVALIDA_GRADE ?: "" ?></span>
                         <button type="button"
                           data-befs-student-id="<?= $stud_id ?>" data-befs-action="<?= !$REVALIDA_GRADE ? "insert" : "update" ?>"
-                          data-befs-value="<?= $REVALIDA_GRADE ?? "" ?>"
+                          data-befs-value="<?= $REVALIDA_GRADE ?: "" ?>"
                           title="<?= !$REVALIDA_GRADE ? "Add Revalida Grade" : "Edit Revalida Grade" ?>"
                           class="btn btn-success btn-sm befs-action" 
                           <?php if (!$REVALIDA_GRADE): ?>
@@ -213,7 +213,7 @@ admin_html_head("Student's Revalida", [
                             >
                             <i class="bi bi-pencil"></i>
                           <?php endif; ?>
-                        </butt>
+                        </button>
                       </td>
                     </tr>
                   <?php } ?>

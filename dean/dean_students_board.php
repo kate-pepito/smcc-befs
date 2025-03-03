@@ -173,8 +173,6 @@ admin_html_head("Student's Revalida", [
 
                   $sql .= " ORDER BY students.lname ASC"; // Order by last name
 
-
-                  debug_out("SQL: " . $sql);
                   $query = conn()->query($sql) or die(mysqli_error(conn()->get_conn()));
                   $counter = 1;
 
@@ -189,7 +187,6 @@ admin_html_head("Student's Revalida", [
                       $sy = $row['sy'];
                       $BOARD_EXAM_GRADE = $row["board_exam_score"] ?? null;
                       $BOARD_EXAM_GRADE = $BOARD_EXAM_GRADE !== null ? "$BOARD_EXAM_GRADE %" : "";
-                      debug_out("BOARD EXAM: " . $BOARD_EXAM_GRADE)
                   ?>
                     <tr>
                       <td><?php echo $counter++; ?></td>
@@ -201,10 +198,10 @@ admin_html_head("Student's Revalida", [
                       <td><?php echo $section; ?></td>
                       <td><?php echo $sy; ?></td>
                       <td class="d-flex justify-content-end gap-3">
-                        <span class="fw-bold"><?= $BOARD_EXAM_GRADE ?? "" ?></span>
+                        <span class="fw-bold"><?= $BOARD_EXAM_GRADE ?: "" ?></span>
                         <button type="button"
                           data-befs-student-id="<?= $stud_id ?>" data-befs-action="<?= !$BOARD_EXAM_GRADE ? "insert" : "update" ?>"
-                          data-befs-value="<?= $BOARD_EXAM_GRADE ?? "" ?>"
+                          data-befs-value="<?= $BOARD_EXAM_GRADE ?: "" ?>"
                           title="<?= !$BOARD_EXAM_GRADE ? "Add Board Exam Grade" : "Edit Board Exam Grade" ?>"
                           class="btn btn-success btn-sm befs-action" 
                           <?php if (!$BOARD_EXAM_GRADE): ?>
@@ -214,7 +211,7 @@ admin_html_head("Student's Revalida", [
                             >
                             <i class="bi bi-pencil"></i>
                           <?php endif; ?>
-                        </butt>
+                        </button>
                       </td>
                     </tr>
                   <?php } ?>

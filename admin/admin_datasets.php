@@ -54,7 +54,6 @@ admin_html_head("Datasets", [
       </nav>
     </div><!-- End Page Title -->
 
-    
     <div class="row">
       <!-- Column for Reviewers Count -->
       <div class="col-md">
