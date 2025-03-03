@@ -686,7 +686,7 @@ CREATE TABLE `inference_model` (
 
 CREATE TABLE `selected_model` (
   `id` int(11) NOT NULL,
-  `school_year_id` int(11) NOT NULL UNIQUE,
+  `school_year_id` int(11) NOT NULL,
   `inference_model_id` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -880,6 +880,12 @@ ALTER TABLE `year_level`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `selected_model`
+--
+ALTER TABLE `selected_model`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- Constraints for dumped tables
 --
 
@@ -887,6 +893,8 @@ ALTER TABLE `year_level`
 -- Constraints for table `selected_model`
 --
 ALTER TABLE `selected_model`
+  ADD CONSTRAINT `unique_school_year_id` UNIQUE (`school_year_id`),
+  ADD CONSTRAINT `unique_school_year_inference` UNIQUE (`school_year_id`, `inference_model_id`),
   ADD CONSTRAINT `selected_model_ibfk_1` FOREIGN KEY (`school_year_id`) REFERENCES `school_year` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `selected_model_ibfk_2` FOREIGN KEY (`inference_model_id`) REFERENCES `inference_model` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 

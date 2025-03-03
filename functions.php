@@ -25,6 +25,17 @@ function check_api_key($api_key)
     }
 }
 
+function enable_CORS() {
+    header("Access-Control-Allow-Origin: *"); // Allow all domains (change "*" to specific domains if needed)
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allowed HTTP methods
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept");
+    // Handle preflight OPTIONS request
+    if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+        http_response_code(204); // No content for preflight
+        exit();
+    }
+}
+
 function http_request_get(string $url)
 {
     $ch = curl_init();
@@ -420,6 +431,10 @@ function is_nav_active(...$uri_paths): bool
     return false;
 }
 
+function isAssociative(array $arr): bool {
+    return array_keys($arr) !== range(0, count($arr) - 1);
+}
+
 function user_id()
 {
     return $_SESSION['user_id'] ?? null;
@@ -640,4 +655,9 @@ function student_nav($main_nav_link = null, $main_nav_label = null)
     </nav>
     <!-- Navbar End -->
 <?php
+}
+
+function debug_out(string $message)
+{
+    file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . "debug.log", "[DEBUG]: $message" . PHP_EOL, FILE_APPEND);
 }

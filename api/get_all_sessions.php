@@ -1,5 +1,6 @@
 <?php
 
+enable_CORS();
 header("Content-Type: application/json");
 
 if ($_SERVER['REQUEST_METHOD'] === "GET"):
