@@ -15,22 +15,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'):
     $created_at = $data['created_at'] ?? null;
     $accuracy = $data['accuracy'] ?? null;
     $name = $data['name'] ?? null;
-    $scaler = $data['scaler'] ?? null;
+    // $scaler = $data['scaler'] ?? null;
     $fullpath = $data['fullpath'] ?? null;
     
     try {
-        if ($algo === null || $size === null || $filename === null || $file_extension === null || $created_at === null || $name === null || $accuracy === null || $scaler === null || $fullpath === null) {
+        if ($algo === null || $size === null || $filename === null || $file_extension === null || $created_at === null || $name === null || $accuracy === null || /*$scaler === null ||*/ $fullpath === null) {
             throw new Exception("Missing required parameters");
         }
 
         $dt = new DateTime($created_at);
         $dt->setTimezone(new DateTimeZone("Asia/Manila"));
         $created_at_mysql = $dt->format("Y-m-d H:i:s");
-        $scalerJson = json_encode($scaler);
-        $sqlquery = "INSERT INTO inference_model (name, algo, size, filename, file_extension, filepath, fullpath, accuracy, scaler, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // $scalerJson = json_encode($scaler);
+        $sqlquery = "INSERT INTO inference_model (name, algo, size, filename, file_extension, filepath, fullpath, accuracy, created_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = conn()->prepare($sqlquery);
-        $stmt->bind_param("ssissssdss", $name, $algo, $size, $filename, $file_extension, $filepath, $fullpath, $accuracy, $scalerJson, $created_at_mysql);
+        $stmt->bind_param("ssissssds", $name, $algo, $size, $filename, $file_extension, $filepath, $fullpath, $accuracy, $created_at_mysql);
 
         $result = $stmt->execute();
         if ($result === false) {

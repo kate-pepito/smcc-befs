@@ -21,7 +21,7 @@
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     <?php 
                     // Assuming you have a field 'profile_image' in the users table
-                    $profile_image = !empty($row['profile_image']) ? $row['profile_image'] : '../assets/img/profile-img2.jpg'; 
+                    $profile_image = !empty($row['profile_image']) ? base_url() . "/" . $row['profile_image'] : base_url() . '/assets/img/profile-img2.jpg'; 
                     ?>
                     <img src="<?php echo $profile_image; ?>" alt="Profile" class="rounded-circle">
                     <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $lname; ?></span>

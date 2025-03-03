@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Initialize variables for image upload
     $image_path = $profile_image;
 
-    if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] == 0) {
+    if (isset($_FILES['profile_image']) && ($_FILES['profile_image'] ?: false) && $_FILES['profile_image']['error'] == 0) {
         $image_name = $_FILES['profile_image']['name'];
         $image_tmp_name = $_FILES['profile_image']['tmp_name'];
         $image_ext = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowed_extensions = ['jpg', 'jpeg', 'png'];
         if (in_array($image_ext, $allowed_extensions)) {
             $new_image_name = uniqid() . '.' . $image_ext;
-            $image_path = "../uploads/$new_image_name";
+            $image_path = dirname(__DIR__) . DIRECTORY_SEPARATOR . "uploads/$new_image_name";
             $image_path_url = "uploads/$new_image_name";
 
             if (!move_uploaded_file($image_tmp_name, $image_path)) {
@@ -48,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Update user profile in the database
-    $query_update = "UPDATE users SET fname = '$fname', lname = '$lname', profile_image = '$image_path_url' WHERE id = '" . user_id() . "'";
+    $query_update = "UPDATE users SET fname = '$fname', lname = '$lname'";
+    $query_update .= (($image_path_url ?? false) ? ", profile_image = '$image_path_url'" : "") . " WHERE id = '" . user_id() . "'";
     if (conn()->query($query_update)) {
         echo "<script>alert('Profile updated successfully!'); window.location='admin_profile';</script>";
     } else {

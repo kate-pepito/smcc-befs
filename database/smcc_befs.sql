@@ -624,13 +624,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `type`, `status`, `fname`, `lname`, `profile_image`, `date_created`, `logged_in`) VALUES
-(1, 'admin', 'admin', 'ADMIN', 'Active', 'EDP', 'Personnel', '../uploads/6777bf0a41cad.jpg', '2024-11-21 09:07:16', 'NO'),
-(2, 'JissrelAcabo', 'Acabo12', 'REVIEWER', 'Active', 'Jissrell', 'Acabo', '../uploads/67774a2ec09bd.jpg', '2024-12-03 02:32:48', 'YES'),
-(3, 'JunVillarmia', 'Jun123', 'DEAN', 'Active', 'Jun', 'Villarmia', '../uploads/67774a0e51219.png', '2024-12-15 06:16:25', 'YES'),
+(1, 'admin', 'admin', 'ADMIN', 'Active', 'EDP', 'Personnel', 'uploads/6777bf0a41cad.jpg', '2024-11-21 09:07:16', 'NO'),
+(2, 'JissrelAcabo', 'Acabo12', 'REVIEWER', 'Active', 'Jissrell', 'Acabo', 'uploads/67774a2ec09bd.jpg', '2024-12-03 02:32:48', 'YES'),
+(3, 'JunVillarmia', 'Jun123', 'DEAN', 'Active', 'Jun', 'Villarmia', 'uploads/67774a0e51219.png', '2024-12-15 06:16:25', 'YES'),
 (4, 'kk', 'kk', 'DEAN', 'Inactive', 'korek', 'a', NULL, '2024-12-15 06:28:41', 'NO'),
-(5, 'DaisaGupit', 'Daisa123', 'DEAN', 'Active', 'Daisa', 'Gupit', '../uploads/676fae3bab708.png', '2024-12-21 02:27:45', 'YES'),
+(5, 'DaisaGupit', 'Daisa123', 'DEAN', 'Active', 'Daisa', 'Gupit', 'uploads/676fae3bab708.png', '2024-12-21 02:27:45', 'YES'),
 (6, 'A', 'A', 'DEAN', 'Active', 'A', 'B', NULL, '2024-12-23 10:52:32', 'NO'),
-(7, 'MarlonT', 'Marlon', 'REVIEWER', 'Active', 'Marlon juhn', 'Timogan', '../uploads/676fb4df97218.jpg', '2024-12-24 01:49:04', 'YES'),
+(7, 'MarlonT', 'Marlon', 'REVIEWER', 'Active', 'Marlon juhn', 'Timogan', 'uploads/676fb4df97218.jpg', '2024-12-24 01:49:04', 'YES'),
 (8, 'ReginaldG', 'Reginald123', 'REVIEWER', 'Active', 'Reginald Ryan', 'Gosela', NULL, '2024-12-24 05:21:06', 'YES'),
 (9, 'IvanH', 'Ivan', 'REVIEWER', 'Active', 'Ivan Allen', 'Honrada', NULL, '2024-12-24 05:21:28', 'NO'),
 (10, 'JessieM', 'jessie', 'REVIEWER', 'Inactive', 'Jessie', 'Mahinay', NULL, '2024-12-25 05:06:21', 'NO'),
@@ -706,7 +706,6 @@ CREATE TABLE `inference_model` (
   `filepath` varchar(200) NOT NULL,
   `fullpath` varchar(219) NOT NULL,
   `accuracy` float(7,6) NOT NULL,
-  `scaler` TEXT NOT NULL,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 

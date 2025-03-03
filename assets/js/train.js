@@ -71,7 +71,7 @@ $(function () {
 
         const wsConn = new WebSocket(wsUrl);
         var wsIntervalSync = null, checkConnectedDisableButtonsInterval = null;
-        var savedTestModelPath = "", savedScaler = {}, savedModelMetadata = {};
+        var savedTestModelPath = "", /*savedScaler = {},*/ savedModelMetadata = {};
 
         // Function to send data
         function sendAction(action, data = undefined) {
@@ -518,7 +518,7 @@ $(function () {
                 });
 
                 savedTestModelPath = `${data.model?.filepath}testmodels/`;
-                savedScaler = data.scaler;
+                // savedScaler = data.scaler;
                 savedModelMetadata = data.model
             }
         }
@@ -528,7 +528,7 @@ $(function () {
             const d1 = $("#testPredictModal").find("input#feature1").val();
             const d2 = $("#testPredictModal").find("input#feature2").val();
             const d3 = $("#testPredictModal").find("input#feature3").val();
-            if (!savedTestModelPath || !savedScaler || !savedModelMetadata) {
+            if (!savedTestModelPath /*|| !savedScaler*/ || !savedModelMetadata) {
                 alert("No model created yet. Please train the model first.");
                 return;
             }
@@ -537,7 +537,7 @@ $(function () {
                 return;
             }
             // do inference here if model is available
-            if (savedTestModelPath && savedModelMetadata && savedScaler && !!d1 && !!d2 && !!d3) {
+            if (savedTestModelPath && savedModelMetadata && /* savedScaler &&*/ !!d1 && !!d2 && !!d3) {
                 $("#predictionOutput").empty().html("Predicting...");
                 setTimeout(async () => {
                     const testmodel = `${savedTestModelPath}${savedModelMetadata.filename}${savedModelMetadata.file_extension}`
@@ -547,7 +547,7 @@ $(function () {
                         $("#predictionOutput").empty().html("ERROR: " + error);
                         return;
                     }
-                    const data = await ml_inference_input_tensor_with_scaler('float32', [Number.parseFloat(d1), Number.parseFloat(d2), Number.parseFloat(d3)], savedScaler)
+                    const data = await ml_inference_input_tensor('float32', [Number.parseFloat(d1), Number.parseFloat(d2), Number.parseFloat(d3)])
                     const feeds = { [inputNames[0]]: data }
                     const result = await ml_inference_run(session, feeds, outputNames);
                     
@@ -587,11 +587,10 @@ $(function () {
             sendAction("upload_model");
             $(this).find("#yesSaveBtn").on("click", function (ev) {
                 ev.preventDefault();
-                console.log("Saving...")
                 const modelname = $("input#modelNameSaveInput").val();
-                const scaler = savedScaler
+                // const scaler = savedScaler
                 const modelmetadata = savedModelMetadata;
-                if (!scaler || !modelmetadata) {
+                if (/*!scaler ||*/ !modelmetadata) {
                     alert("No model created yet. Please train the model first.");
                     return;
                 }
@@ -600,7 +599,6 @@ $(function () {
                     $("input#modelNameSaveInput").focus();
                     return;
                 }
-                console.log("Saving 2...")
                 const api_key = window.sessionStorage.getItem("TRAIN_API_KEY");
                 const url = `${BASE_URL}/api/save_model?api_key=${api_key}`;
                 const fullpath = `${modelmetadata.filepath}${modelmetadata.filename}${modelmetadata.file_extension}`;
@@ -608,11 +606,8 @@ $(function () {
                     ...modelmetadata,
                     name: modelname,
                     fullpath,
-                    scaler,
+                    // scaler,
                 };
-                console.log(data);
-                console.log("JSONIFIED:");
-                console.log(JSON.stringify(data));
                 $.ajax({
                     url: url,
                     type: "POST",
@@ -620,7 +615,6 @@ $(function () {
                     data: JSON.stringify(data),
                     success: function({ success, detail }) {
                         alert(detail);
-                        console.log(detail);
                         if (success) {
                             sendAction("end_session");
                             $("button#model-save-close").trigger("click");
@@ -653,6 +647,34 @@ $(function () {
             sendAction("set_target", sel);
         });
 
+        $("input#trainingTestSize").on("change", function (ev) {
+            ev.preventDefault();
+            const testSize = $(this).val();
+            sendAction("set_test_size", Number.parseFloat(testSize));
+        });
+
+        $("input#trainingRandomState").on("change", function (ev) {
+            ev.preventDefault();
+            const random_state = $(this).val();
+            sendAction("set_random_state", Number.parseFloat(random_state));
+        });
+
+        $("input.befs-hyperparameters").on("change", function () {
+            const result = {};
+        
+            $("input.befs-hyperparameters").each(function () {
+                const name = $(this).attr("name");
+                const value = $(this).val();
+                
+                if (name && value !== "") {
+                    result[name] = value;
+                }
+            });
+        
+            sendAction("set_hyperparameters", result);
+        });
+        
+
         wsConn.addEventListener("message", function (event) {
             try {
                 const data = JSON.parse(event.data);
@@ -671,6 +693,7 @@ $(function () {
                         break;
                     case "error":
                         console.error("Training error:", data.error);
+                        alert("Training error: " + data.error);
                         break;
                     default:
                         console.log("OTHERS:", data);

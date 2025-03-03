@@ -101,8 +101,7 @@ admin_html_head("Student's Revalida", [
                             imodel.name AS model_name,
                             imodel.algo AS model_algo,
                             imodel.created_at AS model_created,
-                            imodel.fullpath AS model_path,
-                            imodel.scaler AS model_scaler
+                            imodel.fullpath AS model_path
                         FROM `selected_model` AS smodel
                         INNER JOIN `inference_model` AS imodel ON imodel.id = smodel.inference_model_id
                         WHERE smodel.school_year_id = '$school_year'
@@ -115,7 +114,6 @@ admin_html_head("Student's Revalida", [
                         $model_algo = $mrow["model_algo"];
                         $model_created = (new DateTime($mrow["model_created"]))->format("M j, Y");
                         $model_filepath = $mrow["model_path"];
-                        $model_scaler = $mrow["model_scaler"];
                     }
               ?>
               <div
@@ -151,7 +149,6 @@ admin_html_head("Student's Revalida", [
                         id="forecastRecommendationBtn"
                         title="Click to Forecast Recommendation to take board exam"
                         data-befs-model-path="<?= htmlspecialchars($model_filepath) ?>"
-                        data-befs-model-scaler="<?= htmlspecialchars($model_scaler) ?>"
                     >
                     <i class="bi bi-check2-circle"></i>
                     </button></th>
@@ -176,11 +173,11 @@ admin_html_head("Student's Revalida", [
                         MAX(rg.revalida_grade) AS revalida_score
                     FROM 
                         students
-                    INNER JOIN 
+                    LEFT JOIN 
                         course ON students.course_id = course.id
-                    INNER JOIN 
+                    LEFT JOIN 
                         section ON students.section_id = section.id
-                    INNER JOIN 
+                    LEFT JOIN 
                         school_year ON students.school_year_id = school_year.id
                     LEFT JOIN 
                         `revalida_grade` as rg

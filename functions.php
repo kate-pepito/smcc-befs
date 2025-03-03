@@ -663,7 +663,6 @@ function debug_out(string $message)
 }
 
 function getStudentsWithTotalAvgScore($preboard_level, $school_year_id = null) {
-    $mysqli = conn();
     $query = "
         SELECT
             st.id AS id,
@@ -677,7 +676,7 @@ function getStudentsWithTotalAvgScore($preboard_level, $school_year_id = null) {
             LEFT JOIN
                 `student_score` as ss
                 ON ss.stud_id = st.id
-                AND ss.level = ?
+                AND ss.level = '$preboard_level'
             LEFT JOIN
             `school_year` as sy
             ON sy.id = st.school_year_id
@@ -690,32 +689,23 @@ function getStudentsWithTotalAvgScore($preboard_level, $school_year_id = null) {
                         ELSE 'NOT TAKEN' 
                     END AS s_status
                 FROM `students_subjects` as sss
-                WHERE sss.level = ?
+                WHERE sss.level = '$preboard_level'
                 GROUP BY
                 sss.students_id
                 ) as sssq
                 ON sssq.stid = st.id
             WHERE 
-            ss.level = ? ".
-            (!$school_year_id ? "" : " AND sy.id = ? ")
-            ."GROUP BY
+                ss.level = '$preboard_level' ".
+            ($school_year_id !== null ? "AND sy.id = '$school_year_id' " : "")."
+            GROUP BY
                 st.id
     ";
-
-    $stmt = $mysqli->prepare($query);
-    if (!$school_year_id) {
-        $stmt->bind_param("ssss", $preboard_level, $preboard_level, $preboard_level, $school_year_id);
-    } else {
-        $stmt->bind_param("ssss", $preboard_level, $preboard_level, $preboard_level, $school_year_id);
+    $qry = conn()->query($query);
+    
+    $students = [];
+    while ($row = $qry->fetch_assoc()) {
+        $students[] = $row;
     }
-    if ($stmt->execute()) {
-        $result = $stmt->get_result();
-
-        $students = [];
-        while ($row = $result->fetch_assoc()) {
-            $students[] = $row;
-        }
-    }
-    $stmt->close();
+    $qry->free();
     return $students;
 }

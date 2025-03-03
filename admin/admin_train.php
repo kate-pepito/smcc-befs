@@ -326,7 +326,7 @@ admin_html_head("Forecast Training", [
                                         ?>
                                         <div class="col-md">
                                             <div class="form-floating" style="min-width: 150px;">                                                
-                                                <input type="text" class="form-control" name="<?= $vhk ?>"  <?= isset($state["hyperparameters"]) ? "value=\"".($state["hyperparameters"][$vhk] ?? ""). "\"" : "value=\"\"" ?> id="trainingHyperparameters_<?= $vhk ?>" placeholder="<?= $vhk ?>" />
+                                                <input type="text" class="form-control befs-hyperparameters" name="<?= $vhk ?>"  <?= isset($state["hyperparameters"]) ? "value=\"".($state["hyperparameters"][$vhk] ?? ""). "\"" : "value=\"\"" ?> id="trainingHyperparameters_<?= $vhk ?>" placeholder="<?= $vhk ?>" />
                                                 <label for="trainingHyperparameters_<?= $vhk ?>" class="text-secondary"><?= $vhk ?></label>
                                             </div>
                                         </div>

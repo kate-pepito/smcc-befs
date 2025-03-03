@@ -16,7 +16,7 @@ $(function () {
         $("button#forecastRecommendationBtn").on("click", function(ev) {
                 ev.preventDefault();
                 const model_path = $(this).attr("data-befs-model-path");
-                const scaler = JSON.parse($(this).attr("data-befs-model-scaler"));
+                // const scaler = JSON.parse($(this).attr("data-befs-model-scaler"));
                 const $elem = $(".befs-forecast[data-befs-forecast-available=true]");
                 const countElem = $elem.length;
                 $elem.each(function(i) {
@@ -28,14 +28,14 @@ $(function () {
                         data = JSON.parse(data);
                         const stud_id = data.id;
                         const sy_id = data.sy_id;
-                        console.log(stud_id, "and", sy_id, "from", data);
                         const preboard1 = data.preboard1;
                         const preboard2 = data.preboard2;
                         const revalida = data.revalida;
                         const $thisElem = $(this);
                         $thisElem.html("Loading ... Please wait.");
+                        console.log("loading model:", model_path);
 
-                        ml_inference_input_tensor_with_scaler("float32", [preboard1, preboard2, revalida], scaler)
+                        ml_inference_input_tensor("float32", [preboard1, preboard2, revalida])
                                 .then(async (feed_data) => {
                                         const result = await model_inference(model_path, feed_data);
                                         const rs = [];
@@ -54,7 +54,7 @@ $(function () {
                                                 }
                                                 rs.push(`Chance of <span class="fw-bold">${cls}</span> is <span class="fw-bold">${Math.floor(Number.parseFloat(result[rk]) * 10000) / 100}%</spa>`)
                                         });
-                                        const inference_result = /*html*/`<p class="${rs[0].toLowerCase() !== "not passing" ? "text-danger" : "text-success"}">${rs[0]}</p><p style="font-size: 10px; font-weight: normal;">${rs[1]}</p><p style="font-size: 10px; font-weight: normal;">${rs[2]}</p>
+                                        const inference_result = /*html*/`<p class="${rs[0].toLowerCase() !== "not passing" ? "text-success" : "text-danger"}">${rs[0]}</p><p style="font-size: 10px; font-weight: normal;">${rs[1]}</p><p style="font-size: 10px; font-weight: normal;">${rs[2]}</p>
                                         `;
                                         console.log("s", stud_id, "y", sy_id,"i", inference_result);
                                         $.post(window.location.href, {
