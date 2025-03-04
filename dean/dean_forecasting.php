@@ -188,6 +188,7 @@ admin_html_head("Student's Revalida", [
                         AND students.course_id = '$dean_course'
                   ";
 
+
                   if (empty($_GET['school_year']) && $current_school_year) {
                     $school_year_id = $current_school_year;
                     $sql .= " AND students.school_year_id = '$school_year_id'";
@@ -212,8 +213,8 @@ admin_html_head("Student's Revalida", [
                       $course = $row['course'];
                       $section = $row['section'];
                       $sy = $row['sy'];
-                      $REVALIDA_GRADE = $row["revalida_score"] ?? null;
-                      $REVALIDA_GRADE = $REVALIDA_GRADE !== null ? "$REVALIDA_GRADE %" : "";
+                      $REVALIDA_GRADE = $row["revalida_score"] ?: null;
+                      $REVALIDA_GRADE = $REVALIDA_GRADE !== null ? "$REVALIDA_GRADE %" : null;
                       $PREBOARD1 = array_filter($preboard1, fn($pb1) => strval($pb1["lrn_num"]) === strval($lrn_num));
                       $PREBOARD1 = end($PREBOARD1);
                       $PREBOARD2 = array_filter($preboard2, fn($pb2) => strval($pb2["lrn_num"]) === strval($lrn_num));
