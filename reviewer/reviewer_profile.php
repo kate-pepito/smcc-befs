@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowed_extensions = ['jpg', 'jpeg', 'png'];
         if (in_array($image_ext, $allowed_extensions)) {
             $new_image_name = uniqid() . '.' . $image_ext;
-            $image_path = "../uploads/$new_image_name";
+            $image_path = dirname(__DIR__) . DIRECTORY_SEPARATOR . "uploads/$new_image_name";
             $image_path_url = "uploads/$new_image_name";
 
             if (!move_uploaded_file($image_tmp_name, $image_path)) {

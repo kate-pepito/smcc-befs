@@ -3,7 +3,6 @@
 if (isset($_POST['update_profile'])) {
     $about = conn()->sanitize($_POST['about']);
     $address = conn()->sanitize($_POST['address']);
-    $image_path = '';
 
     // Handle profile image upload
     if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] == UPLOAD_ERR_OK) {
@@ -14,6 +13,7 @@ if (isset($_POST['update_profile'])) {
         $allowed_extensions = ['jpg', 'jpeg', 'png'];
         if (in_array($image_ext, $allowed_extensions)) {
             $new_image_name = uniqid() . '.' . $image_ext;
+            $image_upload = dirname(__DIR__) . DIRECTORY_SEPARATOR . $new_image_name;
             $image_upload_path = "uploads/$new_image_name";
 
             // Ensure the uploads directory exists and is writable
@@ -21,13 +21,13 @@ if (isset($_POST['update_profile'])) {
                 mkdir('uploads', 0777, true);
             }
 
-            if (move_uploaded_file($image_tmp_name, $image_upload_path)) {
-                $image_path = $image_upload_path;
-            } else {
+            if (!move_uploaded_file($image_tmp_name, $image_upload)) {
                 echo "<script>alert('Failed to move uploaded file.');</script>";
+                exit;
             }
         } else {
             echo "<script>alert('Invalid image format. Only JPG, JPEG, and PNG allowed.');</script>";
+            exit;
         }
     }
 
