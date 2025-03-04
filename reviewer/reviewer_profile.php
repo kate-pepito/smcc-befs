@@ -48,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Update user profile in the database
-    $query_update = "UPDATE users SET fname = '$fname', lname = '$lname', profile_image = '$image_path_url' WHERE id = '" . user_id() . "'";
+    $query_update = "UPDATE users SET fname = '$fname', lname = '$lname' ";
+    $query_update .= (($image_path_url ?? false) ? ", profile_image = '$image_path_url' " : "") . " WHERE id = '" . user_id() . "'";
     if (conn()->query($query_update)) {
         echo "<script>alert('Profile updated successfully!'); window.location='reviewer_profile';</script>";
     } else {

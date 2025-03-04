@@ -43,7 +43,7 @@ if ($row = mysqli_fetch_array($query)) {
     $profile_image = base_url() . "/" . $row['profile_image'];
 
     // Set a default profile image if none is provided
-    if (empty($profile_image)) {
+    if (empty($row['profile_image'])) {
         $profile_image = base_url() . "/assets/img/profile-img2.jpg";
     }
 } else {

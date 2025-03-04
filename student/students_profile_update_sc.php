@@ -34,9 +34,8 @@ if (isset($_POST['update_profile'])) {
     // Update the database
     $query = "UPDATE students SET 
                   about = '$about', 
-                  complete_address = '$address', 
-                  profile_image = '$image_path' 
-              WHERE id = '" . user_id() . "'";
+                  complete_address = '$address', ";
+    $query .= (($image_path ?: false) ? " profile_image = '$image_path' " : "") . " WHERE id = '" . user_id() . "'";
 
     if (conn()->query($query)) {
         echo "<script>alert('Profile Successfully Updated!');
