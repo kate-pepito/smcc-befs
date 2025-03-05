@@ -187,8 +187,13 @@ class DB {
             throw new mysqli_sql_exception("[Connection failed] " . $c1->connect_error);
         } else {
             $dbname = $this->mysql_dbname;
-            if (!$c1->query("USE $dbname")) {
+            try {
+                if (!$c1->query("USE $dbname")) {
+                    $c1->query("CREATE DATABASE $dbname");
+                }
+            } catch (mysqli_sql_exception $e) {
                 $c1->query("CREATE DATABASE $dbname");
+                $c1->query("USE $dbname");
             }
             $c1->close();
         }

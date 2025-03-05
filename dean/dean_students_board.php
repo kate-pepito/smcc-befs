@@ -308,6 +308,14 @@ admin_html_head("Student's Revalida", [
               inputLabel: "Enter board exam grade (%):",
               inputValue: prev_value, 
               showLoaderOnConfirm: true,
+              inputAttributes: {
+                step: "any" // Allows any decimal value
+              },
+              inputValidator: (value) => {
+                if (!value) {
+                  return "Please enter a number!";
+                }
+              },
               allowOutsideClick: () => !Swal.isLoading(),
               preConfirm: async (board_exam_grade) => {
                   if (!board_exam_grade) {

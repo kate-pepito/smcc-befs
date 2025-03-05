@@ -309,6 +309,14 @@ admin_html_head("Student's Revalida", [
               inputLabel: "Enter revalida grade (%):",
               inputValue: prev_value, 
               showLoaderOnConfirm: true,
+              inputAttributes: {
+                step: "any" // Allows any decimal value
+              },
+              inputValidator: (value) => {
+                if (!value) {
+                  return "Please enter a number!";
+                }
+              },
               allowOutsideClick: () => !Swal.isLoading(),
               preConfirm: async (revalida_score) => {
                   if (!revalida_score) {

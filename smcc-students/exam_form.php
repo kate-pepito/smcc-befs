@@ -26,7 +26,8 @@ if ($row = mysqli_fetch_array($query)) {
 
 student_html_head('Home', [
     [ "type" => "style", "href" => "smcc-students/css/style.css" ],
-    [ "type" => "custom", function() use ($sub_id, $timer) {
+    [ "type" => "style", "href" => "smcc-students/lib/owlcarousel/assets/owl.carousel.min.css" ],
+    [ "type" => "custom", "content" => function() use ($sub_id, $timer) {
         ?>
             <script>
                 document.addEventListener('contextmenu', function(e) {
@@ -149,13 +150,10 @@ student_html_head('Home', [
             if (conn()->query($query)) {
                 echo "<script type='text/javascript'>alert('Exam Successfully Submited!');
                     document.location='exam_subject_list'</script>";
-                conn()->close();
             }
         } else {
             echo "Error: " . $query . "<br>" . mysqli_error(conn()->get_conn());
-            conn()->close();
         }
-        conn()->close();
         ?>
     <?php endif; ?>
     <!-- Testimonial End -->
@@ -168,6 +166,7 @@ student_html_head('Home', [
     <!-- Footer End -->
 
     <?php student_html_body_end([
+        [ "type" => "script", "src" => "/smcc-students/lib/owlcarousel/owl.carousel.min.js" ],
         [ "type" => "script", "src" => "/smcc-students/js/main.js" ],
     ]); ?>
 

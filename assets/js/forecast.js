@@ -33,7 +33,6 @@ $(function () {
                         const revalida = data.revalida;
                         const $thisElem = $(this);
                         $thisElem.html("Loading ... Please wait.");
-                        console.log("loading model:", model_path);
 
                         ml_inference_input_tensor("float32", [preboard1, preboard2, revalida])
                                 .then(async (feed_data) => {
@@ -56,7 +55,6 @@ $(function () {
                                         });
                                         const inference_result = /*html*/`<p class="${rs[0].toLowerCase() !== "not passing" ? "text-success" : "text-danger"}">${rs[0]}</p><p style="font-size: 10px; font-weight: normal;">${rs[1]}</p><p style="font-size: 10px; font-weight: normal;">${rs[2]}</p>
                                         `;
-                                        console.log("s", stud_id, "y", sy_id,"i", inference_result);
                                         $.post(window.location.href, {
                                                 stud_id, sy_id, inference_result
                                         }).done((status) => {
