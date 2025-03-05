@@ -25,6 +25,7 @@ if ($row = mysqli_fetch_array($query)) {
 }
 
 student_html_head('Home', [
+    [ "type" => "style", "href" => "smcc-students/lib/animate/animate.min.css"],
     [ "type" => "style", "href" => "smcc-students/css/style.css" ],
     [ "type" => "style", "href" => "smcc-students/lib/owlcarousel/assets/owl.carousel.min.css" ],
     [ "type" => "custom", "content" => function() use ($sub_id, $timer) {
