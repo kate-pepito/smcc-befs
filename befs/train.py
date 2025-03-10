@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from fastapi import WebSocket
 from sklearn.calibration import LabelEncoder
+from sklearn.impute import SimpleImputer
 from sklearn.metrics import auc, classification_report, confusion_matrix, f1_score, precision_recall_curve, precision_score, recall_score, accuracy_score, roc_curve
 from befs.http_request import end_session, get_dataset_contents, invalidate_train_session_token, remove_dataset_file, remove_model_file, update_training_state, upload_model
 from sklearn.pipeline import Pipeline
@@ -338,6 +339,7 @@ class LogisticRegressionTrainer(BaseMLTrainer):
         await self.update_state()
         self.model: Pipeline = Pipeline([
             #("scaler", self.scaler_class),
+            ('imputer', SimpleImputer(strategy='mean')),
             ("logreg", LogisticRegression(**self.hyperparameters))
         ])
         self.model.fit(X_train, y_train.ravel())
@@ -399,6 +401,7 @@ class XGBClassifierTrainer(BaseMLTrainer):
         await self.update_state()
         self.model: Pipeline = Pipeline([
             # ("scaler", self.scaler_class),
+            ('imputer', SimpleImputer(strategy='mean')),
             ("xgb", XGBClassifier(**self.hyperparameters))
         ])
         self.model.fit(X_train, y_train.ravel())
