@@ -424,33 +424,33 @@ $(function () {
             }
 
             // random state
-            const $randomStateInput = $("input#trainingRandomState");
-            if ($randomStateInput.length > 0) {
-                $randomStateInput.val(data.random_state);
-            }
+            // const $randomStateInput = $("input#trainingRandomState");
+            // if ($randomStateInput.length > 0) {
+            //     $randomStateInput.val(data.random_state);
+            // }
             
             // hyperparameters
-            const $hyperparametersRow = $("#trainingHyperparametersContainer");
-            if ($hyperparametersRow.length > 0) {
-                const $hpc = $hyperparametersRow.find("input");
-                if ($hpc.length === 0) {
-                    const $allValidHyperparameters = data.valid_hyperparameters?.map((vhk) =>
-                        $(/*html*/`
-                        <div class="col-md">
-                            <div class="form-floating" style="min-width: 150px;">                                                
-                                <input type="text" class="form-control" name="${vhk}" value="${data.hyperparameters && Object.keys(data.hyperparameters).includes(vhk) ? data.hyperparameters[vhk] : ''}" id="trainingHyperparameters_${vhk}" placeholder="${vhk}" />
-                                <label for="trainingHyperparameters_${vhk}" class="text-secondary">${vhk}</label>
-                            </div>
-                        </div>`)
-                    );
-                    $hyperparametersRow.append($allValidHyperparameters);
-                } else {
-                    $hpc.each(function () {
-                        const param_name = $(this).attr("placeholder");
-                        $(this).val(data.hyperparameters?.[param_name] || "");
-                    });
-                }
-            }
+            // const $hyperparametersRow = $("#trainingHyperparametersContainer");
+            // if ($hyperparametersRow.length > 0) {
+            //     const $hpc = $hyperparametersRow.find("input");
+            //     if ($hpc.length === 0) {
+            //         const $allValidHyperparameters = data.valid_hyperparameters?.map((vhk) =>
+            //             $(/*html*/`
+            //             <div class="col-md">
+            //                 <div class="form-floating" style="min-width: 150px;">                                                
+            //                     <input type="text" class="form-control" name="${vhk}" value="${data.hyperparameters && Object.keys(data.hyperparameters).includes(vhk) ? data.hyperparameters[vhk] : ''}" id="trainingHyperparameters_${vhk}" placeholder="${vhk}" />
+            //                     <label for="trainingHyperparameters_${vhk}" class="text-secondary">${vhk}</label>
+            //                 </div>
+            //             </div>`)
+            //         );
+            //         $hyperparametersRow.append($allValidHyperparameters);
+            //     } else {
+            //         $hpc.each(function () {
+            //             const param_name = $(this).attr("placeholder");
+            //             $(this).val(data.hyperparameters?.[param_name] || "");
+            //         });
+            //     }
+            // }
             if (data.status === "completed") {
                 const $containerMetric = $("#trainingContainer");
                 !!data.metrics && $containerMetric.empty();
@@ -513,8 +513,8 @@ $(function () {
                 });
                 const $testPredictModal = $("#testPredictModal");
                 $testPredictModal.find(".modal-body .mb-3").each(function (i) {
-                    $(this).find("label").text(data.features[i]);
-                    $(this).find("input").attr("placeholder", data.features[i]);
+                    $(this).find("label").text(i === 3 ? data.features[i] + " (optional)" : data.features[i]);
+                    $(this).find("input").attr("placeholder", i === 3 ? data.features[i] + " (optional)" : data.features[i]);
                 });
 
                 savedTestModelPath = `${data.model?.filepath}testmodels/`;
@@ -528,6 +528,7 @@ $(function () {
             const d1 = $("#testPredictModal").find("input#feature1").val();
             const d2 = $("#testPredictModal").find("input#feature2").val();
             const d3 = $("#testPredictModal").find("input#feature3").val();
+            const d4 = $("#testPredictModal").find("input#feature4").val();
             if (!savedTestModelPath /*|| !savedScaler*/ || !savedModelMetadata) {
                 alert("No model created yet. Please train the model first.");
                 return;
@@ -547,7 +548,7 @@ $(function () {
                         $("#predictionOutput").empty().html("ERROR: " + error);
                         return;
                     }
-                    const data = await ml_inference_input_tensor('float32', [Number.parseFloat(d1), Number.parseFloat(d2), Number.parseFloat(d3)])
+                    const data = await ml_inference_input_tensor('float32', [Number.parseFloat(d1), Number.parseFloat(d2), Number.parseFloat(d3), Number.parseFloat(d4)])
                     const feeds = { [inputNames[0]]: data }
                     const result = await ml_inference_run(session, feeds, outputNames);
                     
@@ -653,26 +654,26 @@ $(function () {
             sendAction("set_test_size", Number.parseFloat(testSize));
         });
 
-        $("input#trainingRandomState").on("change", function (ev) {
-            ev.preventDefault();
-            const random_state = $(this).val();
-            sendAction("set_random_state", Number.parseFloat(random_state));
-        });
+        // $("input#trainingRandomState").on("change", function (ev) {
+        //     ev.preventDefault();
+        //     const random_state = $(this).val();
+        //     sendAction("set_random_state", Number.parseFloat(random_state));
+        // });
 
-        $("input.befs-hyperparameters").on("change", function () {
-            const result = {};
+        // $("input.befs-hyperparameters").on("change", function () {
+        //     const result = {};
         
-            $("input.befs-hyperparameters").each(function () {
-                const name = $(this).attr("name");
-                const value = $(this).val();
+        //     $("input.befs-hyperparameters").each(function () {
+        //         const name = $(this).attr("name");
+        //         const value = $(this).val();
                 
-                if (name && value !== "") {
-                    result[name] = value;
-                }
-            });
+        //         if (name && value !== "") {
+        //             result[name] = value;
+        //         }
+        //     });
         
-            sendAction("set_hyperparameters", result);
-        });
+        //     sendAction("set_hyperparameters", result);
+        // });
         
 
         wsConn.addEventListener("message", function (event) {
@@ -763,7 +764,7 @@ $(function () {
             const $trainBtn = $("button#trainingTrainButton");
 
             if ($featureSelect.length > 0 && $targetSelect.length > 0 && $testSizeInput.length > 0 && 
-               !!$featureSelect.val() && $featureSelect.val().length === 3 && $targetSelect.val() &&
+               !!$featureSelect.val() && $featureSelect.val().length === 4 && $targetSelect.val() &&
                !!$testSizeInput.val()
             ) {
                 $trainBtn.prop("disabled", false);

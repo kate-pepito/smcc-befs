@@ -7,30 +7,51 @@ if ($_SERVER['REQUEST_METHOD'] === "POST"): // method POST
   $sy_id = $_POST['sy_id'] ?? null;
   $stud_id = $_POST['stud_id'] ?? null;
   $action = $_POST['action'] ?? null;
-  $board_exam_grade = $_POST['board_exam_grade'] ?? null;
+  $gwa = $_POST['gwa'] ?? null;
+  $gwa = $gwa == "" || $gwa === null ? null : $gwa;
 
-  if ($sy_id === null || $board_exam_grade === null || $stud_id === null || $action === null) {
+  if ($sy_id === null || $stud_id === null || $action === null) {
     http_response_code(400);
     die("Invalid Request");
   }
 
   switch ($action) {
     case 'insert':
-      $stmt = conn()->prepare("INSERT INTO board_exam_grade (school_year_id, student_id, board_exam_grade) VALUES (?, ?, ?)");
-      $stmt->bind_param("iid", $sy_id, $stud_id, $board_exam_grade);
-      if (!$stmt->execute()) {
-        http_response_code(500);
-        die("Failed to insert Board Exam grade.");
+      try {
+        $stmt = conn()->prepare("INSERT INTO gwa_percentage (school_year_id, student_id, gwa) VALUES (?, ?, ?)");
+        $stmt->bind_param("iid", $sy_id, $stud_id, $gwa);
+        if (!$stmt->execute()) {
+          if (strpos($stmt->error, "Duplicate entry") === 0) {
+            $stmt = conn()->prepare("UPDATE gwa_percentage SET gwa = ? WHERE school_year_id = ? AND student_id = ?");
+            $stmt->bind_param("dii", $gwa, $sy_id, $stud_id);
+            if (!$stmt->execute()) {
+              http_response_code(500);
+              die("Failed to update gwa percentage.");
+            }
+            die("gwa percentage updated successfully.");
+          } else {
+            http_response_code(500);
+            die("Failed to insert gwa percentage.");
+          }
+        }
+        die("GWA inserted successfully.");
+      } catch (PDOException $e) {
+        $stmt = conn()->prepare("UPDATE gwa_percentage SET gwa = ? WHERE school_year_id = ? AND student_id = ?");
+        $stmt->bind_param("dii", $gwa, $sy_id, $stud_id);
+        if (!$stmt->execute()) {
+          http_response_code(500);
+          die("Failed to update gwa percentage.");
+        }
+        die("gwa percentage updated successfully.");
       }
-      die("Board Exam result inserted successfully.");
     case 'update':
-      $stmt = conn()->prepare("UPDATE board_exam_grade SET board_exam_grade = ? WHERE school_year_id = ? AND student_id = ?");
-      $stmt->bind_param("dii", $board_exam_grade, $sy_id, $stud_id);
+      $stmt = conn()->prepare("UPDATE gwa_percentage SET gwa = ? WHERE school_year_id = ? AND student_id = ?");
+      $stmt->bind_param("dii", $gwa, $sy_id, $stud_id);
       if (!$stmt->execute()) {
         http_response_code(500);
-        die("Failed to update Board Exam grade.");
+        die("Failed to update gwa percentage.");
       }
-      die("Board Exam result updated successfully.");
+      die("gwa percentage updated successfully.");
     default:
       http_response_code(400);
       die("Invalid Request");
@@ -59,7 +80,7 @@ if ($row = mysqli_fetch_array($query)) {
     $type = ucfirst(strtolower($type));
 }
 
-admin_html_head("Student's Revalida", [
+admin_html_head("Student's GWA", [
   [ "type" => "style", "href" => "assets/vendor/simple-datatables/style.css" ],
   [ "type" => "style", "href" => "https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.min.css" ],
   [ "type" => "style", "href" => "assets/css/style.css" ],
@@ -77,13 +98,13 @@ admin_html_head("Student's Revalida", [
     <div class="pagetitle">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <h1>Board Exam Results</h1>
+          <h1>GWA Records</h1>
           <nav>
             <ol class="breadcrumb">
               <li class="breadcrumb-item">
                 <a href="dean_home_page">Dashboard</a>
               </li>
-              <li class="breadcrumb-item">Board Exam Results</li>
+              <li class="breadcrumb-item">GWA Records</li>
             </ol>
           </nav>
         </div>
@@ -126,7 +147,7 @@ admin_html_head("Student's Revalida", [
                     <th>Course</th>
                     <th>Section</th>
                     <th>School Year</th>
-                    <th>Board Exam Grade (%)</th>
+                    <th>GWA (%)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -142,7 +163,7 @@ admin_html_head("Student's Revalida", [
                         students.lname AS lname,
                         students.fname AS fname,
                         school_year.description AS sy,
-                        MAX(board_exam.board_exam_grade) AS board_exam_score
+                        MAX(gwa_p.gwa) AS gwa
                     FROM 
                         students
                     INNER JOIN 
@@ -152,9 +173,9 @@ admin_html_head("Student's Revalida", [
                     INNER JOIN 
                         school_year ON students.school_year_id = school_year.id
                     LEFT JOIN 
-                        `board_exam_grade` as board_exam
-                        ON board_exam.school_year_id = school_year.id
-                        AND board_exam.student_id = students.id
+                        `gwa_percentage` as gwa_p
+                        ON gwa_p.school_year_id = school_year.id
+                        AND gwa_p.student_id = students.id
                     WHERE 
                         students.status = 'active' 
                         AND students.course_id = '$dean_course'
@@ -173,6 +194,7 @@ admin_html_head("Student's Revalida", [
 
                   $sql .= " ORDER BY students.lname ASC"; // Order by last name
 
+
                   $query = conn()->query($sql) or die(mysqli_error(conn()->get_conn()));
                   $counter = 1;
 
@@ -185,8 +207,9 @@ admin_html_head("Student's Revalida", [
                       $course = $row['course'];
                       $section = $row['section'];
                       $sy = $row['sy'];
-                      $BOARD_EXAM_GRADE = $row["board_exam_score"] ?? null;
-                      $BOARD_EXAM_GRADE = $BOARD_EXAM_GRADE !== null ? "$BOARD_EXAM_GRADE %" : "";
+                      $GWA = $row["gwa"] ?? null;
+                      $GWA = $GWA !== null ? "$GWA %" : "";
+                      
                   ?>
                     <tr>
                       <td><?php echo $counter++; ?></td>
@@ -198,15 +221,15 @@ admin_html_head("Student's Revalida", [
                       <td><?php echo $section; ?></td>
                       <td><?php echo $sy; ?></td>
                       <td class="d-flex justify-content-end gap-3">
-                        <span class="fw-bold"><?= $BOARD_EXAM_GRADE ?: "" ?></span>
+                        <span class="fw-bold"><?= $GWA ?: "" ?></span>
                         <button type="button"
-                          data-befs-student-id="<?= $stud_id ?>" data-befs-action="<?= !$BOARD_EXAM_GRADE ? "insert" : "update" ?>"
-                          data-befs-value="<?= $BOARD_EXAM_GRADE ?: "" ?>"
-                          title="<?= !$BOARD_EXAM_GRADE ? "Add Board Exam Grade" : "Edit Board Exam Grade" ?>"
+                          data-befs-student-id="<?= $stud_id ?>" data-befs-action="<?= !$GWA ? "insert" : "update" ?>"
+                          data-befs-value="<?= $GWA ?: "" ?>"
+                          title="<?= !$GWA ? "Add GWA" : "Edit GWA" ?>"
                           class="btn btn-success btn-sm befs-action" 
-                          <?php if (!$BOARD_EXAM_GRADE): ?>
+                          <?php if (!$GWA): ?>
                             style="background-color: DodgerBlue; color: white;">
-                            <i class="bi bi-plus-circle"></i> Add Board Exam Grade
+                            <i class="bi bi-plus-circle"></i> Add GWA
                           <?php else: ?>
                             >
                             <i class="bi bi-pencil"></i>
@@ -257,27 +280,20 @@ admin_html_head("Student's Revalida", [
         switch (action) {
           case "insert":
             Swal.fire({
-              title: "Add Board Exam Grade",
+              title: "Add GWA",
               input: "number",
-              inputLabel: "Enter board exam grade (%):",
+              inputLabel: "Enter GWA (%):",
               inputAttributes: {
                 step: "any" // Allows any decimal value
               },
-              inputValidator: (value) => {
-                if (!value) {
-                  return "Please enter a number!";
-                }
-              },
+              inputValidator: (value) => {},
               showLoaderOnConfirm: true,
               allowOutsideClick: () => !Swal.isLoading(),
-              preConfirm: async (board_exam_grade) => {
-                  if (!board_exam_grade) {
-                      Swal.showValidationMessage(`Fill in required field.`);
-                      return;
-                  }
+              preConfirm: async (gwa_p) => {
                   const sy_id = $("select#school_year_filter").val();
                   return new Promise(async (resolve) => {
-                      $.post(window.location.href, {sy_id, stud_id, board_exam_grade, action: "insert"})
+                      const gwa = !gwa_p ? null : gwa_p;
+                      $.post(window.location.href, {sy_id, stud_id, gwa, action: "insert"})
                           .done(function (result) {
                               resolve([true, result]);
                           })
@@ -294,7 +310,7 @@ admin_html_head("Student's Revalida", [
                               window.location.reload()
                           })
                       } else {
-                          Swal.showValidationMessage("Failed to add board exam grade.");
+                          Swal.showValidationMessage("Failed to add GWA.");
                       }
                   });
               }
@@ -302,28 +318,21 @@ admin_html_head("Student's Revalida", [
             break;
           case "update":
             Swal.fire({
-              title: "Add Board Exam Grade",
+              title: "Add GWA",
               input: "number",
-              inputLabel: "Enter board exam grade (%):",
+              inputLabel: "Enter GWA (%):",
               inputValue: prev_value, 
               showLoaderOnConfirm: true,
               inputAttributes: {
                 step: "any" // Allows any decimal value
               },
-              inputValidator: (value) => {
-                if (!value) {
-                  return "Please enter a number!";
-                }
-              },
+              inputValidator: (value) => {},
               allowOutsideClick: () => !Swal.isLoading(),
-              preConfirm: async (board_exam_grade) => {
-                  if (!board_exam_grade) {
-                      Swal.showValidationMessage(`Fill in required field.`);
-                      return;
-                  }
+              preConfirm: async (gwa_p) => {
                   const sy_id = $("select#school_year_filter").val();
                   return new Promise(async (resolve) => {
-                      $.post(window.location.href, {sy_id, stud_id, board_exam_grade, action: "update"})
+                      const gwa = !gwa_p ? null : gwa_p;
+                      $.post(window.location.href, {sy_id, stud_id, gwa, action: "update"})
                           .done(function (result) {
                               resolve([true, result]);
                           })
@@ -340,7 +349,7 @@ admin_html_head("Student's Revalida", [
                               window.location.reload()
                           })
                       } else {
-                          Swal.showValidationMessage("Failed to update board exam grade.");
+                          Swal.showValidationMessage("Failed to update GWA.");
                       }
                   });
               }

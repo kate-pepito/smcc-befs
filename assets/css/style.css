@@ -1549,3 +1549,7 @@ h6 {
 .btn-group.befs-dropend .dropdown-menu .dropdown-item.active[disabled] {
   background-color: var(--bs-info-border-subtle);
 }
+
+button[type=button] {
+  cursor: pointer;
+}

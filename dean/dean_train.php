@@ -1,6 +1,6 @@
 <?php 
 
-authenticated_page("admin");
+authenticated_page("dean");
 
 
 $query=conn()->query("select * from users where id = '" . user_id() . "'")or die(mysqli_error(conn()->get_conn()));
@@ -38,10 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] === "POST"):
                     })
                         .then(response => response.json())
                         .then(({ session_token }) => {
-                            window.location.href = `<?= base_url() ?>/admin/admin_train?train_token=${session_token}`;
+                            window.location.href = `<?= base_url() ?>/dean/dean_train?train_token=${session_token}`;
                         })
                         .catch((error) => {
-                            window.location.href = `<?= base_url() ?>/admin/admin_train`;
+                            window.location.href = `<?= base_url() ?>/dean/dean_train`;
                             alert('Failed to create train session. ' + error.message);
                         })
                 }
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST"):
                     })
                         .then(response => response.json())
                         .then(({ success, detail }) => {
-                            window.location.href = `<?= base_url() ?>/admin/admin_train`;
+                            window.location.href = `<?= base_url() ?>/dean/dean_train`;
                             alert(detail);
                         })
                         .catch((error) => {
@@ -142,18 +142,11 @@ admin_html_head("Forecast Training", [
 ]); // html head
 ?>
 <body>
-  <!-- ======= Header ======= -->
-  <?php require_once get_admin_header(); ?>
-  <!-- End Header -->
-  <!-- ======= Sidebar ======= -->
-  <?php
-  $query=conn()->query("select * from school_year where status = 'Current Set' and user_id = '". user_id() . "'")or die(mysqli_error(conn()->get_conn()));
-  if($row=mysqli_fetch_array($query))
-  {
-    require_once get_admin_sidebar();
-  }
-  ?>
-  <!-- End Sidebar-->
+  
+  <!-- Header and Sidebar -->
+  <?php require_once get_dean_header(); ?>
+  <?php require_once get_dean_sidebar(); ?>
+
 
   <main id="main" class="main position-relative">
 
@@ -242,7 +235,7 @@ admin_html_head("Forecast Training", [
             ?>
                 <script>
                     alert("Invalid Session.");
-                    window.location.href = `<?= base_url() ?>/admin/admin_train`;
+                    window.location.href = `<?= base_url() ?>/dean/dean_train`;
                 </script>
                 </body>
                 </html>
@@ -256,7 +249,7 @@ admin_html_head("Forecast Training", [
                 ?>
                 <script>
                     alert("No Session State Found.");
-                    window.location.href = `<?= base_url() ?>/admin/admin_train`;
+                    window.location.href = `<?= base_url() ?>/dean/dean_train`;
                 </script>
                 </body>
                 </html>
@@ -269,7 +262,7 @@ admin_html_head("Forecast Training", [
         <input type="hidden" name="username" id="trainingSessionUsername" value="<?= $_SESSION['train_username'] ?>" />
         <input type="hidden" name="session_key" id="trainingSessionId" value="<?= $_SESSION['train_session_key'] ?>" />
         <input type="hidden" name="token" id="trainingToken" value="<?= $_GET['train_token'] ?>" />
-        <a href="<?= base_url() ?>/admin/admin_train" class="btn btn-outline-secondary" style="position: absolute; left: 28rem; top: 1.5em; z-index:100;"><i class="bi bi-arrow-left-short"></i> Back</a>
+        <a href="<?= base_url() ?>/dean/dean_train" class="btn btn-outline-secondary" style="position: absolute; left: 28rem; top: 1.5em; z-index:100;"><i class="bi bi-arrow-left-short"></i> Back</a>
         <div
             class="alert alert-warning pt-1 pb-1"
             role="alert"
@@ -412,11 +405,11 @@ admin_html_head("Forecast Training", [
                             <label for="feature3" class="form-label">Feature 3</label>
                             <input type="number" class="form-control" id="feature3" placeholder="Enter Feature 3">
                         </div>
+
                         <div class="mb-3">
                             <label for="feature4" class="form-label">Feature 4</label>
                             <input type="number" class="form-control" id="feature4" placeholder="Enter Feature 4">
                         </div>
-
                         <!-- Predict Button -->
                         <button type="button" class="btn btn-success w-100" id="predictBtn">Predict</button>
 

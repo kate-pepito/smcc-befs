@@ -289,8 +289,9 @@
    * Initiate Datatables
    */
   const datatables = select('.datatable', true)
+  window.myDataTables = [];
   datatables.forEach(datatable => {
-    new simpleDatatables.DataTable(datatable, {
+    window.myDataTables.push(new simpleDatatables.DataTable(datatable, {
       perPageSelect: [5, 10, 15, ["All", -1]],
       columns: [{
           select: 2,
@@ -306,7 +307,7 @@
           headerClass: "red"
         }
       ]
-    });
+    }));
   })
 
   /**

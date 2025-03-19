@@ -40,6 +40,15 @@ if ($row = mysqli_fetch_array($query)) {
 }
 
 
+$has_inference = false;
+$ks = array_keys($_SESSION);
+foreach ($ks as $ks_key) {
+  if (strpos($ks_key, "inference_") === 0) {
+    $has_inference = true;
+    break;
+  }
+}
+
 admin_html_head("Student's Revalida", [
   [ "type" => "style", "href" => "assets/vendor/simple-datatables/style.css" ],
   [ "type" => "style", "href" => "https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.min.css" ],
@@ -128,7 +137,8 @@ admin_html_head("Student's Revalida", [
                     <?php endif; ?>
                 </p>
               </div>
-               <!-- Table with stripped rows -->
+              
+              <!-- Table with stripped rows -->
               <table class="table datatable">
                 <thead>
                   <tr>
@@ -143,6 +153,7 @@ admin_html_head("Student's Revalida", [
                     <th>Preboard 1 (%)</th>
                     <th>Preboard 2 (%)</th>
                     <th>Revalida (%)</th>
+                    <th>GWA (%)</th>
                     <th>Passer? <button
                         type="button"
                         class="btn btn-success pl-2 pr-2 pt-1 pb-1 border border-success"
@@ -170,7 +181,8 @@ admin_html_head("Student's Revalida", [
                         students.lname AS lname,
                         students.fname AS fname,
                         school_year.description AS sy,
-                        MAX(rg.revalida_grade) AS revalida_score
+                        MAX(rg.revalida_grade) AS revalida_score,
+                        MAX(gwa_p.gwa) AS gwa
                     FROM 
                         students
                     LEFT JOIN 
@@ -183,6 +195,10 @@ admin_html_head("Student's Revalida", [
                         `revalida_grade` as rg
                         ON rg.school_year_id = school_year.id
                         AND rg.student_id = students.id
+                    LEFT JOIN 
+                        `gwa_percentage` as gwa_p
+                        ON gwa_p.school_year_id = school_year.id
+                        AND gwa_p.student_id = students.id
                     WHERE 
                         students.status = 'active' 
                         AND students.course_id = '$dean_course'
@@ -201,26 +217,34 @@ admin_html_head("Student's Revalida", [
                   $sql .= " GROUP BY students.id"; // Group by ID
 
                   $sql .= " ORDER BY students.lname ASC"; // Order by last name
-
                   $query = conn()->query($sql) or die(mysqli_error(conn()->get_conn()));
                   $counter = 1;
+                  $filter = $_GET['filter'] ?? "";
                   while ($row = mysqli_fetch_assoc($query)) {
                       $stud_id = $row['stud_id'];
                       $lrn_num = $row['lrn_num'];
-                      $lname = $row['lname'];
-                      $fname = $row['fname'];
-                      $gender = $row['gender'];
-                      $course = $row['course'];
-                      $section = $row['section'];
                       $sy = $row['sy'];
                       $REVALIDA_GRADE = $row["revalida_score"] ?: null;
                       $REVALIDA_GRADE = $REVALIDA_GRADE !== null ? "$REVALIDA_GRADE %" : null;
+                      $GWA = $row["gwa"] ?: null;
+                      $GWA = $GWA !== null ? "$GWA %" : null;
                       $PREBOARD1 = array_filter($preboard1, fn($pb1) => strval($pb1["lrn_num"]) === strval($lrn_num));
                       $PREBOARD1 = end($PREBOARD1);
                       $PREBOARD2 = array_filter($preboard2, fn($pb2) => strval($pb2["lrn_num"]) === strval($lrn_num));
                       $PREBOARD2 = end($PREBOARD2);
                       $is_valid = ($PREBOARD1["s_status"] ?: "") === "TAKEN" && ($PREBOARD2["s_status"] ?: "") === "TAKEN" && $REVALIDA_GRADE !== null;
                       $ikey = "inference_{$stud_id}_{$school_year}";
+                      if (!(($is_valid && $filter === "Available" && !$has_inference) || ($is_valid && $filter === "Passing" && $has_inference) || 
+                        ($is_valid && $filter === "Not Passing" && $has_interference) || (!$is_valid && $filter === "Not Available") || ($filter === ""))) {
+                        continue;                          
+                      }
+                      if (!($filter === "Not Passing" && strpos($_SESSION[$ikey] ?? "!!!", "<p class=\"text-danger\">Not Passing</p>") === 0) &&
+                        !($filter === "Passing" && strpos($_SESSION[$ikey] ?? "!!!", "<p class=\"text-success\">Passing</p>") === 0) &&
+                        !($filter === "Not Available" && ($_SESSION[$ikey] ?? null) === null) &&
+                        !($filter === "Available" && $is_valid) && ($filter !== "")) {
+                        continue;
+                      }
+                      
                       if ($is_valid) {
                         $inference_result = $_SESSION[$ikey] ?? null;
                         $jsonForecastData = json_encode([
@@ -229,8 +253,16 @@ admin_html_head("Student's Revalida", [
                             "preboard1" => floatval($PREBOARD1["total_preboard_average"]),
                             "preboard2" => floatval($PREBOARD2["total_preboard_average"]),
                             "revalida" => floatval($REVALIDA_GRADE),
+                            "gwa" => $GWA
                         ]);
                       }
+                      
+                      $lname = $row['lname'];
+                      $fname = $row['fname'];
+                      $gender = $row['gender'];
+                      $course = $row['course'];
+                      $section = $row['section'];
+                      
                   ?>
                     <tr>
                       <td><?= $counter++ ?></td>
@@ -244,6 +276,7 @@ admin_html_head("Student's Revalida", [
                       <td><?= ($PREBOARD1["s_status"] ?: "") === "TAKEN" ? $PREBOARD1["total_preboard_average"] . "%" : "NOT TAKEN" ?></td>
                       <td><?= ($PREBOARD2["s_status"] ?: "") === "TAKEN" ? $PREBOARD2["total_preboard_average"] . "%" : "NOT TAKEN" ?></td>
                       <td><?= $REVALIDA_GRADE ?: "<a class='btn btn-outline-secondary border-0 text-start' href='".base_url()."/dean/dean_students_revalida?school_year=$school_year_id' title='Go to Revalida'>Add Revalida</a>" ?></td>
+                      <td><?= $GWA ?: "<a class='btn btn-outline-secondary border-0 text-start' href='".base_url()."/dean/dean_students_gwa?school_year=$school_year_id' title='Go to GWA'>Add GWA</a>" ?></td>
                       <td>
                         <span
                             class="fw-bold befs-forecast"
@@ -259,7 +292,26 @@ admin_html_head("Student's Revalida", [
                 </tbody>
               </table>
               <!-- End Table with stripped rows -->
-
+              <!-- Filter select -->
+              <div class="d-block float-right ps-3 mb-3" id="filter-container">
+                <div class="form-floating" style="max-width:200px;">
+                  <?php
+                  $filter = $_GET['filter'] ?? "";
+                  ?>
+                  <select class="form-select" id="filterPassing" default-value="<?= $filter === "Not Available" ? "N/A" : $filter ?>">
+                    <option value="">-</option>
+                    <?php if (!$has_inference): ?>
+                    <option value="Available">Available</option>
+                    <option value="N/A">Not Available</option>
+                    <?php else: ?>
+                    <option value="Not Passing">Not Passing</option>
+                    <option value="Passing">Passing</option>
+                    <option value="N/A">Not Available</option>
+                    <?php endif; ?>
+                  </select>
+                  <label for="filterPassing" class="fw-bold">Filter Passer:</label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -274,8 +326,8 @@ admin_html_head("Student's Revalida", [
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <?php admin_html_body_end([
-      ["type" => "script", "src" => "assets/vendor/simple-datatables/simple-datatables.js"],
       ["type" => "script", "src" => "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"],
+      ["type" => "script", "src" => "assets/vendor/simple-datatables/simple-datatables.js"],
       ["type" => "script", "src" => "https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.min.js"],
       ["type" => "script", "src" => "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"],
       ["type" => "script", "src" => "assets/js/main.js"],

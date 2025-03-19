@@ -1,6 +1,6 @@
 <?php 
 
-authenticated_page("admin");
+authenticated_page("dean");
 
 if ($_SERVER['REQUEST_METHOD'] === "POST"): // POST METHOD
   
@@ -85,18 +85,11 @@ admin_html_head("Datasets", [
 
 ?>
 <body>
-  <!-- ======= Header ======= -->
-  <?php require_once get_admin_header(); ?>
-  <!-- End Header -->
-  <!-- ======= Sidebar ======= -->
-  <?php
-  $query=conn()->query("select * from school_year where status = 'Current Set' and user_id = '". user_id() . "'")or die(mysqli_error(conn()->get_conn()));
-  if($row=mysqli_fetch_array($query))
-  {
-    require_once get_admin_sidebar();
-  }
-  ?>
-  <!-- End Sidebar-->
+  
+  <!-- Header and Sidebar -->
+  <?php require_once get_dean_header(); ?>
+  <?php require_once get_dean_sidebar(); ?>
+
 
   <main id="main" class="main">
 

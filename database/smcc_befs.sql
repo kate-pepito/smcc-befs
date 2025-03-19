@@ -673,6 +673,22 @@ CREATE TABLE `revalida_grade` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gwa_percentage`
+--
+
+CREATE TABLE `gwa_percentage` (
+  `id` int(11) NOT NULL,
+  `school_year_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `gwa` DECIMAL(5,2) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+
+
 
 -- --------------------------------------------------------
 
@@ -828,6 +844,12 @@ ALTER TABLE `selected_model`
 ALTER TABLE `revalida_grade`
   ADD PRIMARY KEY (`id`) USING BTREE;
 
+--
+-- Indexes for table `gwa_percentage`
+--
+ALTER TABLE `gwa_percentage`
+  ADD PRIMARY KEY (`id`) USING BTREE;
+
 
 --
 -- Indexes for table `board_exam_grade`
@@ -936,6 +958,12 @@ ALTER TABLE `revalida_grade`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `gwa_percentage`
+--
+ALTER TABLE `gwa_percentage`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `board_exam_grade`
 --
 ALTER TABLE `board_exam_grade`
@@ -962,6 +990,14 @@ ALTER TABLE `revalida_grade`
   ADD CONSTRAINT `unique_school_year_student_revalida` UNIQUE (`school_year_id`, `student_id`),
   ADD CONSTRAINT `revalida_grade_ibfk_1` FOREIGN KEY (`school_year_id`) REFERENCES `school_year` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `revalida_grade_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `gwa_percentage`
+--
+ALTER TABLE `gwa_percentage`
+  ADD CONSTRAINT `unique_school_year_student_gwa_percentage` UNIQUE (`school_year_id`, `student_id`),
+  ADD CONSTRAINT `gwa_percentage_ibfk_1` FOREIGN KEY (`school_year_id`) REFERENCES `school_year` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `gwa_percentage_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `board_exam_grade`
