@@ -109,8 +109,9 @@ admin_html_head("Assign Subjects", [
             <h1>Assign Subjects</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="dean_dashboard">Dashboard</a></li>
-                    <li class="breadcrumb-item">Assign Subjects</li>
+                    <li class="breadcrumb-item"><a href="dean_home_page">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="dean_reviewers">Reviewer</a></li>
+                    <li class="breadcrumb-item">Assign Subjects (<?= "$faculty_fname $faculty_lname" ?>)</li>
                 </ol>
             </nav>
         </div>
@@ -121,7 +122,7 @@ admin_html_head("Assign Subjects", [
                 <div class="col-lg-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Assign Subjects for: <?php echo $faculty_fname . " " . $faculty_lname; ?></h5>
+                            <h5 class="card-title">Assign Subjects for: <?= "$faculty_fname $faculty_lname" ?></h5>
                             <table class="table datatable">
                                 <thead>
                                     <tr>
