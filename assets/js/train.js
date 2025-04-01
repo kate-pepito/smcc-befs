@@ -141,7 +141,15 @@ $(function () {
                     </tbody>
                 </table>
             `);
-            $("#confusion-matrix-container").empty().append($table);
+            const $tableDescription = $(/*html*/`
+                <code class="text-secondary fst-italic">
+                    <div>1. True Positives (TP = 14): Correctly identified students who will pass.</div>
+                    <div>2. True Negatives (TN = 28): Correctly identified students who will not pass.</div>
+                    <div>3. False Positives (FP = 7): Incorrectly predicted "Passer" when the student actually failed.</div> 
+                    <div>4. False Negatives (FN = 11): Incorrectly predicted "Not a Passer" when the student actually passed.</div>
+                </code><br />
+            `)
+            $("#confusion-matrix-container").empty().append($table).append($tableDescription);
         }
 
         function plotRocCurve(roc) {
@@ -458,8 +466,31 @@ $(function () {
                 !!data.metrics && Object.keys(data.metrics)?.forEach((metrics) => {
                     let $content = null;
                     if (metrics === "accuracy" || metrics === "precision" || metrics === "recall" || metrics === "f1_score" || metrics === "roc_auc" || metrics === "pr_auc") {
+                        let description;
+                        switch (metrics) {
+                            case "accuracy":
+                                description = "Measures how often the model makes the correct prediction overall.";
+                                break;
+                            case "precision":
+                                description = `Out of all students predicted as "Passers," this shows how many were actually`;
+                                break;
+                            case "recall":
+                                description = "Out of all actual Passers, this indicates how many were correctly identified by the model.";
+                                break;
+                            case "f1_score":
+                                description = "A balance between Precision and Recall.";
+                                break;
+                            case "roc_auc":
+                                description = "Indicates how well the model distinguishes between students who will pass and the better the separation.";
+                                break;
+                            case "pr_auc":
+                                description = "Reflects how reliable the model’s predictions are when identifying Passers, with higher values indicating fewer mistakes in classifying them.";
+                                break;
+                        }
                         $content = $(/*html*/`<div>
                             ${metrics.split("_").map((v) => v[0].toUpperCase() + v.substring(1)).join(" ")}: <span class="fw-bold">${(Math.round(Number.parseFloat(data.metrics[metrics]) * 100000) / 1000)} %</span>
+                            &nbsp;
+                            <span class="text-secondary fst-italic">- ${description}</span>
                         </div>`);
                     } else if (metrics === "classification_report") {
                         $content = $(/*html*/`
